@@ -6,4 +6,4 @@ var CrudController = /** @class */ (function () {
     return CrudController;
 }());
 exports.CrudController = CrudController;
-//# sourceMappingURL=CrudController.js.map
+//# sourceMappingURL=Crudcontroller.js.map

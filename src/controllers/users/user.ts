@@ -1,8 +1,8 @@
-import { CrudController } from "../CrudController";
-import { ELASTIC_CLIENT } from "../../elasticsearch";
+import { Crudcontroller } from "../crudcontroller";
+import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import {ApiResponse, RequestParams} from "@elastic/elasticsearch";
 
-export class UserController extends CrudController {
+export class UserController extends Crudcontroller {
 
     create(req, res): void {
         res.json({message: 'POST /users request received'});

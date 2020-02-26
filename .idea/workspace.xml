@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="77570d44-701b-4c15-b4a6-e26a97c75a31" name="Default Changelist" comment="" />
+    <list default="true" id="77570d44-701b-4c15-b4a6-e26a97c75a31" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/controllers/CrudController.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/controllers/CrudController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/CrudController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/crudcontroller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/users/User.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/users/user.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/users/User.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/users/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/elasticsearch.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/elasticsearch.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/users/User.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/users/user.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +30,11 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1YIpkEG2e7jl5j0xBS7643aFan7" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="autoscrollToSource" value="true" />
@@ -26,8 +44,10 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="javascript.nodejs.core.library.configured.version" value="8.10.0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/utils" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -124,6 +144,7 @@
       <updated>1582640103581</updated>
       <workItem from="1582640105565" duration="10737000" />
       <workItem from="1582651595926" duration="16211000" />
+      <workItem from="1582667859169" duration="2217000" />
     </task>
     <servers />
   </component>
@@ -143,22 +164,26 @@
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
     <state x="606" y="286" width="524" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/67.27.1613.1023@67.27.1613.1023" timestamp="1582663567468" />
-    <state width="1590" height="254" key="GridCell.Tab.0.bottom" timestamp="1582667818582">
+    <state x="651" y="281" width="424" height="513" key="FileChooserDialogImpl" timestamp="1582751187835">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
-    <state width="1590" height="254" key="GridCell.Tab.0.bottom/67.27.1613.1023@67.27.1613.1023" timestamp="1582667818582" />
-    <state width="1590" height="254" key="GridCell.Tab.0.center" timestamp="1582667818582">
+    <state x="651" y="281" width="424" height="513" key="FileChooserDialogImpl/67.27.1613.1023@67.27.1613.1023" timestamp="1582751187835" />
+    <state width="1590" height="254" key="GridCell.Tab.0.bottom" timestamp="1582751316681">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
-    <state width="1590" height="254" key="GridCell.Tab.0.center/67.27.1613.1023@67.27.1613.1023" timestamp="1582667818582" />
-    <state width="1590" height="254" key="GridCell.Tab.0.left" timestamp="1582667818581">
+    <state width="1590" height="254" key="GridCell.Tab.0.bottom/67.27.1613.1023@67.27.1613.1023" timestamp="1582751316681" />
+    <state width="1590" height="254" key="GridCell.Tab.0.center" timestamp="1582751316679">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
-    <state width="1590" height="254" key="GridCell.Tab.0.left/67.27.1613.1023@67.27.1613.1023" timestamp="1582667818581" />
-    <state width="1590" height="254" key="GridCell.Tab.0.right" timestamp="1582667818582">
+    <state width="1590" height="254" key="GridCell.Tab.0.center/67.27.1613.1023@67.27.1613.1023" timestamp="1582751316679" />
+    <state width="1590" height="254" key="GridCell.Tab.0.left" timestamp="1582751316678">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
-    <state width="1590" height="254" key="GridCell.Tab.0.right/67.27.1613.1023@67.27.1613.1023" timestamp="1582667818582" />
+    <state width="1590" height="254" key="GridCell.Tab.0.left/67.27.1613.1023@67.27.1613.1023" timestamp="1582751316678" />
+    <state width="1590" height="254" key="GridCell.Tab.0.right" timestamp="1582751316680">
+      <screen x="67" y="27" width="1613" height="1023" />
+    </state>
+    <state width="1590" height="254" key="GridCell.Tab.0.right/67.27.1613.1023@67.27.1613.1023" timestamp="1582751316680" />
     <state x="362" y="145" key="SettingsEditor" timestamp="1582640711120">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>

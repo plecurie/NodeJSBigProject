@@ -1,7 +1,7 @@
 import * as express from 'express'
 import { userRouter } from "./routes";
-import {ES_PORT, HOST, PORT} from "./utils/constants";
-import { ELASTIC_CLIENT } from "./elasticsearch";
+import { ES_PORT, HOST, PORT } from "./utils/constants";
+import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 
 class Application {
 
