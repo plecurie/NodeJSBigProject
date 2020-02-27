@@ -3,11 +3,18 @@
     "module": "commonjs",
     "target": "es5",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "es6",
+      "scripthost",
+      "es2017"
+    ]
   },
   "files": [
     "./node_modules/@types/mocha/index.d.ts",
-    "./node_modules/@types/node/index.d.ts"
+    "./node_modules/@types/node/index.d.ts",
+    "../../.WebStorm2019.3/config/javascript/nodejs/10.10.0/node-typings/node_modules/@types/node/globals.d.ts"
   ],
   "include": [
     "src/**/*.ts"

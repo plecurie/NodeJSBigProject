@@ -25,3 +25,7 @@ router.delete('/', (req: Request, res: Response) => {
 router.get('/test', (req: Request, res: Response) => {
     userController.test(req, res)
 });
+
+router.get('/ocr', (req: Request, res: Response) => {
+    userController.ocr(req, res)
+});
