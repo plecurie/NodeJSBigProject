@@ -1,48 +1,67 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import {ApiResponse, RequestParams} from "@elastic/elasticsearch";
 
 export class UserController extends Crudcontroller {
 
-    create(req, res): void {
-        res.json({message: 'POST /users request received'});
-    }
-
-    delete(req, res): void {
-        res.json({message: 'DELETE /users request received'});
+    create(req, res) : void {
+        ELASTIC_CLIENT.index({
+            index: 'user',
+            type: '_doc',
+            body : {
+                "firstname": req.body.firstname,
+                "lastname": req.body.lastname,
+                "email": req.body.email
+            }
+        }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        })
     }
 
     read(req, res): void {
-        res.json({message: 'GET /users request received'});
-    }
-
-    test(req, res): Promise<void> {
-
-        res.json({message: 'GET /users/test received'});
-
-        const params: RequestParams.Search = {
-            index: 'toto',
-            body: {
-                query: {
-                    match: {
-                        quote: 'toto'
-                    }
-                }
-            }
-        };
-
-        return ELASTIC_CLIENT
-            .search(params)
-            .then((result: ApiResponse) => {
-                console.log(result.body.hits.hits)
-            })
-            .catch((err: Error) => {
-                console.log(err)
-            })
+        ELASTIC_CLIENT.get({
+                index: 'user',
+                id: req.query.id
+            }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        })
     }
 
     update(req, res): void {
-        res.json({message: 'UPDATE /users request received'});
+        // ELASTIC_CLIENT.update({
+        //     index: 'user',
+        //     id: req.query.id,
+        //     body: {
+        //         doc: {
+        //             "firstname": req.body.firstname,
+        //             "lastname": req.body.lastname,
+        //             "email": req.body.email
+        //         }
+        //     }
+        // }, (err, response) => {
+        //     if (err)
+        //         res.send(err);
+        //     else
+        //         res.json(response)
+        // })
+    }
+
+    delete(req, res): void {
+        ELASTIC_CLIENT.delete({
+            index: 'user',
+            id: req.query.id,
+            type: '_doc'
+        }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        });
     }
 
 }

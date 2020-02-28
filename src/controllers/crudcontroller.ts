@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 
 export abstract class Crudcontroller {
-    public abstract test(req: Request, res: Response): void
     public abstract create(req: Request, res: Response): void
     public abstract read(req: Request, res: Response): void
     public abstract update(req: Request, res: Response): void
