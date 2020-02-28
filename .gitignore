@@ -3,7 +3,8 @@ coverage
 # API keys and secrets
 .env
 node_modules
-.idea
+idea
 .DS_Store
 Thumbs.db
 dist/**/*
+src/uploads

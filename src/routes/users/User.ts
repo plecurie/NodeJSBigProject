@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
 import * as express from 'express'
 import  { userController } from '../../controllers'
+import * as multer from 'multer';
+import { RequestHandler } from 'express-serve-static-core';
+
+const upload = multer({dest: `./src/uploads`});
 
 export const router = express.Router({
-    strict: true
+    strict: true,
+    mergeParams: true
 });
 
 router.post('/', (req: Request, res: Response) => {
@@ -26,6 +31,6 @@ router.get('/test', (req: Request, res: Response) => {
     userController.test(req, res)
 });
 
-router.get('/ocr', (req: Request, res: Response) => {
+router.post('/ocr', upload.array('file'), (req: Request, res: Response) => {
     userController.ocr(req, res)
 });

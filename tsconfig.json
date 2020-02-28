@@ -11,11 +11,10 @@
       "es2017"
     ]
   },
-  "files": [
-    "./node_modules/@types/mocha/index.d.ts",
-    "./node_modules/@types/node/index.d.ts",
-    "../../.WebStorm2019.3/config/javascript/nodejs/10.10.0/node-typings/node_modules/@types/node/globals.d.ts"
-  ],
+  // "files": [
+  //   "./node_modules/@types/mocha/index.d.ts",
+  //   "./node_modules/@types/node/index.d.ts",
+  // ],
   "include": [
     "src/**/*.ts"
   ],

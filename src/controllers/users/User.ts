@@ -1,8 +1,8 @@
 import { CrudController } from "../CrudController";
 import { ELASTIC_CLIENT } from "../../elasticsearch";
 import {ApiResponse, RequestParams} from "@elastic/elasticsearch";
-import {exec} from "../../utils/exec";
-import {codes} from "../../utils/country_code";
+import { OcrService } from '../../services';
+const ocrService = OcrService.getInstance();
 
 export class UserController extends CrudController {
 
@@ -48,14 +48,9 @@ export class UserController extends CrudController {
     }
 
     async ocr(req, res): Promise<void> {
-        const isinReg = /^[a-z]{2}[O0-9]+$/i;
-        //const {path} = req.query;
-        const path = 'Securities.png';
-        const data = (<string>await exec(`tesseract ${path} stdout`))
-            .split(' ')
-            .filter(v => isinReg.test(v))
-            .filter(v => codes.includes(v.substring(0, 2).toUpperCase()));
-        //await exec(`rm ${path}`);
+        const path = req.files[0].path;
+        const data = await ocrService.processOcr(path);
+        ocrService.removeImageOcr(path);
         return res.json({data});
     }
 }
