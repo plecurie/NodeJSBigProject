@@ -1,5 +1,9 @@
-import { router as userRouter } from './users/user'
+import { router as usersRouter } from './users/users'
+import { router as productsRouter } from './products/products'
+import  { router as producersRouter } from './producers/producers'
 
 export {
-    userRouter
+    usersRouter,
+    productsRouter,
+    producersRouter
 };

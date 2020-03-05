@@ -1,7 +1,7 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 
-export class UserController extends Crudcontroller {
+export class UsersController extends Crudcontroller {
 
     create(req, res) : void {
         ELASTIC_CLIENT.index({

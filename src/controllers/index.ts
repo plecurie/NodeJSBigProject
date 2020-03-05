@@ -1,7 +1,13 @@
-import { UserController } from "./users/user";
+import { UsersController } from "./users/users";
+import {ProducersController} from "./producers/producers";
+import {ProductsController} from "./product/products";
 
-const userController = new UserController();
+const userController = new UsersController();
+const producersController = new ProducersController();
+const productsController = new ProductsController();
 
 export {
-    userController
+    userController,
+    producersController,
+    productsController
 };
