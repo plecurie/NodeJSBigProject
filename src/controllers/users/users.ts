@@ -1,16 +1,20 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import {User} from "../../models/User";
 
 export class UsersController extends Crudcontroller {
 
     create(req, res) : void {
+
+        const user = new User(req.body.firstname, req.body.lastname, req.body.email);
+
         ELASTIC_CLIENT.index({
             index: 'scala',
             type: 'users',
             body : {
-                "firstname": req.body.firstname,
-                "lastname": req.body.lastname,
-                "email": req.body.email
+                "firstname": user.firstname,
+                "lastname": user.lastname,
+                "email": user.email
             }
         }, (err, response) => {
             if (err)
