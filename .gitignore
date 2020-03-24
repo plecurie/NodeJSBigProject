@@ -5,7 +5,7 @@ coverage
 idea
 .DS_Store
 Thumbs.db
-dist/**/*
+dist/
 src/uploads/
 
 node_modules/
