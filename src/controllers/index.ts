@@ -1,6 +1,6 @@
 import { UsersController } from "./users/users";
 import {ProducersController} from "./producers/producers";
-import {ProductsController} from "./product/products";
+import {ProductsController} from "./products/products";
 
 const userController = new UsersController();
 const producersController = new ProducersController();

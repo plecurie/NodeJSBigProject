@@ -7,7 +7,7 @@ import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 
 class Application {
 
-    app: express.Application;
+    private app: express.Application;
 
     constructor() {
         this.app = express();
@@ -23,17 +23,10 @@ class Application {
 
     start(): void {
 
-        this.app.listen(PORT, (err) => {
-
-            if (err) {
-                return console.log(err)
-            }
-
-            return console.log('>>>> Node server is listening on', HOST + ":" + PORT)
+        this.app.listen(PORT, () => {
+            console.log('>>>> Node server is listening on', HOST + ":" + PORT)
         });
-
-
-
+        
         ELASTIC_CLIENT.ping(((err, result) => {
             if (err) {
                 throw new Error('>>>> Failed to connect to ' + HOST + ":" + ES_PORT)

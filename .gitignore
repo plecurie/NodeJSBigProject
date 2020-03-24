@@ -1,0 +1,11 @@
+public/css/main.css
+coverage
+# API keys and secrets
+.env
+idea
+.DS_Store
+Thumbs.db
+dist/**/*
+src/uploads/
+
+node_modules/

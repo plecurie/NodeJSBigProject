@@ -1,6 +1,8 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import {User} from "../../models/User";
+import { OcrService } from '../../services';
+const ocrService = OcrService.getInstance();
 
 export class UsersController extends Crudcontroller {
 
@@ -69,5 +71,13 @@ export class UsersController extends Crudcontroller {
                 res.json(response)
         });
     }
+
+    async ocr(req, res): Promise<void> {
+        const path = req.files[0].path;
+        const data = await ocrService.processOcr(path);
+        ocrService.removeImageOcr(path);
+        return res.json({data});
+    }
+
 
 }
