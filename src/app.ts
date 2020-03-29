@@ -10,6 +10,7 @@ class Application {
     private app: express.Application;
 
     constructor() {
+        require('dotenv').config();
         this.app = express();
         this.routes()
     }

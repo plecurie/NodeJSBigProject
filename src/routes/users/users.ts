@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import * as express from 'express'
 import  { userController } from '../../controllers'
 import * as multer from 'multer';
-import { RequestHandler } from 'express-serve-static-core';
 
 const upload = multer({dest: `./src/uploads`});
 
@@ -30,3 +29,7 @@ router.delete('/', (req: Request, res: Response) => {
 router.post('/ocr', upload.array('file'), (req: Request, res: Response) => {
     userController.ocr(req, res)
 });
+
+router.post('/forgot-password', (req: Request, res: Response) => {
+    userController.forgotPassword(req, res);
+})

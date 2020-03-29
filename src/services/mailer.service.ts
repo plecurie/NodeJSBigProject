@@ -1,0 +1,35 @@
+import * as nodemailer from 'nodemailer';
+
+export class MailerService {
+    private static instance: MailerService;
+    private transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: 'tibdevtest@gmail.com',
+            pass: 'ozsppzispiznnuko'
+        }
+    });
+
+    constructor() {}
+    
+    public static getInstance(): MailerService {
+        if(!MailerService.instance) {
+            MailerService.instance = new MailerService();
+        }
+        return MailerService.instance;
+    }
+
+    public async sendEmail(to: string, newPassword: string) {
+        let info = await this.transporter.sendMail({
+            from: 'tibdevtest@gmail.com',
+            to: to,
+            subject: 'Reset Password',
+            html: `<p> Here, your new password generated ${newPassword} (write it down somewhere), 
+            if you want to change your password, login to your account.</p>`,
+        });
+        return info;
+    }
+}
