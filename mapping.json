@@ -1,0 +1,11 @@
+{
+  "users" : {
+    "properties" : {
+      "firstname" : { "type" : "text" },
+      "lastname" : { "type" : "text" },
+      "password" : { "type" : "text" },
+      "email" : { "type" : "text" }
+    }
+  },
+
+}
