@@ -1,11 +1,13 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import {User} from "../../models/User";
-import { OcrService, MailerService } from '../../services';
+import { OcrService, MailerService, UserService, GeneratorService } from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 
 const ocrService = OcrService.getInstance();
 const mailerService = MailerService.getInstance();
+const userService = UserService.getInstance();
+const generatorService = GeneratorService.getInstance();
 
 export class UsersController extends Crudcontroller {
 
@@ -87,20 +89,12 @@ export class UsersController extends Crudcontroller {
 
     async forgotPassword(req, res): Promise<void> {
         try {
-            const searchUser = await ELASTIC_CLIENT.search({
-                index: 'scala',
-                type: 'users',
-                body: { query: { match: { email: req.body.email }}}
-            }).then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
+            const searchUser = await userService.searchUser({ email: req.body.email })
+            .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
             if (searchUser) {
-                const randomPassword = String.fromCodePoint(...Array.from({length: 16}, () => Math.floor(Math.random() * 57) + 65))
+                const randomPassword = generatorService.randomPasswordCrypted();
                 const newPasswordCrypted = jsonwebtoken.sign(randomPassword, process.env.JWT_KEY);
-                const passwordUpdated = await ELASTIC_CLIENT.update({
-                    index: 'scala',
-                    type: 'users',
-                    id: searchUser._id,
-                    body: { doc: { password: newPasswordCrypted }}
-                }).then(pu => pu.body);
+                const passwordUpdated = await userService.updateUserPassword({id: searchUser._id, password: newPasswordCrypted});
                 
                 if (passwordUpdated._shards.failed == 0) {
                     await mailerService.sendEmail(req.body.email, randomPassword);
@@ -115,6 +109,4 @@ export class UsersController extends Crudcontroller {
             console.error(err);
         }
     }
-
-
 }
