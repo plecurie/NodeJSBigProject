@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 export class GeneratorService {
     private static instance: GeneratorService;
     constructor () {}
@@ -9,8 +11,17 @@ export class GeneratorService {
         return GeneratorService.instance;
     }
 
-    public randomPasswordCrypted() {
+    public randomPassword(): string {
         return String.fromCodePoint(...Array.from({length: 16}, () => Math.floor(Math.random() * 57) + 65));
+    }
+
+    public async hashPassword(password: string) {
+        try {
+            const passwordHased = await bcrypt.hash(password, 15);
+            return passwordHased;
+        } catch(err) {
+            throw err;
+        }
     }
 
 }

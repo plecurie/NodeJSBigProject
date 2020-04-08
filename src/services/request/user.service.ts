@@ -1,6 +1,7 @@
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import bodyParser = require("body-parser");
 import { ApiResponse } from "@elastic/elasticsearch";
+const bcrypt = require('bcrypt');
 
 export class UserService {
     private static instance: UserService;
@@ -30,5 +31,15 @@ export class UserService {
             type: this.types,
             body: { query: { match: user }}
         });
+    }
+
+    public async checkValidPassword(passwordUser: string, hash: string) {
+        try {
+            const verifyPassword = await bcrypt.compare(passwordUser, hash);
+            if (verifyPassword) return true;
+            return false
+        } catch(err) {
+          throw err;  
+        }
     }
 }

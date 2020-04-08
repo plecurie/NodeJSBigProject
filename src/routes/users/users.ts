@@ -30,6 +30,14 @@ router.post('/ocr', upload.array('file'), (req: Request, res: Response) => {
     userController.ocr(req, res)
 });
 
-router.post('/forgot-password', (req: Request, res: Response) => {
+router.put('/forgot-password', (req: Request, res: Response) => {
     userController.forgotPassword(req, res);
+})
+
+router.post('/login', (req: Request, res: Response) => {
+    userController.login(req, res);
+})
+
+router.post('/checkToken', (req: Request, res: Response) => {
+    userController.checkToken(req, res);
 })
