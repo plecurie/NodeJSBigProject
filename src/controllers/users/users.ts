@@ -11,10 +11,10 @@ const generatorService = GeneratorService.getInstance();
 
 export class UsersController extends Crudcontroller {
 
-    create(req, res) : void {
+    async create(req, res) {
 
-        const user = new User(req.body.firstname, req.body.lastname, req.body.email, req.body.password);
-        const mdpCrypted = jsonwebtoken.sign(user.password, process.env.JWT_KEY);
+        const user = new User(req.body.firstname, req.body.lastname, req.body.birthday, req.body.email, req.body.password);
+        const mdpCrypted = await generatorService.hashPassword(req.body.password);
         
         ELASTIC_CLIENT.index({
             index: 'scala',
@@ -22,6 +22,7 @@ export class UsersController extends Crudcontroller {
             body : {
                 firstname: user.firstname,
                 lastname: user.lastname,
+                birthday: user.birthday,
                 email: user.email,
                 password: mdpCrypted
             }
