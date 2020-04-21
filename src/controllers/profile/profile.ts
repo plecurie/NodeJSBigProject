@@ -1,22 +1,21 @@
 import { Crudcontroller } from "../crudcontroller";
+import { Profile } from "../../models/Profile";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import { Producer } from "../../models/Producer";
 
-var producer : Producer;
+var profile : Profile;
 
-export class ProducersController extends Crudcontroller {
-
+export class ProfileController extends Crudcontroller {
     create(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        profile = new Profile(req.body.username, req.body.criteria);
 
         ELASTIC_CLIENT.index({
             index: 'scala',
             type: 'database',
             body : {
-                "type": "producer",
-                "name": producer.name,
-                "products": producer.products,
+                "type": "profile",
+                "username": profile.username,
+                "criteria": profile.criteria
             }
         }, (err, response) => {
             if (err)
@@ -44,7 +43,7 @@ export class ProducersController extends Crudcontroller {
 
     update(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        profile = new Profile(req.body.username, req.body.criteria);
 
         ELASTIC_CLIENT.update({
             index: 'scala',
@@ -52,9 +51,9 @@ export class ProducersController extends Crudcontroller {
             id: req.query.id,
             body: {
                 doc: {
-                    "type": "producer",
-                    "name": producer.name,
-                    "products": producer.products,
+                    "type": "profile",
+                    "username": profile.username,
+                    "criteria": profile.criteria
                 }
             }
         }, (err, response) => {

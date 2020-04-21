@@ -1,22 +1,28 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import {User} from "../../models/User";
+import { User } from "../../models/User";
 import { OcrService } from '../../services';
 const ocrService = OcrService.getInstance();
+
+var user : User;
 
 export class UsersController extends Crudcontroller {
 
     create(req, res) : void {
 
-        const user = new User(req.body.firstname, req.body.lastname, req.body.email);
+        user = new User(req.body.firstname, req.body.lastname, req.body.birthdate, req.body.email, req.body.password, req.body.username);
 
         ELASTIC_CLIENT.index({
             index: 'scala',
-            type: 'users',
+            type: 'database',
             body : {
+                "type": "user",
                 "firstname": user.firstname,
                 "lastname": user.lastname,
-                "email": user.email
+                "birthdate": user.birthdate,
+                "email": user.email,
+                "password": user.password,
+                "username": user.username
             }
         }, (err, response) => {
             if (err)
@@ -29,7 +35,7 @@ export class UsersController extends Crudcontroller {
     read(req, res): void {
         ELASTIC_CLIENT.get({
                 index: 'scala',
-                type: 'users',
+                type: 'database',
                 id: req.query.id
             }, (err, response) => {
             if (err)
@@ -40,15 +46,22 @@ export class UsersController extends Crudcontroller {
     }
 
     update(req, res): void {
+
+        user = new User(req.body.firstname, req.body.lastname, req.body.birthdate, req.body.email, req.body.password, req.body.username);
+
          ELASTIC_CLIENT.update({
              index: 'scala',
-             type: 'users',
+             type: 'database',
              id: req.query.id,
              body: {
                  doc: {
-                     "firstname": req.body.firstname,
-                     "lastname": req.body.lastname,
-                     "email": req.body.email
+                     "type": "user",
+                     "firstname": user.firstname,
+                     "lastname": user.lastname,
+                     "birthdate": user.birthdate,
+                     "email": user.email,
+                     "password": user.password,
+                     "username": user.username
                  }
              }
          }, (err, response) => {
@@ -62,7 +75,7 @@ export class UsersController extends Crudcontroller {
     delete(req, res): void {
         ELASTIC_CLIENT.delete({
             index: 'scala',
-            type: 'users',
+            type: 'database',
             id: req.query.id,
         }, (err, response) => {
             if (err)

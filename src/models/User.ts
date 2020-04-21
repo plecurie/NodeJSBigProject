@@ -1,16 +1,19 @@
-import {Product} from "./Product";
-
 export class User {
 
     id: Number;
     firstname: String;
     lastname: String;
+    birthdate: Date;
     email: String;
-    portfolio: [Product];
+    password: String;
+    username: String;
 
-    constructor(firstname: String, lastname: String, email: String) {
+    constructor(firstname: String, lastname: String, birthdate: Date, email: String, password: String, username: String) {
         this.firstname = firstname;
         this.lastname = lastname;
-        this.email = email
+        this.birthdate = birthdate;
+        this.email = email;
+        this.password = password;
+        this.username = username;
     }
 }

@@ -1,13 +1,14 @@
 export class Product {
 
-    id: Number;
-    code: String;
+    isin_code: String;
     name: String;
-    fees: Number;
+    category: String;
+    criteria: Map<String, String>;
 
-    constructor(code: String, name: String, fees: Number) {
-        this.code = code;
+    constructor(isin_code: String, name: String, category: String, criteria: Map<String, String>) {
+        this.isin_code = isin_code;
         this.name = name;
-        this.fees = fees
+        this.category = category;
+        this.criteria = criteria;
     }
 }

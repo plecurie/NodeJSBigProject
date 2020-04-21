@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import * as express from 'express'
 import  { userController } from '../../controllers'
 import * as multer from 'multer';
-import { RequestHandler } from 'express-serve-static-core';
 
 const upload = multer({dest: `./src/uploads`});
 

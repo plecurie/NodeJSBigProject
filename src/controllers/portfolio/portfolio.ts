@@ -1,22 +1,22 @@
 import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import { Producer } from "../../models/Producer";
+import { Portfolio } from "../../models/Portfolio";
 
-var producer : Producer;
+var portfolio : Portfolio;
 
-export class ProducersController extends Crudcontroller {
+export class PortfolioController extends Crudcontroller {
 
     create(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        portfolio = new Portfolio(req.body.username,req.body.products);
 
         ELASTIC_CLIENT.index({
             index: 'scala',
             type: 'database',
             body : {
-                "type": "producer",
-                "name": producer.name,
-                "products": producer.products,
+                "type": "portfolio",
+                "username": portfolio.username,
+                "products": portfolio.products
             }
         }, (err, response) => {
             if (err)
@@ -44,7 +44,7 @@ export class ProducersController extends Crudcontroller {
 
     update(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        portfolio = new Portfolio(req.body.username,req.body.products);
 
         ELASTIC_CLIENT.update({
             index: 'scala',
@@ -52,9 +52,9 @@ export class ProducersController extends Crudcontroller {
             id: req.query.id,
             body: {
                 doc: {
-                    "type": "producer",
-                    "name": producer.name,
-                    "products": producer.products,
+                    "type": "portfolio",
+                    "username": portfolio.username,
+                    "products": portfolio.products
                 }
             }
         }, (err, response) => {
@@ -63,7 +63,6 @@ export class ProducersController extends Crudcontroller {
             else
                 res.json(response)
         })
-
     }
 
     delete(req, res): void {
