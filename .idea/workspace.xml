@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="77570d44-701b-4c15-b4a6-e26a97c75a31" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mapping.json" beforeDir="false" afterPath="$PROJECT_DIR$/mapping.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/users/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/users/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/User.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/User.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Base-Projet-IT-v3.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/services/excelToJson.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +42,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="javascript.nodejs.core.library.configured.version" value="8.10.0" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/routes" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -50,6 +51,9 @@
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/routes" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/routes/users" />
       <recent name="$PROJECT_DIR$/src/controllers" />
@@ -147,7 +151,7 @@
       <workItem from="1585427722228" duration="2573000" />
       <workItem from="1587380913982" duration="1818000" />
       <workItem from="1587415526765" duration="3605000" />
-      <workItem from="1587469086171" duration="11105000" />
+      <workItem from="1587469086171" duration="16422000" />
     </task>
     <servers />
   </component>
@@ -171,30 +175,34 @@
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
     <state x="651" y="281" width="424" height="513" key="FileChooserDialogImpl/67.27.1613.1023@67.27.1613.1023" timestamp="1585056758877" />
-    <state width="1830" height="490" key="GridCell.Tab.0.bottom" timestamp="1587486194630">
+    <state width="1830" height="224" key="GridCell.Tab.0.bottom" timestamp="1587490457713">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.bottom/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761088" />
     <state width="1824" height="266" key="GridCell.Tab.0.bottom/67.27.1847.897@67.27.1847.897" timestamp="1585152756188" />
-    <state width="1830" height="490" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1587486194630" />
-    <state width="1830" height="490" key="GridCell.Tab.0.center" timestamp="1587486194629">
+    <state width="1830" height="224" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1587490457713" />
+    <state width="1830" height="224" key="GridCell.Tab.0.center" timestamp="1587490457712">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.center/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.center/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="490" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1587486194629" />
-    <state width="1830" height="490" key="GridCell.Tab.0.left" timestamp="1587486194629">
+    <state width="1830" height="224" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1587490457712" />
+    <state width="1830" height="224" key="GridCell.Tab.0.left" timestamp="1587490457712">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.left/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.left/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="490" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1587486194629" />
-    <state width="1830" height="490" key="GridCell.Tab.0.right" timestamp="1587486194630">
+    <state width="1830" height="224" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1587490457712" />
+    <state width="1830" height="224" key="GridCell.Tab.0.right" timestamp="1587490457712">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.right/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.right/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="490" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1587486194630" />
+    <state width="1830" height="224" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1587490457712" />
+    <state x="698" y="270" width="580" height="564" key="MultipleFileMergeDialog" timestamp="1587491769179">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="698" y="270" width="580" height="564" key="MultipleFileMergeDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1587491769179" />
     <state x="362" y="145" key="SettingsEditor" timestamp="1582640711120">
       <screen x="67" y="27" width="1613" height="1023" />
     </state>

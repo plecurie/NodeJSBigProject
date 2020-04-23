@@ -2,10 +2,9 @@ public/css/main.css
 coverage
 # API keys and secrets
 .env
-idea
+node_modules/
+.idea/
 .DS_Store
 Thumbs.db
-dist/
-src/uploads/
-
-node_modules/
+dist/**/*
+src/uploads
