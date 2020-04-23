@@ -1,6 +1,6 @@
-import {Crudcontroller} from "../crudcontroller";
+import {CrudUser} from "../../utils/cruds/crud-user";
 
-export class ProducersController extends Crudcontroller {
+export class ProducersController extends CrudUser {
     create(req, res): void {
     }
 

@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
-import * as express from 'express'
-import  { userController } from '../../controllers'
-import * as multer from 'multer';
-
-const upload = multer({dest: `./src/uploads`});
+import * as express from 'express';
+import  { userController } from '../../controllers';
 
 export const router = express.Router({
     strict: true,
@@ -25,19 +22,3 @@ router.post('/update',(req: Request, res: Response) => {
 router.delete('/', (req: Request, res: Response) => {
     userController.delete(req, res);
 });
-
-router.post('/ocr', upload.array('file'), (req: Request, res: Response) => {
-    userController.ocr(req, res)
-});
-
-router.put('/forgot-password', (req: Request, res: Response) => {
-    userController.forgotPassword(req, res);
-})
-
-router.post('/login', (req: Request, res: Response) => {
-    userController.login(req, res);
-})
-
-router.post('/checkToken', (req: Request, res: Response) => {
-    userController.checkToken(req, res);
-})

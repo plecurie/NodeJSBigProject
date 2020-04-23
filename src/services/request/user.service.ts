@@ -1,6 +1,4 @@
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import bodyParser = require("body-parser");
-import { ApiResponse } from "@elastic/elasticsearch";
 const bcrypt = require('bcrypt');
 
 export class UserService {

@@ -1,6 +1,6 @@
-import {Crudcontroller} from "../crudcontroller";
+import {CrudUser} from "../../utils";
 
-export class ProductsController extends Crudcontroller {
+export class ProductsController extends CrudUser {
     create(req, res): void {
     }
 
