@@ -6,6 +6,7 @@ import { portfolioRouter } from "./routes";
 import { profileRouter } from "./routes";
 import { ES_PORT, HOST, PORT } from "./utils/constants";
 import { ELASTIC_CLIENT } from "./utils/elasticsearch";
+import { bulkindexService } from "./services/bulkindex.service";
 
 class Application {
 
@@ -38,6 +39,8 @@ class Application {
                 console.log('>>>> ElasticSearch is listening on', HOST + ":" + ES_PORT)
             }
         }));
+
+        bulkindexService.getInstance().bulk();
     }
 
 }
