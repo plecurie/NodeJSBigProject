@@ -8,7 +8,7 @@ export class OcrController extends CrudOcr {
         // const path = req.files[0].path;
         // console.log(data);
         // ocrService.removeImageOcr(path);
-        const data = ocrService.filterOcr(req.body.codeArray);
-        return res.json(data);
+        const result = ocrService.filterOcr(req.body.codeArray);
+        return res.json({data: result});
     }
 }
