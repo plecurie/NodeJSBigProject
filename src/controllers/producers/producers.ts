@@ -1,11 +1,10 @@
-import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import { Producer } from "../../models/Producer";
+import {CrudUser} from "../../utils";
 
 var producer : Producer;
 
-export class ProducersController extends Crudcontroller {
-
+export class ProducersController extends CrudUser {
     create(req, res): void {
 
         producer = new Producer(req.body.name, req.body.products);

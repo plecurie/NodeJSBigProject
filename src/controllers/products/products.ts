@@ -1,11 +1,11 @@
-import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import {CrudUser} from "../../utils";
 import { Product } from "../../models/Product";
 
 var product: Product;
 
-export class ProductsController extends Crudcontroller {
 
+export class ProductsController extends CrudUser {
     create(req, res): void {
 
         product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);

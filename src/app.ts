@@ -1,9 +1,6 @@
 import * as express from 'express'
-import { usersRouter } from "./routes";
-import { productsRouter } from "./routes";
-import { producersRouter } from "./routes";
-import { portfolioRouter } from "./routes";
-import { profileRouter } from "./routes";
+import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter, 
+profileRouter, portfolioRouter } from "./routes";
 import { ES_PORT, HOST, PORT } from "./utils/constants";
 import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 import { bulkindexService } from "./services/bulkindex.service";
@@ -13,6 +10,7 @@ class Application {
     private app: express.Application;
 
     constructor() {
+        require('dotenv').config();
         this.app = express();
         this.routes()
     }
@@ -24,6 +22,9 @@ class Application {
         this.app.use('/products', productsRouter);
         this.app.use('/portfolio', portfolioRouter);
         this.app.use('/profile', profileRouter)
+        this.app.use('/auth', authRouter);
+        this.app.use('/ocr', ocrRouter);
+
     }
 
     start(): void {

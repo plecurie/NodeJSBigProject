@@ -4,7 +4,9 @@ const fs = require('fs');
 
 export class OcrService {
     private static instance: OcrService;
-    private regExOcr = /^[a-z]{2}[O0-9]+$/i;
+    //private regExOcr = /^[a-zA-Z]{2}[O0-9]+$/i;
+    private regExOcr = /\b([A-Z]{2})((?![A-Z]{10}\b)[A-Z0-9]{10})\b/g;
+    //private regExOcr = /([A-Z]{2})([A-Z0-9]{9})([0-9]{1})/g;
 
     public static getInstance(): OcrService {
         if(!OcrService.instance) {
@@ -13,11 +15,9 @@ export class OcrService {
         return OcrService.instance;
     }
 
-    public async processOcr(path: any): Promise<Array<string>>{
-        return (<string>await exec(`tesseract ${path} stdout`))
-            .split(' ')
-            .filter(v => this.regExOcr.test(v))
-            .filter(v => codes.includes(v.substring(0, 2).toUpperCase()));
+    public filterOcr(array: Array<string>): Array<string> {
+        return array.filter(d => this.regExOcr.test(d.toUpperCase()))
+        .filter(v => codes.includes(v.substring(0, 2).toUpperCase()));
     }
 
     public removeImageOcr(path: any): void {

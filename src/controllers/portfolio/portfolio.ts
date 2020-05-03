@@ -1,10 +1,10 @@
-import { Crudcontroller } from "../crudcontroller";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import { Portfolio } from "../../models/Portfolio";
+import {CrudUser} from "../../utils";
 
 var portfolio : Portfolio;
 
-export class PortfolioController extends Crudcontroller {
+export class PortfolioController extends CrudUser{
 
     create(req, res): void {
 

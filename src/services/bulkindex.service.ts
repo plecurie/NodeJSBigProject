@@ -461,7 +461,7 @@ export class bulkindexService {
             products_list.push(this.mapToObj(yolo));
         }
 
-        console.log(products_list);
+        //console.log(products_list);
 
 /*       ELASTIC_CLIENT.bulk({
             index: 'scala',
