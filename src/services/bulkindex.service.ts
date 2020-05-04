@@ -3,6 +3,7 @@ import {excelToJsonService} from "./excelToJson.service";
 import {ProductsController} from "../controllers/products/products";
 import {Request} from "express";
 import {Product} from "../models/Product";
+import {Criteria} from "../models/Criteria";
 
 export class bulkindexService {
     private static instance: bulkindexService;
@@ -250,9 +251,7 @@ export class bulkindexService {
 
         const data = excelToJsonService.getInstance().processXlsxToJson();
         var products_list = [];
-
-        //console.log(data[0])
-
+        //Object.keys(data).length
         for (var i=0; i < Object.keys(data).length; i++) {
             const criteria : Map<String, String> = new Map<String, String>([
                 ['Portfolio Date', data[i]['Portfolio Date']],
@@ -450,6 +449,7 @@ export class bulkindexService {
                 ['Percent of AUM with High Controversies', data[i]['Percent of AUM with High Controversies']],
                 ['Percent of AUM with Severe Controversies', data[i]['Percent of AUM with Severe Controversies']]
             ]);
+            //console.log(criteria);
             const yolo : Map<String, String> = new Map<String, String>([
                 ["type","product"],
                 ["isin_code", 'unknown'],
