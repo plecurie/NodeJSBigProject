@@ -252,7 +252,7 @@ export class bulkindexService {
 
         console.log(products_list[1]);
 
-       /*ELASTIC_CLIENT.bulk({
+       ELASTIC_CLIENT.bulk({
             index: 'scala',
             type: 'database',
             body: products_list
@@ -263,7 +263,7 @@ export class bulkindexService {
             else {
                 console.log("RESPONSE: ", response.body.items[0])
             }
-        });*/
+        });
 
 
     }

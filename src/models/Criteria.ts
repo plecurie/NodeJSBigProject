@@ -191,6 +191,7 @@ export interface Criteria {
     percentOfAUMWithSignificantControversies: number;
     percentOfAUMWithHighControversies: number;
     percentOfAUMWithSevereControversies: number;
+
     numberOfFundsInGlobalCategory: number;
     percentOfAUMCoveredESGPillars: number;
     the12MonthAverageBenchmarkCarbonRiskScore: number;
@@ -205,10 +206,5 @@ export interface Criteria {
     benchmarkEmissionsScope2: number;
     portfolioEmissionsVsBenchmarkScope1: number;
     portfolioEmissionsVsBenchmarkScope2: number;
-
-
-
-
-
 
 }

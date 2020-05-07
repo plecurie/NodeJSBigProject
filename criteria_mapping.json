@@ -586,6 +586,48 @@
         },
         "percentOfAUMWithSevereControversies": {
           "type": "double"
+        },
+        "numberOfFundsInGlobalCategory": {
+          "type": "double"
+        },
+        "percentOfAUMCoveredESGPillars": {
+          "type": "double"
+        },
+        "the12MonthAverageBenchmarkCarbonRiskScore": {
+          "type": "double"
+        },
+        "the12MonthAverageBenchmarkFossilFuelInvolvement": {
+          "type": "double"
+        },
+        "benchmarkFossilFuelInvolvement": {
+          "type": "double"
+        },
+        "portfolioCarbonRiskScoreVsBenchmark": {
+          "type": "double"
+        },
+        "benchmarkCarbonIntensity": {
+          "type": "double"
+        },
+        "portfolioCarbonIntensityVsBenchmark": {
+          "type": "double"
+        },
+        "emissionsScope1": {
+          "type": "double"
+        },
+        "emissionsScope2": {
+          "type": "double"
+        },
+        "benchmarkEmissionsScope1": {
+          "type": "double"
+        },
+        "benchmarkEmissionsScope2": {
+          "type": "double"
+        },
+        "portfolioEmissionsVsBenchmarkScope1": {
+          "type": "double"
+        },
+        "portfolioEmissionsVsBenchmarkScope2": {
+          "type": "double"
         }
       }
     }
