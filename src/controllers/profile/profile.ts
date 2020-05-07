@@ -1,13 +1,12 @@
 import { Profile } from "../../models/Profile";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import {CrudController} from "../../utils";
-
-var profile : Profile;
+import {Portfolio} from "../../models/Portfolio";
 
 export class ProfileController extends CrudController {
     create(req, res): void {
 
-        profile = new Profile(req.body.username, req.body.criteria);
+        const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
 
         ELASTIC_CLIENT.index({
             index: 'scala',
@@ -43,7 +42,7 @@ export class ProfileController extends CrudController {
 
     update(req, res): void {
 
-        profile = new Profile(req.body.username, req.body.criteria);
+        const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
 
         ELASTIC_CLIENT.update({
             index: 'scala',

@@ -1,12 +1,6 @@
 import {Product} from "./Product";
 
-export class Portfolio {
-
+export interface Portfolio {
     username: String;
     products: Product[];
-
-    constructor(username: String, products: Product[]) {
-        this.username = username;
-        this.products = products
-    }
 }

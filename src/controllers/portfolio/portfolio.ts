@@ -2,13 +2,11 @@ import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import { Portfolio } from "../../models/Portfolio";
 import {CrudController} from "../../utils";
 
-var portfolio : Portfolio;
-
 export class PortfolioController extends CrudController{
 
     create(req, res): void {
 
-        portfolio = new Portfolio(req.body.username,req.body.products);
+        const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
 
         ELASTIC_CLIENT.index({
             index: 'scala',
@@ -44,7 +42,7 @@ export class PortfolioController extends CrudController{
 
     update(req, res): void {
 
-        portfolio = new Portfolio(req.body.username,req.body.products);
+        const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
 
         ELASTIC_CLIENT.update({
             index: 'scala',

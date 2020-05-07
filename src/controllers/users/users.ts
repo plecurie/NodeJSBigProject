@@ -8,7 +8,8 @@ export class UsersController extends CrudController {
 
     async create(req, res) {
 
-        const user = new User(req.body.firstname, req.body.lastname, req.body.birthday, req.body.email, req.body.password, req.body.username);
+        const user : User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
+            email: req.body.email, password: req.body.password, username: req.body.username };
         const mdpCrypted = await generatorService.hashPassword(req.body.password);
         
         ELASTIC_CLIENT.index({
@@ -47,7 +48,8 @@ export class UsersController extends CrudController {
 
     update(req, res): void {
 
-        var user = new User(req.body.firstname, req.body.lastname, req.body.birthdate, req.body.email, req.body.password, req.body.username);
+        const user : User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
+            email: req.body.email, password: req.body.password, username: req.body.username };
 
          ELASTIC_CLIENT.update({
              index: 'scala',
