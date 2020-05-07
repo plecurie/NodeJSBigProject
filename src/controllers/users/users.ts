@@ -1,10 +1,10 @@
-import { CrudUser } from "../../utils";
+import { CrudController } from "../../utils";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import { User } from "../../models/User";
 import { GeneratorService } from '../../services';
 const generatorService = GeneratorService.getInstance();
 
-export class UsersController extends CrudUser {
+export class UsersController extends CrudController {
 
     async create(req, res) {
 

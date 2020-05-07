@@ -1,17 +1,17 @@
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 const bcrypt = require('bcrypt');
 
-export class UserService {
-    private static instance: UserService;
+export class AuthService {
+    private static instance: AuthService;
     private index = 'scala';
     private types = 'users';
     constructor() {}
 
-    public static getInstance(): UserService {
-        if(!UserService.instance) {
-            UserService.instance = new UserService();
+    public static getInstance(): AuthService {
+        if(!AuthService.instance) {
+            AuthService.instance = new AuthService();
         }
-        return UserService.instance;
+        return AuthService.instance;
     }
 
     public async updateUserPassword(user: any): Promise<any> {

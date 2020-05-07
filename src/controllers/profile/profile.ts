@@ -1,10 +1,10 @@
 import { Profile } from "../../models/Profile";
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
-import {CrudUser} from "../../utils";
+import {CrudController} from "../../utils";
 
 var profile : Profile;
 
-export class ProfileController extends CrudUser {
+export class ProfileController extends CrudController {
     create(req, res): void {
 
         profile = new Profile(req.body.username, req.body.criteria);

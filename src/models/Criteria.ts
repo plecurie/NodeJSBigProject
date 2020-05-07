@@ -1,7 +1,6 @@
 export interface Criteria {
-    portfolioDate: number;
-    kiidOngoingCharge: number;
-    sustainabilityRatingDate: number;
+    portfolioDate: string;
+    sustainabilityRatingDate: string;
     morningstarSustainabilityRating: string;
     historicalSustainabilityScore: number;
     portfolioSustainabilityScore: number;
@@ -79,7 +78,7 @@ export interface Criteria {
     productInvolvementTobacco: number;
     productInvolvementOfHoldingsTobacco: number;
     productInvolvementCatAvgTobacco: number;
-    carbonDate: number;
+    carbonDate: string;
     percentAUMCoveredCarbon: number;
     lowCarbonDesignation: string;
     carbonRiskScore: number;
@@ -186,11 +185,30 @@ export interface Criteria {
     portfolioESGRiskExposureScore: number;
     portfolioESGManagedRiskScore: number;
     percentOfAUMWithNULLESGRiskScores: number;
-    percentOfAUMWithHighSevereControversies: number;
     percentOfAUMWithNoControversies: number;
     percentOfAUMWithLowControveries: number;
     percentOfAUMWithModerateControversies: number;
     percentOfAUMWithSignificantControversies: number;
     percentOfAUMWithHighControversies: number;
     percentOfAUMWithSevereControversies: number;
+    numberOfFundsInGlobalCategory: number;
+    percentOfAUMCoveredESGPillars: number;
+    the12MonthAverageBenchmarkCarbonRiskScore: number;
+    the12MonthAverageBenchmarkFossilFuelInvolvement: number;
+    benchmarkFossilFuelInvolvement: number;
+    portfolioCarbonRiskScoreVsBenchmark: number;
+    benchmarkCarbonIntensity: number;
+    portfolioCarbonIntensityVsBenchmark: number;
+    emissionsScope1: number;
+    emissionsScope2: number;
+    benchmarkEmissionsScope1: number;
+    benchmarkEmissionsScope2: number;
+    portfolioEmissionsVsBenchmarkScope1: number;
+    portfolioEmissionsVsBenchmarkScope2: number;
+
+
+
+
+
+
 }

@@ -3,7 +3,7 @@ import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
 profileRouter, portfolioRouter } from "./routes";
 import { ES_PORT, HOST, PORT } from "./utils/constants";
 import { ELASTIC_CLIENT } from "./utils/elasticsearch";
-import { bulkindexService } from "./services/bulkindex.service";
+import { bulkindexService } from "./services/request/bulkindex.service";
 
 class Application {
 

@@ -7,11 +7,11 @@ export const router = express.Router({
     mergeParams: true
 });
 
-router.post('/create', (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
     userController.create(req, res)
 });
 
-router.get('/read', (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
     userController.read(req, res)
 });
 
@@ -19,6 +19,6 @@ router.post('/update',(req: Request, res: Response) => {
     userController.update(req, res);
 });
 
-router.delete('/delete', (req: Request, res: Response) => {
+router.delete('/', (req: Request, res: Response) => {
     userController.delete(req, res);
 });

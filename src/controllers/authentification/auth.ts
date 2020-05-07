@@ -1,12 +1,11 @@
-import { MailerService, UserService, GeneratorService } from '../../services';
-import { CrudAuth } from '../../utils';
+import { MailerService, AuthService, GeneratorService } from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 
 const mailerService = MailerService.getInstance();
-const userService = UserService.getInstance();
+const userService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
 
-export class AuthController extends CrudAuth {
+export class AuthController {
     async login(req, res): Promise<void> {
         try {
             const searchUser = await userService.searchUser({ email: req.body.email })
