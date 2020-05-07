@@ -250,8 +250,6 @@ export class bulkindexService {
             products_list.push(this.mapToObj(dict_products));
         }
 
-        console.log(products_list[1]);
-
        ELASTIC_CLIENT.bulk({
             index: 'scala',
             type: 'database',
@@ -261,10 +259,9 @@ export class bulkindexService {
                 console.log("ERROR: ", err);
             }
             else {
-                console.log("RESPONSE: ", response.body.items[0])
+                console.log("STATUS CODE: ", response.body.items[0].index.status)
             }
         });
-
 
     }
 }

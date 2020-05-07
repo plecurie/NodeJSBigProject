@@ -2,30 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="77570d44-701b-4c15-b4a6-e26a97c75a31" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Base Projet IT v5.xlsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/criteria_mapping.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/products_mapping.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mapping.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/authentification/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/authentification/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/ocr/ocr.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/ocr/ocr.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/portfolio/portfolio.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/portfolio/portfolio.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/producers/producers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/producers/producers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/products/products.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/products/products.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/profile/profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/profile/profile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controllers/users/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/users/users.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/criteria_mapping.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/products_mapping.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/Criteria.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/Criteria.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/authentification/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/authentification/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/users/users.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/users/users.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/bulkindex.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/request/bulkindex.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/request/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/request/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/cruds/crud-auth.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/cruds/crud-ocr.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/cruds/crud-user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crudcontroller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/services/request/bulkindex.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/request/bulkindex.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -177,7 +158,8 @@
       <workItem from="1588150420107" duration="32759000" />
       <workItem from="1588244165984" duration="4105000" />
       <workItem from="1588248690786" duration="15050000" />
-      <workItem from="1588610053821" duration="13954000" />
+      <workItem from="1588610053821" duration="24867000" />
+      <workItem from="1588858989990" duration="11789000" />
     </task>
     <servers />
   </component>
@@ -207,30 +189,30 @@
       <screen x="67" y="27" width="1613" height="1023" />
     </state>
     <state x="651" y="281" width="424" height="513" key="FileChooserDialogImpl/67.27.1613.1023@67.27.1613.1023" timestamp="1585056758877" />
-    <state width="1830" height="383" key="GridCell.Tab.0.bottom" timestamp="1588844478544">
+    <state width="1830" height="497" key="GridCell.Tab.0.bottom" timestamp="1588872504569">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.bottom/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761088" />
     <state width="1824" height="266" key="GridCell.Tab.0.bottom/67.27.1847.897@67.27.1847.897" timestamp="1585152756188" />
-    <state width="1830" height="383" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1588844478544" />
-    <state width="1830" height="383" key="GridCell.Tab.0.center" timestamp="1588844478542">
+    <state width="1830" height="497" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1588872504569" />
+    <state width="1830" height="497" key="GridCell.Tab.0.center" timestamp="1588872504567">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.center/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.center/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="383" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1588844478542" />
-    <state width="1830" height="383" key="GridCell.Tab.0.left" timestamp="1588844478542">
+    <state width="1830" height="497" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1588872504567" />
+    <state width="1830" height="497" key="GridCell.Tab.0.left" timestamp="1588872504567">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.left/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.left/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="383" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1588844478542" />
-    <state width="1830" height="383" key="GridCell.Tab.0.right" timestamp="1588844478542">
+    <state width="1830" height="497" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1588872504567" />
+    <state width="1830" height="497" key="GridCell.Tab.0.right" timestamp="1588872504567">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state width="1590" height="323" key="GridCell.Tab.0.right/67.27.1613.1023@67.27.1613.1023" timestamp="1585056761086" />
     <state width="1824" height="266" key="GridCell.Tab.0.right/67.27.1847.897@67.27.1847.897" timestamp="1585152756187" />
-    <state width="1830" height="383" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1588844478542" />
+    <state width="1830" height="497" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1588872504567" />
     <state width="1830" height="344" key="GridCell.Tab.1.bottom" timestamp="1588234018480">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>

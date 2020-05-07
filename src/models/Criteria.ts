@@ -1,6 +1,6 @@
 export interface Criteria {
-    portfolioDate: string;
-    sustainabilityRatingDate: string;
+    portfolioDate: number;
+    sustainabilityRatingDate: number;
     morningstarSustainabilityRating: string;
     historicalSustainabilityScore: number;
     portfolioSustainabilityScore: number;
@@ -78,7 +78,7 @@ export interface Criteria {
     productInvolvementTobacco: number;
     productInvolvementOfHoldingsTobacco: number;
     productInvolvementCatAvgTobacco: number;
-    carbonDate: string;
+    carbonDate: number;
     percentAUMCoveredCarbon: number;
     lowCarbonDesignation: string;
     carbonRiskScore: number;
@@ -191,7 +191,6 @@ export interface Criteria {
     percentOfAUMWithSignificantControversies: number;
     percentOfAUMWithHighControversies: number;
     percentOfAUMWithSevereControversies: number;
-
     numberOfFundsInGlobalCategory: number;
     percentOfAUMCoveredESGPillars: number;
     the12MonthAverageBenchmarkCarbonRiskScore: number;
