@@ -1,13 +1,12 @@
 import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
 import { Producer } from "../../models/Producer";
 import {CrudController} from "../../utils";
-
-var producer : Producer;
+import {Portfolio} from "../../models/Portfolio";
 
 export class ProducersController extends CrudController {
     create(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        const producer : Producer = { name: req.body.name, products: req.body.products };
 
         ELASTIC_CLIENT.index({
             index: 'scala',
@@ -43,7 +42,7 @@ export class ProducersController extends CrudController {
 
     update(req, res): void {
 
-        producer = new Producer(req.body.name, req.body.products);
+        const producer : Producer = { name: req.body.name, products: req.body.products };
 
         ELASTIC_CLIENT.update({
             index: 'scala',
