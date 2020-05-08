@@ -33,15 +33,15 @@ class Application {
             console.log('>>>> Node server is listening on', HOST + ":" + PORT)
         });
         
-        ELASTIC_CLIENT.ping(((err, result) => {
-            if (err) {
-                throw new Error('>>>> Failed to connect to ' + HOST + ":" + ES_PORT)
-            } else {
-                console.log('>>>> ElasticSearch is listening on', HOST + ":" + ES_PORT)
-            }
-        }));
+        ELASTIC_CLIENT.ping((err, result) => {
+            if (err)
+                throw new Error('>>>> Failed to connect to ' + HOST + ":" + ES_PORT);
+            else
+                console.log('>>>> ElasticSearch is listening on', HOST + ":" + ES_PORT);
+        });
 
-        bulkindexService.getInstance().bulk();
+        bulkindexService.getInstance().importExcel();
+
     }
 
 }

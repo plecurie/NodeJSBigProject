@@ -10,7 +10,7 @@ export class excelToJsonService {
         return excelToJsonService.instance;
     }
 
-    public processXlsxToJson(filename = 'Base-Projet-IT-v3.xlsx'): Object {
+    public processXlsxToJson(filename = 'Base-Projet-IT-v5.xlsx'): Object {
         const workbook = XLSX.readFile(filename);
         return XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
     }

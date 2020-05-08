@@ -23,9 +23,9 @@ export class bulkindexService {
         return JSON.stringify(Array.from(m.entries()))
     };
 
-    public bulk(): void {
+    public importExcel(filename = 'Base Projet IT v5.xlsx'): void {
 
-        const data = excelToJsonService.getInstance().processXlsxToJson('Base Projet IT v5.xlsx');
+        const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         var products_list = [];
 
         for (var i=0; i < Object.keys(data).length; i++) {
@@ -256,12 +256,16 @@ export class bulkindexService {
             body: products_list
         }, (err, response) => {
             if (err){
-                console.log("ERROR: ", err);
+                console.log("Servor error: ", err);
+            }
+            else if (response.body.items[0].index.status == 201){
+                console.log('>>>> Bulk index done.');
             }
             else {
-                console.log("STATUS CODE: ", response.body.items[0].index.status)
+                console.log('Malformed Exception.')
             }
         });
+
 
     }
 }
