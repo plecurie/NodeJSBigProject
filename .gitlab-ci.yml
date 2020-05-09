@@ -43,7 +43,7 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    #- ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - ssh gitlab@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
     - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
     - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
