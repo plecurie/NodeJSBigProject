@@ -43,7 +43,7 @@ deploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh root@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> /home/gitlab/.ssh/authorized_keys
+    - ssh -i echo "$SSH_PRIVATE_KEY" root@vps808693.ovh.net
     - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
     - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
     - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
