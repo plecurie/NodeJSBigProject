@@ -33,11 +33,14 @@ deploy_prod:
       - build/
   only:
     - master
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add <(echo "$STAGING_PRIVATE_KEY")
     - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
     - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
     - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
     - ssh -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
-  after_script:
-    - npm start
