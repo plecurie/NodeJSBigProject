@@ -2,29 +2,31 @@ image: node:latest
 
 #services:
 #  - elassandra:latest
-  
+
+before_script:
+  - npm install
+
 stages:
   - test
   - build
   - quality
+  - deploy
 
 cache:
   paths:
     - node_modules/
 
-build_job:
-  stage: build
-  script:
-    - npm install
-    - npm run build
-    
-unit_test_job:
+test_unit:
   stage: test
   script:
-    - npm install
     - npm run test
+
+build:
+  stage: build
+  script:
+    - npm run build
     
-quality_job:
+quality:
   stage: quality
   image: docker:stable
   allow_failure: true
@@ -41,3 +43,17 @@ quality_job:
   artifacts:
     paths:
       - codequality-results/
+
+deploy_prod:
+  stage: deploy
+  artifacts:
+    paths:
+      - build/
+  only:
+    - master
+  script:
+    - ssh-add <(echo "$STAGING_PRIVATE_KEY")
+    - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
+    - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
+    - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
+    - ssh -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
