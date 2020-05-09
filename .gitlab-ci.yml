@@ -36,7 +36,11 @@ deploy:
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan vps808693.ovh.net >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
     - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add (echo "$SSH_PRIVATE_KEY")
