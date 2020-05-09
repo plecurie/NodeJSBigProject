@@ -3,8 +3,6 @@ image: node:latest
 #services:
 #  - elassandra:latest
 
-include: 'https://gitlab.com/x4v13r/gitlab-ci/raw/master/ssh.yml'
-
 stages:
   - test
   - build
@@ -36,10 +34,13 @@ deploy:
   only:
     - master
   before_script:
-    - ssh_init "$SSH_PRIVATE_KEY" "vps808693.ovh.net"
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh-add <(echo "$STAGING_PRIVATE_KEY")
-    - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
-    - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
-    - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
-    - ssh -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
+    - ssh-add <(echo "SSH_PRIVATE_KEY")
+    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
+    - scp -i ~/.ssh/id_rsa.pub -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
+    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
+    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
