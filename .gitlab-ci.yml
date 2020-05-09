@@ -16,7 +16,6 @@ test_unit:
   stage: test
   before_script:
     - npm install
-    - npm audit fix
   script:
     - npm run test
 
@@ -24,7 +23,6 @@ build:
   stage: build
   before_script:
     - npm install
-    - npm audit fix
   script:
     - npm run build
 
