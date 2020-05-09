@@ -40,7 +40,8 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add <(echo "SSH_PRIVATE_KEY")
-    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
-    - scp -i ~/.ssh/id_rsa.pub -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
-    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
-    - ssh -i ~/.ssh/id_rsa.pub -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
+    - ssh -o StrictHostKeyChecking=no root@vps808693.ovh.net 'rm -rf /root/test/*'
+    - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
+    - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
+    - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
+    - ssh -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
