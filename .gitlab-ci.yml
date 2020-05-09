@@ -4,27 +4,27 @@ image: node:latest
 #  - elassandra:latest
 
 stages:
-  - test
-  - build
+#  - test
+#  - build
   - deploy
 
 cache:
   paths:
     - node_modules/
 
-test:
-  stage: test
-  before_script:
-    - npm install
-  script:
-    - npm run test
-
-build:
-  stage: build
-  before_script:
-    - npm install
-  script:
-    - npm run build
+#test:
+#  stage: test
+#  before_script:
+#    - npm install
+#  script:
+#    - npm run test
+#
+#build:
+#  stage: build
+#  before_script:
+#    - npm install
+#  script:
+#    - npm run build
 
 deploy:
   stage: deploy
@@ -44,7 +44,7 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     #- ssh-add <(echo "$SSH_PRIVATE_KEY")
-    - ssh -p22 root@vps808693.ovh.net (echo "$SSH_PRIVATE_KEY") >> .ssh/authorized_keys
+    - ssh -p22 root@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
     - ssh -p22 root@vps808693.ovh.net "mkdir /var/www/_tmp"
     - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
     - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
