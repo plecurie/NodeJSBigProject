@@ -10,8 +10,7 @@ image: node:latest
 #  - elassandra:latest
   
 stages:
-  - build
-  - tests
+  - test_async
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -20,13 +19,8 @@ cache:
     - node_modules/
 
 build_job:
-  stage: build
+  stage: test_async
   script:
     - npm install
     - npm run build
-
-test_job:
-  stage: tests
-  script:
-    - npm install
-    - nnpm run tests
+    - npm run test

@@ -21,7 +21,7 @@ class Application {
         this.app.use('/producers', producersRouter);
         this.app.use('/products', productsRouter);
         this.app.use('/portfolio', portfolioRouter);
-        this.app.use('/profile', profileRouter)
+        this.app.use('/profile', profileRouter);
         this.app.use('/auth', authRouter);
         this.app.use('/ocr', ocrRouter);
 
