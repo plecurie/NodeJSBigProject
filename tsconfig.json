@@ -3,16 +3,23 @@
     "module": "commonjs",
     "target": "es5",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": [
+      "dom",
+      "es6",
+      "scripthost",
+      "es2017"
+    ]
   },
-  "files": [
-    "./node_modules/@types/mocha/index.d.ts",
-    "./node_modules/@types/node/index.d.ts"
-  ],
+  // "files": [
+  //   "./node_modules/@types/mocha/index.d.ts",
+  //   "./node_modules/@types/node/index.d.ts",
+  // ],
   "include": [
-    "src/**/*.ts"
+    "src/**/*",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.spec.ts"
   ]
 }

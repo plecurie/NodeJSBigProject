@@ -1,4 +1,4 @@
-import Application from "./App";
+import Application from "./app";
 
 const app = new Application();
 app.start();
