@@ -19,6 +19,7 @@
     "express-serve-static-core": "latest"
   },
   "devDependencies": {
+    "rimraf": "^3.0.2",
     "mocha": "^7.0.1",
     "@elastic/elasticsearch": "latest",
     "ts-node": "^8.6.2"
