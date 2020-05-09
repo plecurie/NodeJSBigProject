@@ -11,7 +11,7 @@ image: node:latest
   
 stages:
   - build
-  - test
+  - tests
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -26,7 +26,7 @@ build_job:
     - npm run build
 
 test_job:
-  stage: test
+  stage: tests
   script:
     - npm install
-    - nnpm run test
+    - nnpm run tests
