@@ -5,6 +5,7 @@ image: node:latest
 
 before_script:
   - npm install
+  - npm audit fix
 
 stages:
   - test
