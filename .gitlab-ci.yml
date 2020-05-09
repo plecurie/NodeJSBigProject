@@ -10,7 +10,7 @@ stages:
   - build
   - quality
 
-test_job:
+unit_tests:
   image: node:latest
   stage: test
   variables:
@@ -19,7 +19,7 @@ test_job:
     - npm install
   script:
     - npm run test
-    - npm run start prettier --list-different
+#    - npm run start prettier --list-different
 
 build_job:
   image: docker:latest
@@ -34,6 +34,9 @@ build_job:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
     - docker build --pull -t "${CI_REGISTRY_IMAGE}:latest" .
     - docker push "${CI_REGISTRY_IMAGE}:latest"
+  artifacts:
+    paths:
+      - bin
   only: 
     - master
 
