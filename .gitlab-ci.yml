@@ -1,6 +1,4 @@
 image: node:latest
-variables:
-  - SSHPASS=$USER_PASS
 
 #services:
 #  - elassandra:latest
