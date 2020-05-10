@@ -1,39 +1,32 @@
 image: node:latest
 
-#services:
-#  - elassandra:latest
-
 stages:
-#  - test
-#  - build
+  - test
+  - build
   - deploy
+  - clean
 
 cache:
   paths:
     - node_modules/
 
-#test:
-#  stage: test
-#  before_script:
-#    - npm install
-#  script:
-#    - npm run test
-#
+test:
+  stage: test
+  before_script:
+    - npm install
+  script:
+    - npm run test
 
-#build:
-#  stage: build
-#  before_script:
-#    - npm install
-#  script:
-#    - npm run build
+
+build:
+  stage: build
+  before_script:
+    - npm install
+  script:
+    - npm run build
 
 deploy:
   stage: deploy
-  artifacts:
-    paths:
-      - build/
-  only:
-    - master
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
@@ -42,10 +35,21 @@ deploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    # - ssh scala@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
     - sshpass -V
     - export SSHPASS=$SSH_PASS
     - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && mkdir _tmp/"
     - sshpass -e scp -P22 -r build/* root@vps808693.ovh.net:htdocs/api/_tmp
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf htdocs/api/_old"
+  artifacts:
+    paths:
+      - dist/
+  only:
+    - master
+
+clean_job:
+  stage: clean
+  script:
+    - rm -rf node_modules
+    - rm -rf ~/.node-gyp
+  when: on_failure
