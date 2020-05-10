@@ -1,4 +1,6 @@
 image: node:latest
+variables:
+  - SSHPASS=$USER_PASS
 
 #services:
 #  - elassandra:latest
@@ -35,16 +37,13 @@ deploy:
     - master
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan vps808693.ovh.net >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
     - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    #- ssh gitlab@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> /home/gitlab/.ssh/authorized_keys
-    - ssh -o StrictHostKeyChecking=no -p22 gitlab@vps808693.ovh.net "mkdir /home/gitlab/_tmp"
-    - scp -P22 -r build/* root@vps808693.ovh.net:/var/www/_tmp
-    - ssh -p22 root@vps808693.ovh.net "mv /var/www/scala-api /var/www/_old && mv /var/www/_tmp /var/www/scala-api"
-    - ssh -p22 root@vps808693.ovh.net "rm -rf /var/www/_old"
+    #- ssh scala@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
+    - ssh -p22 scala@vps808693.ovh.net "mkdir htdocs/api/_tmp"
+    - scp -P22 -r build/* scala@vps808693.ovh.net:htdocs/api/_tmp
+    - ssh -p22 scala@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
+    - ssh -p22 scala@vps808693.ovh.net "rm -rf htdocs/api/_old"
