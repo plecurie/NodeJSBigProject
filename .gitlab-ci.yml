@@ -45,7 +45,7 @@ deploy:
     # - ssh scala@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd htdocs/api/ && mkdir _tmp/"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && mkdir _tmp/"
     - sshpass -e scp -P22 -r build/* root@vps808693.ovh.net:htdocs/api/_tmp
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf htdocs/api/_old"
