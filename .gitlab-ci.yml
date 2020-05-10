@@ -31,8 +31,8 @@ test:
 deploy:
   stage: deploy
   before_script:
-    - 'which ssh-agent || (apt-get update -y && apt-get install openssh-client -y)'
-    - 'which sshpass || (apt-get update -y -qq && apt-get install sshpass -y -qq)'
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
@@ -40,13 +40,11 @@ deploy:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "mkdir /home/scala/htdocs/api/_tmp/"
-    - sshpass -e scp -P22 -r ./ root@vps808693.ovh.net:/home/scala/htdocs/api/_tmp
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "mv /home/scala/htdocs/api/current /home/scala/htdocs/api/_old && mv /home/scala/htdocs/api/_tmp /home/scala/htdocs/api/current"
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf /home/scala/htdocs/api/_old"
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "node current/dist/index.js"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && rm -rf /home/scala/htdocs/api/scala-api/ && git clone git@gitlab.com:scala1/scala-api.git"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "npm install && npm start --production"
   needs:
     - job: build
-      artifacts: true
+      artifacts: false
   only:
     - master
