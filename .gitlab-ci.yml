@@ -3,19 +3,13 @@ image: node:latest
 stages:
   - test
   - build
+  - clean_build
   - deploy
-  - clean
+  - cleanup
 
 cache:
   paths:
     - node_modules/
-
-test:
-  stage: test
-  before_script:
-    - npm install
-  script:
-    - npm run test
 
 build:
   stage: build
@@ -23,6 +17,25 @@ build:
     - npm install
   script:
     - npm run build
+  artifacts:
+    paths:
+      - dist/
+      - node_modules
+
+clean_build:
+  stage: clean_build
+  script:
+    - rm -rf node_modules
+    - rm -rf ~/.node-gyp
+  when: on_failure
+
+test:
+  stage: test
+  script:
+    - npm run test
+  needs:
+    - job: build
+      artifacts: true
 
 deploy:
   stage: deploy
@@ -36,19 +49,12 @@ deploy:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && mkdir _tmp/"
-    - sshpass -e scp -P22 -r dist/* root@vps808693.ovh.net:htdocs/api/_tmp
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf htdocs/api/_old"
-  artifacts:
-    paths:
-      - dist/
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "mkdir /home/scala/htdocs/api/_tmp/ "
+    - sshpass -e scp -P22 -r dist/* root@vps808693.ovh.net:/home/scala/htdocs/api/_tmp
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "mv /home/scala/htdocs/api/current /home/scala/htdocs/api/_old && mv /home/scala/htdocs/api/_tmp /home/scala/htdocs/api/current"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf /home/scala/htdocs/api/_old"
+  needs:
+    - job: build
+      artifacts: true
   only:
     - master
-
-clean:
-  stage: clean
-  script:
-    - rm -rf node_modules
-    - rm -rf ~/.node-gyp
-  when: on_failure
