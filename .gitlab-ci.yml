@@ -44,6 +44,7 @@ deploy:
     - sshpass -e scp -P22 -r dist/* root@vps808693.ovh.net:/home/scala/htdocs/api/_tmp
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mv /home/scala/htdocs/api/current /home/scala/htdocs/api/_old && mv /home/scala/htdocs/api/_tmp /home/scala/htdocs/api/current"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf /home/scala/htdocs/api/_old"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "which curl || ( apt update && apt upgrade && apt install curl )"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "which node || ( curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs )"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "node current/index.js"
   needs:
