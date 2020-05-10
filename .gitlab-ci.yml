@@ -42,7 +42,7 @@ deploy:
     - export SSHPASS=$SSH_PASS
     - sshpass -e ssh -p22 root@vps808693.ovh.net "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && rm -rf /home/scala/htdocs/api/scala-api/ && git clone git@gitlab.com:scala1/scala-api.git"
-    - sshpass -e ssh -p22 root@vps808693.ovh.net "npm install && npm start --production"
+    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/scala-api && npm install && npm start --production"
   needs:
     - job: build
       artifacts: false
