@@ -41,7 +41,7 @@ deploy:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mkdir /home/scala/htdocs/api/_tmp/"
-    - sshpass -e scp -P22 -r . root@vps808693.ovh.net:/home/scala/htdocs/api/_tmp
+    - sshpass -e scp -P22 -r ./ root@vps808693.ovh.net:/home/scala/htdocs/api/_tmp
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mv /home/scala/htdocs/api/current /home/scala/htdocs/api/_old && mv /home/scala/htdocs/api/_tmp /home/scala/htdocs/api/current"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf /home/scala/htdocs/api/_old"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "node current/dist/index.js"
