@@ -17,7 +17,6 @@ test:
   script:
     - npm run test
 
-
 build:
   stage: build
   before_script:
@@ -41,13 +40,10 @@ deploy:
     - sshpass -e scp -P22 -r build/* root@vps808693.ovh.net:htdocs/api/_tmp
     - sshpass -e ssh -p22 root@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
     - sshpass -e ssh -p22 root@vps808693.ovh.net "rm -rf htdocs/api/_old"
-  artifacts:
-    paths:
-      - dist/
   only:
     - master
 
-clean_job:
+clean:
   stage: clean
   script:
     - rm -rf node_modules
