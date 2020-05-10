@@ -41,7 +41,7 @@ deploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    #- ssh scala@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
+    # - ssh scala@vps808693.ovh.net echo "$SSH_PRIVATE_KEY" >> .ssh/authorized_keys
     - ssh -p22 scala@vps808693.ovh.net "mkdir htdocs/api/_tmp"
     - scp -P22 -r build/* scala@vps808693.ovh.net:htdocs/api/_tmp
     - ssh -p22 scala@vps808693.ovh.net "mv htdocs/api/current htdocs/api/_old && mv htdocs/api/_tmp htdocs/api/current"
