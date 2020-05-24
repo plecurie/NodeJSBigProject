@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  nginx:
+    image: registry.gitlab.com/scala1/scala-api:master
+    expose:
+      - "3000"
+    environment:
+      - VIRTUAL_HOST=api.scala-app.com
+      - VIRTUAL_PORT=3000
+    volumes:
+      - /home/gitlab-runner/api:/app/data
+    restart: unless-stopped
