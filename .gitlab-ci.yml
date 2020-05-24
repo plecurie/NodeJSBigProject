@@ -11,8 +11,10 @@ variables:
   RELEASE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 cache:
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
+    - .npm/
 
 build:
   stage: build
