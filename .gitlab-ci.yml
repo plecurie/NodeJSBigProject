@@ -38,7 +38,7 @@ test:
     - job: build
       artifacts: true
 
-build:
+build_docker:
   stage: release
   tags:
     - docker
