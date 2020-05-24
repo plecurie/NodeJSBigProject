@@ -40,7 +40,6 @@ class Application {
                 console.log('>>>> ElasticSearch is listening on', HOST + ":" + ES_PORT);
         });
         //bulkindexService.getInstance().importExcel();
-
     }
 
 }
