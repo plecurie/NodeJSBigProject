@@ -30,6 +30,7 @@ test:
     - docker
   script:
     - docker pull $TEST_TAG
+    - docker run $TEST_TAG npm install
     - docker run $TEST_TAG npm run test
 
 release-image:
