@@ -5,6 +5,8 @@ stages:
   - deploy
 
 variables:
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_CERTDIR: "/certs"
   IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
   RELEASE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
@@ -39,7 +41,8 @@ dockerize:
     - docker
   image: docker:19.03.8
   services:
-    - docker:19.03.8-dind
+    - name: docker:19.03.8-dind
+      alias: docker
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
@@ -56,7 +59,8 @@ deploy_vps:
     - vps
   image: docker:19.03.8
   services:
-    - docker:19.03.8-dind
+    - name: docker:19.03.8-dind
+      alias: docker
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
