@@ -10,8 +10,8 @@ stages:
   - deploy
 
 variables:
-  TEST_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  RELEASE_TAG: $CI_REGISTRY_IMAGE:latest
+  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
@@ -21,26 +21,26 @@ build:
   tags:
     - docker
   script:
-    - docker build --pull -t $TEST_TAG .
-    - docker push $TEST_TAG
+    - docker build --pull -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
 
 test:
   stage: test
   tags:
     - docker
   script:
-    - docker pull $TEST_TAG
-    - docker run $TEST_TAG npm install
-    - docker run $TEST_TAG npm run test
+    - docker pull $TEST_IMAGE
+    - docker run $TEST_IMAGE npm install
+    - docker run $TEST_IMAGE npm run test
 
 release-image:
   stage: release
   tags:
     - docker
   script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
+    - docker pull $TEST_IMAGE
+    - docker tag $TEST_IMAGE $RELEASE_IMAGE
+    - docker push $RELEASE_IMAGE
   only:
     - master
 
@@ -50,7 +50,7 @@ deploy_vps:
   tags:
     - vps
   script:
-    - docker pull $CONTAINER_RELEASE_IMAGE
+    - docker pull $RELEASE_IMAGE
     - docker-compose down
     - docker-compose up -d
   only:
