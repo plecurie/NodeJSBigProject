@@ -42,8 +42,8 @@ dockerize:
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker build --pull -t IMAGE_TAG .
-    - docker push IMAGE_TAG
+    - docker build --pull -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
   only:
     - master
 
