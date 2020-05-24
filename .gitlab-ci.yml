@@ -7,8 +7,8 @@ stages:
 variables:
   DOCKER_HOST: tcp://docker:2376
   DOCKER_TLS_CERTDIR: "/certs"
-  IMAGE_TAG: https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api:$CI_COMMIT_REF_NAME
-  RELEASE_TAG: https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api:latest
+  IMAGE_TAG: $CI-REGISTRY/scala1/scala-api:$CI_COMMIT_REF_NAME
+  RELEASE_TAG: $CI-REGISTRY/scala1/scala-api:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -46,7 +46,7 @@ dockerize:
     - name: docker:19.03.8-dind
       alias: docker
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI-REGISTRY
   script:
     - docker build -t $IMAGE_TAG .
     - docker tag $IMAGE_TAG $RELEASE_TAG
@@ -64,7 +64,7 @@ deploy_vps:
     - name: docker:19.03.8-dind
       alias: docker
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.scala-patrimoine.fr:5555/scala1/scala-api
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI-REGISTRY
   script:
     - docker pull $RELEASE_IMAGE
     - docker-compose down
