@@ -10,38 +10,41 @@ stages:
   - deploy
 
 variables:
-  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
+cache:
+  paths:
+    - node_modules/
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
 build:
   stage: build
-  tags:
-    - docker
+  before_script:
+    - npm install
   script:
-    - docker build --pull -t $TEST_IMAGE .
-    - docker push $TEST_IMAGE
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+      - node_modules
 
 test:
   stage: test
-  tags:
-    - docker
   script:
-    - docker pull $TEST_IMAGE
-    - docker run $TEST_IMAGE npm install
-    - docker run $TEST_IMAGE npm install @elastic/elasticsearch
-    - docker run $TEST_IMAGE npm run test
+    - npm run test
+  needs:
+    - job: build
+      artifacts: true
 
-release-image:
+build:
   stage: release
   tags:
     - docker
   script:
-    - docker pull $TEST_IMAGE
-    - docker tag $TEST_IMAGE $RELEASE_IMAGE
-    - docker push $RELEASE_IMAGE
+    - docker build --pull -t IMAGE_TAG .
+    - docker push IMAGE_TAG
   only:
     - master
 
