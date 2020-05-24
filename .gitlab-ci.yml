@@ -18,8 +18,6 @@ cache:
 
 build:
   stage: build
-  tags:
-    - npm
   image: node:latest
   before_script:
     - npm install
@@ -32,8 +30,6 @@ build:
 
 test:
   stage: test
-  tags:
-    - npm
   image: node:latest
   script:
     - npm run test
