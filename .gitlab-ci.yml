@@ -31,6 +31,7 @@ test:
   script:
     - docker pull $TEST_IMAGE
     - docker run $TEST_IMAGE npm install
+    - docker run $TEST_IMAGE npm install @elastic/elasticsearch
     - docker run $TEST_IMAGE npm run test
 
 release-image:
