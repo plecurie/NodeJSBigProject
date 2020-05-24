@@ -37,9 +37,9 @@ dockerize:
   stage: release
   tags:
     - docker
-  image: docker:latest
+  image: docker:19.03.8
   services:
-    - docker:dind
+    - docker:19.03.8-dind
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
@@ -54,9 +54,9 @@ deploy_vps:
   dependencies: []
   tags:
     - vps
-  image: docker:latest
+  image: docker:19.03.8
   services:
-    - docker:dind
+    - docker:19.03.8-dind
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
