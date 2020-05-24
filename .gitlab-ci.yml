@@ -18,6 +18,8 @@ cache:
 
 build:
   stage: build
+  tags:
+    - npm
   image: node:latest
   before_script:
     - npm install
@@ -30,6 +32,8 @@ build:
 
 test:
   stage: test
+  tags:
+    - npm
   image: node:latest
   script:
     - npm run test
@@ -40,7 +44,7 @@ test:
 dockerize:
   stage: release
   tags:
-    - docker
+    - vps
   image: docker:19.03.8
   services:
     - name: docker:19.03.8-dind
