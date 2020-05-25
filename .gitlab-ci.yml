@@ -1,3 +1,7 @@
+services:
+  - name: docker:19.03.8-dind
+    alias: docker
+
 stages:
   - build
   - test
@@ -20,9 +24,6 @@ before_script:
 build_docker:
   stage: build
   image: docker:19.03.8
-  services:
-    - name: docker:19.03.8-dind
-    alias: docker
   script:
     - docker build --pull -t $TEST_IMAGE .
     - docker push $TEST_IMAGE
@@ -30,9 +31,6 @@ build_docker:
 test_docker:
   stage: test
   image: docker:19.03.8
-  services:
-    - name: docker:19.03.8-dind
-    alias: docker
   script:
     - docker pull $TEST_IMAGE
     - docker run $TEST_IMAGE npm install
@@ -42,9 +40,6 @@ test_docker:
 release:
   stage: release
   image: docker:19.03.8
-  services:
-  - name: docker:19.03.8-dind
-    alias: docker
   script:
     - docker pull $TEST_IMAGE
     - docker tag $TEST_IMAGE $RELEASE_IMAGE
