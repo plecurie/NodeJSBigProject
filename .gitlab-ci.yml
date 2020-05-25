@@ -1,3 +1,8 @@
+image: docker:19.03.8
+services:
+  - name: docker:19.03.8-dind
+    alias: docker
+
 stages:
   - build
   - test
@@ -5,10 +10,8 @@ stages:
   - deploy
 
 variables:
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: "/certs"
-  IMAGE_TAG: $CI-REGISTRY/scala1/scala-api:$CI_COMMIT_REF_NAME
-  RELEASE_TAG: $CI-REGISTRY/scala1/scala-api:latest
+  TEST_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:$CI_COMMIT_REF_NAME
+  RELEASE_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -16,110 +19,41 @@ cache:
     - node_modules/
     - .npm/
 
-build:
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.scala-patrimoine.fr:5555
+
+build_docker:
   stage: build
-  image: node:latest
-  before_script:
-    - npm install
   script:
-    - npm run build
-  artifacts:
-    paths:
-      - dist/
-      - node_modules
+    - docker build --pull -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
 
-test:
+test_docker:
   stage: test
-  image: node:latest
   script:
-    - npm run test
-  needs:
-    - job: build
-      artifacts: true
+    - docker pull $TEST_IMAGE
+    - docker run $TEST_IMAGE npm install
+    - docker run $TEST_IMAGE npm build
+    - docker run $TEST_IMAGE npm test
 
-dockerize:
+release:
   stage: release
   tags:
-    - vps
-  image: docker:19.03.8
-  services:
-    - name: docker:19.03.8-dind
-      alias: docker
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI-REGISTRY
-  script:
-    - docker build -t $IMAGE_TAG .
-    - docker tag $IMAGE_TAG $RELEASE_TAG
-    - docker push $RELEASE_TAG
+    - ssh
   only:
     - master
-
-deploy_vps:
-  stage: deploy
-  dependencies: []
-  tags:
-    - vps
-  image: docker:19.03.8
-  services:
-    - name: docker:19.03.8-dind
-      alias: docker
+  when: manual
+  allow_failure: false
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI-REGISTRY
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
+    - mkdir -p ~/.ssh
+    - echo “$SSH_PRIVATE_KEY” > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
+    - eval $(ssh-agent -s)
+    - ssh-add ~/.ssh/id_rsa
   script:
-    - docker pull $RELEASE_IMAGE
-    - docker-compose down
-    - docker-compose up -d
-  only:
-    - master
-
-#image: node:latest
-#
-#stages:
-#  - build
-#  - test
-#  - deploy
-#
-#cache:
-#  paths:
-#    - node_modules/
-#
-#build:
-#  stage: build
-#  before_script:
-#    - npm install
-#  script:
-#    - npm run build
-#  artifacts:
-#    paths:
-#      - dist/
-#      - node_modules
-#
-#test:
-#  stage: test
-#  script:
-#    - npm run test
-#  needs:
-#    - job: build
-#      artifacts: true
-#
-#deploy:
-#  stage: deploy
-#  before_script:
-#    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
-#    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
-#    - eval $(ssh-agent -s)
-#    - mkdir -p ~/.ssh
-#    - ssh-add <(echo "$SSH_PRIVATE_KEY")
-#    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-#  script:
-#    - sshpass -V
-#    - export SSHPASS=$SSH_PASS
-#    - sshpass -e ssh -p22 root@vps808693.ovh.net "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
-#    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/ && rm -rf /home/scala/htdocs/api/scala-api/ && git clone git@gitlab.com:scala1/scala-api.git"
-#    - sshpass -e ssh -p22 root@vps808693.ovh.net "cd /home/scala/htdocs/api/scala-api && npm install && npm run build"
-#  needs:
-#    - job: build
-#    - job: test
-#      artifacts: false
-#  only:
-#    - master
+    - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
+    - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
+    - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
+    - rm -f ~/.ssh/id_rsa
