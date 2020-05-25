@@ -47,8 +47,6 @@ release:
 
 deploy_ssh:
   stage: deploy
-  tags:
-    - ssh
   only:
     - master
   when: manual
