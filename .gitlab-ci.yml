@@ -53,13 +53,15 @@ deploy_ssh:
   allow_failure: false
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
-    - mkdir -p ~/.ssh
-    - echo “$SSH_PRIVATE_KEY” > ~/.ssh/id_rsa
-    - chmod 700 ~/.ssh
-    - chmod 600 ~/.ssh/id_rsa
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
     - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -i $SSH_PRIVATE_KEY $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
-    - ssh -i $SSH_PRIVATE_KEY $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
-    - ssh -i $SSH_PRIVATE_KEY $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
+    - sshpass -V
+    - export SSHPASS=$SSH_PASS
+    - sshpass -e ssh -p22 $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
+    - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
+    - sshpass -e ssh -p22 $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
     - rm -f ~/.ssh/id_rsa
