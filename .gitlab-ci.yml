@@ -20,7 +20,7 @@ cache:
     - .npm/
 
 before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.scala-patrimoine.fr:5555
+  - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD gitlab.scala-patrimoine.fr:5555
 
 build_docker:
   stage: build
