@@ -58,7 +58,7 @@ deploy_ssh:
     - chmod 700 ~/.ssh
     - chmod 600 ~/.ssh/id_rsa
     - eval $(ssh-agent -s)
-    - ssh-add ~/.ssh/id_rsa
+    #- ssh-add ~/.ssh/id_rsa
   script:
     - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
     - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
