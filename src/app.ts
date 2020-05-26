@@ -1,7 +1,7 @@
 import * as express from 'express'
 import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter, 
 profileRouter, portfolioRouter } from "./routes";
-import { ES_PORT, HOST, PORT } from "./utils/constants";
+import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
 import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 import { bulkindexService } from "./services/request/bulkindex.service";
 
@@ -29,15 +29,15 @@ class Application {
 
     start(): void {
 
-        this.app.listen(PORT, () => {
-            console.log('>>>> Node server is listening on', HOST + ":" + PORT)
+        this.app.listen(APP_PORT, () => {
+            console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
         });
         
         ELASTIC_CLIENT.ping((err, result) => {
             if (err)
-                throw new Error('>>>> Failed to connect to ' + HOST + ":" + ES_PORT);
+                throw new Error('>>>> Failed to connect to ' + ES_URL);
             else
-                console.log('>>>> ElasticSearch is listening on', HOST + ":" + ES_PORT);
+                console.log('>>>> ElasticSearch is listening on', ES_URL);
         });
         //bulkindexService.getInstance().importExcel();
     }
