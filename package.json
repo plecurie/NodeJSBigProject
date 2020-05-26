@@ -11,8 +11,8 @@
     "clean": "rm -rf ./dist",
     "dev": "ts-node src/index.ts",
     "debug": "node --inspect dist/",
-    "test": "tsc && mocha 'src/tests/**/*.spec.ts'",
-    "build": "tsc -p .",
+    "test": "tsc && mocha 'dist/**/*.spec.js'",
+    "build": "npm run clean && tsc",
     "start": "ts-node dist/index.js"
   },
   "keywords": [],
