@@ -1,8 +1,8 @@
 FROM node:alpine
-WORKDIR /dist
+WORKDIR /usr/src/app
 COPY package*.json ./
 RUN apk add --update python make g++ && rm -rf /var/cache/apk/*
 RUN npm ci --only=production
 COPY . .
 EXPOSE 3100
-CMD [ "node", "src/app.ts" ]
+CMD [ "node", "dist/index.js" ]

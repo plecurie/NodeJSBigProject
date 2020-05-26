@@ -1,14 +1,18 @@
 version: '3'
 
 services:
-  scala-api:
-    image: registry.gitlab.com/scala1/scala-api:master
-    expose:
-      - "3000"
-    environment:
-      - VIRTUAL_HOST: api.scala-app.com
-      - VIRTUAL_PORT: 3000
-      - LETSENCRYPT_HOST: api.scala-app.com
-    volumes:
-      - /home/gitlab-runner/api:/app/data
+  app:
+    container_name: app
     restart: unless-stopped
+    build: .
+    environment:
+      - PORT = 3100
+    ports:
+      - "3100:3100"
+    links:
+      - elasticsearch
+  elasticsearch:
+    container_name: elasticsearch
+    image: strapdata/elassandra:latest
+    ports:
+      - "9201:9201"

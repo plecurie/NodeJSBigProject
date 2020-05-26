@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
-    "outDir": "dist",
+    "target": "es6",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "sourceMap": true,
     "lib": [
       "dom",
@@ -11,10 +12,6 @@
       "es2017"
     ]
   },
-  // "files": [
-  //   "./node_modules/@types/mocha/index.d.ts",
-  //   "./node_modules/@types/node/index.d.ts",
-  // ],
   "include": [
     "src/**/*"
   ],
