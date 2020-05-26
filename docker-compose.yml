@@ -6,6 +6,40 @@ services:
     restart: unless-stopped
     build: .
     environment:
-      - PORT = 3100
+      - NODE_ENV=local
+      - ELASTICSEARCH_HOST=elasticsearch
+      - PORT=3100
     ports:
       - "3100:3100"
+
+  elasticsearch:
+    image: strapdata/elassandra:latest
+    container_name: elastic-scala
+    environment:
+      - node.name=elassandra
+      - cluster.name=mobile-app-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "http.cors.allow-origin=*"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+      - "http.cors.allow-credentials=true"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/var/lib/cassandra
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
