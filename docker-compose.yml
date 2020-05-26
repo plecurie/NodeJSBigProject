@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     build: .
     environment:
-      - PORT = 3100
+      ELASTICSEARCH_HOST: 'elasticsearch:9201'
     ports:
       - "3100:3100"
     links:
