@@ -23,6 +23,7 @@ before_script:
 
 build:
   stage: build
+  image: node:latest
   before_script:
     - npm install
   script:
