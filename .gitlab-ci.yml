@@ -31,7 +31,7 @@ build:
     paths:
       - dist/
 
-build:
+build_staging:
   stage: build-staging
   image: docker:19.03.8
   script:
@@ -41,7 +41,7 @@ build:
     - job: build
       artifacts: true
 
-test:
+test_staging:
   stage: test-staging
   image: docker:19.03.8
   script:
