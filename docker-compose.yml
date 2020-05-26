@@ -7,7 +7,7 @@ services:
     build: .
     environment:
       - NODE_ENV=local
-      - ELASTICSEARCH_HOST=elasticsearch
+      - ES_HOST=elasticsearch
       - PORT=3100
     ports:
       - "3100:3100"
