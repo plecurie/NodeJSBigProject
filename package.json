@@ -13,7 +13,7 @@
     "debug": "node --inspect dist/",
     "test": "tsc && mocha 'src/tests/**/*.spec.ts'",
     "build": "npm run clean && tsc",
-    "start": "node dist/index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "Scala Patrimoine",

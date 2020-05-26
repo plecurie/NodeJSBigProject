@@ -6,7 +6,6 @@ stages:
   - build
   - test
   - release
-  - deploy
 
 variables:
   TEST_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:$CI_COMMIT_REF_NAME
@@ -34,7 +33,7 @@ test_docker:
   script:
     - docker pull $TEST_IMAGE
     - docker run $TEST_IMAGE npm install
-    - docker run $TEST_IMAGE npm build
+    - docker run $TEST_IMAGE npm run build
     - docker run $TEST_IMAGE npm test
 
 release:
@@ -47,24 +46,24 @@ release:
   only:
     - master
 
-deploy_ssh:
-  stage: deploy
-  image: node:latest
-  only:
-    - master
-  when: manual
-  allow_failure: false
-  before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
-    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  script:
-    - sshpass -V
-    - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
-    - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
-    - sshpass -e ssh -p22 $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
-    - rm -f ~/.ssh/id_rsa
+#deploy_ssh:
+#  stage: deploy
+#  image: node:latest
+#  only:
+#    - master
+#  when: manual
+#  allow_failure: false
+#  before_script:
+#    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
+#    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
+#    - eval $(ssh-agent -s)
+#    - mkdir -p ~/.ssh
+#    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+#    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+#  script:
+#    - sshpass -V
+#    - export SSHPASS=$SSH_PASS
+#    - sshpass -e ssh -p22 $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
+#    - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
+#    - sshpass -e ssh -p22 $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
+#    - rm -f ~/.ssh/id_rsa
