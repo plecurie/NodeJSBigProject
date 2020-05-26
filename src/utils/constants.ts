@@ -1,4 +1,3 @@
 export const APP_PORT = process.env.PORT || 3100;
-export const APP_HOST = "http://localhost";
-export const ES_HOST = process.env.ELASTICSEARCH_HOST || 'localhost';
-export const ES_URL = 'http://' + ES_HOST + ':9200';
+export const APP_HOST = "0.0.0.0";
+export const ES_URL = process.env.ELASTIC_URL || "http://localhost:9200";

@@ -2,44 +2,54 @@ version: '3'
 
 services:
   app:
-    container_name: app
-    restart: unless-stopped
-    build: .
+    container_name: node-app
+    restart: always
+    build: ./
     environment:
       - NODE_ENV=local
       - ES_HOST=elasticsearch
-      - PORT=3100
+      - NODE_PORT=3100
+      - ELASTIC_URL=http://elasticsearch:9200
     ports:
       - "3100:3100"
+    volumes:
+      - .:/app
+      - ./error.log:/usr/src/app/error.log
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch:elasticsearch
+    networks:
+      - esnet
 
   elasticsearch:
     image: strapdata/elassandra:latest
     container_name: elastic-scala
     environment:
-      - node.name=elassandra
+      - node.name=es01
       - cluster.name=mobile-app-cluster
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "http.cors.allow-origin=*"
-      - "http.cors.enabled=true"
-      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
-      - "http.cors.allow-credentials=true"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+#      - "http.cors.allow-origin=*"
+#      - "http.cors.enabled=true"
+#      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+#      - "http.cors.allow-credentials=true"
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
     volumes:
-      - data01:/var/lib/cassandra
+      - esdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+      - 9300:9300
     networks:
-      - elastic
+      - esnet
 
 volumes:
-  data01:
+  esdata:
     driver: local
 
 networks:
-  elastic:
-    driver: bridge
+  esnet:
