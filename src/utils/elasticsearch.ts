@@ -8,3 +8,6 @@ export const ELASTIC_CLIENT = new elasticsearch.Client({
     requestTimeout: 30000,
     sniffOnStart:true
 });
+
+export const errors = elasticsearch.errors;
+

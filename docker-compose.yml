@@ -1,27 +1,6 @@
 version: '3'
 
 services:
-  app:
-    container_name: node-app
-    restart: always
-    build: ./
-    environment:
-      - NODE_ENV=local
-      - ES_HOST=elasticsearch
-      - NODE_PORT=3100
-      - ELASTIC_URL=http://elasticsearch:9200
-    ports:
-      - "3100:3100"
-    volumes:
-      - .:/app
-      - ./error.log:/usr/src/app/error.log
-    depends_on:
-      - elasticsearch
-    links:
-      - elasticsearch:elasticsearch
-    networks:
-      - esnet
-
   elasticsearch:
     image: strapdata/elassandra:latest
     container_name: elastic-scala
@@ -44,6 +23,27 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    networks:
+      - esnet
+
+  app:
+    container_name: node-app
+    restart: always
+    build: ./
+    environment:
+      - NODE_ENV=local
+      - ES_HOST=elasticsearch
+      - NODE_PORT=3100
+      - ELASTIC_URL=http://elasticsearch:9200
+    ports:
+      - "3100:3100"
+    volumes:
+      - .:/app
+      - ./error.log:/usr/src/app/error.log
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch:elasticsearch
     networks:
       - esnet
 
