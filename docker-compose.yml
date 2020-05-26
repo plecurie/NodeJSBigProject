@@ -6,13 +6,6 @@ services:
     restart: unless-stopped
     build: .
     environment:
-      ELASTICSEARCH_HOST: 'elasticsearch:9201'
+      - PORT = 3100
     ports:
       - "3100:3100"
-    links:
-      - elasticsearch
-  elasticsearch:
-    container_name: elasticsearch
-    image: strapdata/elassandra:latest
-    ports:
-      - "9201:9201"
