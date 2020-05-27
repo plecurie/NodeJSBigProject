@@ -42,10 +42,10 @@ cache:
 
 deploy_staging:
   stage: review
-  image: docker:latest
+  image: node:latest
   before_script:
-    - 'which ssh-agent || ( apk update && apk add install openssh-client )'
-    - 'which sshpass || ( apk update && apk add install sshpass )'
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - ssh-add <(echo "$SSH_STAGING_KEY")
