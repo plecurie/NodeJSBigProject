@@ -87,7 +87,7 @@ deploy_production:
   script:
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
-  needs:
-    - job: release
+#  needs:
+#    - job: release
   only:
     - master
