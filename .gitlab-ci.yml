@@ -4,8 +4,8 @@ services:
 
 stages:
   - build
-  - build-staging
-  - test-staging
+  - dockerize
+  - test
   - release
 
 variables:
@@ -32,18 +32,21 @@ build:
     paths:
       - dist/
 
-build_staging:
-  stage: build-staging
+dockerize:
+  stage: dockerize
   image: docker:19.03.8
   script:
-    - docker build --pull -t $TEST_IMAGE .
+    - apk add --no-cache py-pip
+    - pip install docker-compose
+    - docker-compose build -t $TEST_IMAGE .
+    - docker-compose up -d
     - docker push $TEST_IMAGE
   needs:
     - job: build
       artifacts: true
 
-test_staging:
-  stage: test-staging
+test:
+  stage: test
   image: docker:19.03.8
   script:
     - docker pull $TEST_IMAGE

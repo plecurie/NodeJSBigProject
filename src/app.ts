@@ -29,16 +29,17 @@ class Application {
 
     start(): void {
 
-        let connected = false;
+        let es_started = false;
 
         function delay(ms: number) {
             return new Promise( resolve => setTimeout(resolve, ms) );
         }
+
         (async () => {
-            while(!connected) {
+            while(!es_started) {
                 await delay(5000);
                 ELASTIC_CLIENT.ping( (err, result) => {
-                    if(result.statusCode != null) connected = true;
+                    if(result.statusCode != null) es_started = true;
                     else console.log(">>>> Waiting for Elasticsearch to Start...");
                 });
             }
