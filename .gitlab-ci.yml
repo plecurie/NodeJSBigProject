@@ -2,7 +2,7 @@ stages:
   - test
   - build
   - review
-#  - release
+  - release
   - deploy
 
 variables:
@@ -44,7 +44,7 @@ deploy_staging:
   stage: review
   image: ubuntu
   before_script:
-    - apk add openssh-client
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -60,24 +60,25 @@ deploy_staging:
   needs:
     - job: build
   only:
+    - master
     - dev
 
-#release:
-#  stage: release
-#  image: docker:19.03.8
-#  script:
-#    - docker pull $TEST_IMAGE
-#    - docker tag $TEST_IMAGE $RELEASE_IMAGE
-#    - docker push $RELEASE_IMAGE
-#  when: manual
-#  only:
-#    - master
+release:
+  stage: release
+  image: docker:19.03.8
+  script:
+    - docker pull $TEST_IMAGE
+    - docker tag $TEST_IMAGE $RELEASE_IMAGE
+    - docker push $RELEASE_IMAGE
+  when: manual
+  only:
+    - master
 
 deploy_production:
   stage: deploy
   image: ubuntu
   before_script:
-    - apk add openssh-client
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -90,7 +91,7 @@ deploy_production:
   script:
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
-#  needs:
-#    - job: release
+  needs:
+    - job: release
   only:
     - master
