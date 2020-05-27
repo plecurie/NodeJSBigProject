@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SLUG
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:master
   RELEASE_IMAGE: scala-api_app:latest
 
 cache:
