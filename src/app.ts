@@ -2,7 +2,7 @@ import * as express from 'express'
 import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
     profileRouter, portfolioRouter } from "./routes";
 import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
-import { ELASTIC_CLIENT, errors } from "./utils/elasticsearch";
+import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 import { bulkindexService } from "./services/request/bulkindex.service";
 
 class Application {

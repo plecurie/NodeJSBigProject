@@ -1,5 +1,5 @@
 import * as elasticsearch from '@elastic/elasticsearch'
-import { ES_URL} from "./constants";
+import { ES_URL } from "./constants";
 
 export const ELASTIC_CLIENT = new elasticsearch.Client({
     node: [ES_URL],
