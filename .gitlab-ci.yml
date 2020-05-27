@@ -1,16 +1,13 @@
-services:
-  - name: docker:19.03.8-dind
-    alias: docker
-
 stages:
-  - build
-  - dockerize
   - test
+  - build
+  - review
   - release
+  - deploy
 
 variables:
-  TEST_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:$CI_COMMIT_REF_NAME
-  RELEASE_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:latest
+  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  RELEASE_IMAGE: $gitlab.scala-patrimoine.fr/node-api:5555:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -18,38 +15,50 @@ cache:
     - node_modules/
     - .npm/
 
-before_script:
-  - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD gitlab.scala-patrimoine.fr:5555
+test:
+  stage: test
+  image: node:alpine
+  script:
+    - npm install
+    - npm run build
+    - npm run test
 
 build:
   stage: build
-  image: node:latest
+  image: docker:latest
+  services:
+    - docker:dind
   before_script:
-    - npm install
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - npm run build
+    - apk add --update py-pip && pip install docker-compose
+    - docker-compose build
+    - docker push $TEST_IMAGE
   artifacts:
     paths:
       - dist/
 
-dockerize:
-  stage: dockerize
-  image: docker:19.03.8
+deploy_staging:
+  stage: review
+  image: ubuntu
+  before_script:
+    - apk add openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - docker build --pull -t $TEST_IMAGE .
-    - docker push $TEST_IMAGE
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $TEST_IMAGE"
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $TEST_IMAGE -d"
   needs:
     - job: build
-      artifacts: true
-
-test:
-  stage: test
-  image: docker:19.03.8
-  script:
-    - docker pull $TEST_IMAGE
-    - docker run $TEST_IMAGE npm install
-    - docker run $TEST_IMAGE npm run build
-    - docker run $TEST_IMAGE npm test
+  only:
+    - dev
 
 release:
   stage: release
@@ -58,26 +67,28 @@ release:
     - docker pull $TEST_IMAGE
     - docker tag $TEST_IMAGE $RELEASE_IMAGE
     - docker push $RELEASE_IMAGE
+  when: manual
   only:
     - master
 
-#deploy_ssh:
-#  stage: deploy
-#  image: node:latest
-#  only:
-#    - master
-#  when: manual
-#  allow_failure: false
-#  before_script:
-#    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
-#    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
-#    - eval $(ssh-agent -s)
-#    - mkdir -p ~/.ssh
-#    - ssh-add <(echo "$SSH_PRIVATE_KEY")
-#    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-#  script:
-#    - sshpass -V
-#    - export SSHPASS=$SSH_PASS
-#    - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
-#    - sshpass -e ssh -p22 $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
-#    - rm -f ~/.ssh/id_rsa
+deploy_production:
+  stage: deploy
+  image: ubuntu
+  before_script:
+    - apk add openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    needs:
+      - job: release
+  only:
+    - master
