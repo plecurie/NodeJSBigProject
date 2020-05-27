@@ -58,8 +58,8 @@ deploy_staging:
     - sshpass -e ssh -p22 $USERNAME@$HOST "rm -rf htdocs/_old"
     - sshpass -e ssh -p22 $USERNAME@$HOST "cd htdocs/_tmp/scala-api && docker-compose down && docker-compose up -d"
     - rm -f ~/.ssh/id_rsa
-    needs:
-      - job: build
+  needs:
+    - job: build
   only:
     - master
     - dev
