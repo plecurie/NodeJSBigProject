@@ -42,10 +42,7 @@ cache:
 
 deploy_staging:
   stage: review
-  image: docker:19.03.8
-  services:
-    - name: docker:19.03.8-dind
-      alias: docker
+  image: node:latest
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
