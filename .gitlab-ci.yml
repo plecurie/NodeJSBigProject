@@ -7,7 +7,7 @@ stages:
 
 variables:
   BUILD_IMAGE: $CI_REGISTRY_IMAGE:master
-  RELEASE_IMAGE: scala-api_app:latest
+  RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -45,14 +45,8 @@ deploy_staging:
   image: ubuntu
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
+    - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
@@ -79,14 +73,8 @@ deploy_production:
   image: ubuntu
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
+    - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
