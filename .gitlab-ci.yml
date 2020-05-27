@@ -2,11 +2,10 @@ stages:
   - test
   - build
   - review
-  - release
+#  - release
   - deploy
 
 variables:
-  TEST_IMAGE: scala-api_app:$CI_COMMIT_REF_SLUG
   RELEASE_IMAGE: scala-api_app:latest
 
 cache:
@@ -33,7 +32,7 @@ build:
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker push $TEST_IMAGE
+    - docker push $RELEASE_IMAGE
   artifacts:
     paths:
       - dist/
@@ -53,23 +52,23 @@ deploy_staging:
     - chmod 644 ~/.ssh/known_hosts
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $TEST_IMAGE"
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $TEST_IMAGE -d"
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
+    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
   needs:
     - job: build
   only:
     - dev
 
-release:
-  stage: release
-  image: docker:19.03.8
-  script:
-    - docker pull $TEST_IMAGE
-    - docker tag $TEST_IMAGE $RELEASE_IMAGE
-    - docker push $RELEASE_IMAGE
-  when: manual
-  only:
-    - master
+#release:
+#  stage: release
+#  image: docker:19.03.8
+#  script:
+#    - docker pull $TEST_IMAGE
+#    - docker tag $TEST_IMAGE $RELEASE_IMAGE
+#    - docker push $RELEASE_IMAGE
+#  when: manual
+#  only:
+#    - master
 
 deploy_production:
   stage: deploy
