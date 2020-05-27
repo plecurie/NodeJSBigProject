@@ -49,6 +49,7 @@ deploy_staging:
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
+    - ssh-add <(echo "$STAGING_PRIVATE_KEY")
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
   needs:
@@ -77,6 +78,7 @@ deploy_production:
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
   needs:
