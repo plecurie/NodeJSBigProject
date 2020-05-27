@@ -6,8 +6,8 @@ stages:
   - deploy
 
 variables:
-  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  RELEASE_IMAGE: $gitlab.scala-patrimoine.fr/node-api:5555:latest
+  TEST_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:$CI_COMMIT_REF_SLUG
+  RELEASE_IMAGE: gitlab.scala-patrimoine.fr:5555/scala-api1/api:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
