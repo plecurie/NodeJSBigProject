@@ -44,16 +44,18 @@ deploy_staging:
   stage: review
   image: jimmyadaro/gitlab-ci-cd:latest
   before_script:
-    - mkdir -p  ~/.ssh
-    - echo “$SSH_STAGING_KEY” > ~/.ssh/id_rsa
-    - chmod 700 ~/.ssh
-    - chmod 600 ~/.ssh/id_rsa
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
     - eval $(ssh-agent -s)
-    - ssh-add ~/.ssh/id_rsa
+    - mkdir -p ~/.ssh
+    - ssh-add <(echo "$SSH_STAGING_KEY")
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -p22 -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    - sshpass -V
+    - export SSHPASS=$SSH_PASS
+    - sshpass -e ssh -p22 -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
+    - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
+    - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
     - rm -f ~/.ssh/id_rsa
   needs:
     - job: build
