@@ -78,7 +78,6 @@ release:
 #  script:
 #    - sshpass -V
 #    - export SSHPASS=$SSH_PASS
-#    - sshpass -e ssh -p22 $USERNAME@$HOST "netstat -tplan | grep :9200 || (sysctl -w vm.max_map_count=262144 && docker rm elassandra && docker run --name elassandra -p 127.0.0.1:9200:9200/tcp -d strapdata/elassandra:latest)"
 #    - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
 #    - sshpass -e ssh -p22 $USERNAME@$HOST "docker run -it -p 3000:3000 $RELEASE_IMAGE"
 #    - rm -f ~/.ssh/id_rsa
