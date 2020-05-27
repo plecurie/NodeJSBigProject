@@ -1,6 +1,6 @@
 stages:
-#  - test
-#  - build
+  - test
+  - build
   - review
   - release
   - deploy
@@ -57,8 +57,8 @@ deploy_staging:
     - sshpass -e ssh -p22 $USERNAME@$HOST "docker pull $BUILD_IMAGE"
     - sshpass -e ssh -p22 $USERNAME@$HOST "docker run $BUILD_IMAGE"
     - rm -f ~/.ssh/id_rsa
-  #  needs:
-  #    - job: build
+    needs:
+      - job: build
   only:
     - master
     - dev
