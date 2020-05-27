@@ -44,7 +44,7 @@ deploy_staging:
   stage: review
   image: jimmyadaro/gitlab-ci-cd:latest
   before_script:
-    - mkdir -p ~/.ssh
+    - mkdir -p  ~/.ssh
     - echo “$SSH_STAGING_KEY” > ~/.ssh/id_rsa
     - chmod 700 ~/.ssh
     - chmod 600 ~/.ssh/id_rsa
