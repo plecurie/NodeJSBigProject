@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: scala1/scala-api:latest
+  BUILD_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SLUG
   RELEASE_IMAGE: scala-api_app:latest
 
 cache:
@@ -34,8 +34,8 @@ build:
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker tag scala-api_app $CI_REGISTRY:$BUILD_IMAGE
-    - docker push $CI_REGISTRY:$BUILD_IMAGE
+    - docker tag scala-api_app $BUILD_IMAGE
+    - docker push $BUILD_IMAGE
   artifacts:
     paths:
       - dist/
