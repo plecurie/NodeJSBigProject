@@ -34,7 +34,7 @@ build:
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker tag scala-api_app $BUILD_IMAGE
+    - docker tag scala-api_app:latest $BUILD_IMAGE
     - docker push $BUILD_IMAGE
   artifacts:
     paths:
