@@ -1,6 +1,6 @@
 import * as express from 'express'
-import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter, 
-profileRouter, portfolioRouter } from "./routes";
+import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
+    profileRouter, portfolioRouter } from "./routes";
 import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
 import { ELASTIC_CLIENT, errors } from "./utils/elasticsearch";
 import { bulkindexService } from "./services/request/bulkindex.service";
@@ -29,17 +29,16 @@ class Application {
 
     start(): void {
 
-        let es_started = false;
+        let connected = false;
 
         function delay(ms: number) {
             return new Promise( resolve => setTimeout(resolve, ms) );
         }
-
         (async () => {
-            while(!es_started) {
+            while(!connected) {
                 await delay(5000);
                 ELASTIC_CLIENT.ping( (err, result) => {
-                    if(result.statusCode != null) es_started = true;
+                    if(result.statusCode != null) connected = true;
                     else console.log(">>>> Waiting for Elasticsearch to Start...");
                 });
             }
