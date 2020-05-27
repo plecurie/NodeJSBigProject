@@ -24,7 +24,7 @@ build:
   stage: build
   image: docker:19.03.8
   script:
-    - apk add --no-cache py-pip python python-dev make g++
+    - apk add --no-cache py-pip python python-dev make g++ gcc
     - pip install docker-compose
     - docker image prune -f
     - docker-compose -f docker-compose.yml build --no--cache
