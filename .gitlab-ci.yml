@@ -44,12 +44,12 @@ deploy_staging:
   stage: review
   image: ubuntu
   before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - mkdir -p ~/.ssh
-    - touch ~/.ssh/id_rsa
-    - echo "$STAGIN_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - echo “$SSH_STAGING_KEY” > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
     - eval $(ssh-agent -s)
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ssh-add ~/.ssh/id_rsa
   script:
     - ssh -p22 -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
@@ -80,7 +80,7 @@ deploy_production:
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh -p22 -i echo $SSH_PRIVATE_KEY gitlab_runner@gitlab.scala-patrimoine.fr
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
   needs:
