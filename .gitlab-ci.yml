@@ -42,7 +42,7 @@ build:
 
 deploy_staging:
   stage: review
-  image: ubuntu
+  image: jimmyadaro/gitlab-ci-cd:latest
   before_script:
     - mkdir -p ~/.ssh
     - echo “$SSH_STAGING_KEY” > ~/.ssh/id_rsa
@@ -54,6 +54,7 @@ deploy_staging:
     - ssh -p22 -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    - rm -f ~/.ssh/id_rsa
   needs:
     - job: build
   only:
@@ -73,7 +74,7 @@ release:
 
 deploy_production:
   stage: deploy
-  image: ubuntu
+  image: jimmyadaro/gitlab-ci-cd:latest
   before_script:
     - 'which ssh-agent || ( apt-get  update -y && apt-get install openssh-client -y )'
     - mkdir -p ~/.ssh
@@ -83,6 +84,8 @@ deploy_production:
     - ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    - rm -f ~/.ssh/id_rsa
+    - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
   needs:
     - job: release
   only:
