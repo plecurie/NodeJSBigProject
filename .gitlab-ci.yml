@@ -42,23 +42,24 @@ cache:
 
 deploy_staging:
   stage: review
-  image: node:latest
+  image: docker:19.03.8
+  services:
+    - name: docker:19.03.8-dind
+      alias: docker
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y)'
-    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq)'
-    - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
-    - ssh-add <(echo "$SSH_STAGING_KEY")
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo “$SSH_PRIVATE_KEY” > ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/id_rsa
+    - eval $(ssh-agent -s)
+    - ssh-add ~/.ssh/id_rsa
   script:
-    - sshpass -V
-    - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 -i ~/.ssh/id_rsa gitlab_runner@gitlab.scala-patrimoine.fr
-    - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
-    - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "docker pull $RELEASE_IMAGE"
+    - ssh -i ~/.ssh/id_rsa $USERNAME@$HOST "docker run $RELEASE_IMAGE"
     - rm -f ~/.ssh/id_rsa
-#  needs:
-#    - job: build
+  #  needs:
+  #    - job: build
   only:
     - master
     - dev
