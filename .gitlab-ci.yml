@@ -4,6 +4,7 @@ services:
 
 stages:
   - build
+  - dockerize
   - test
   - release
 
@@ -22,13 +23,24 @@ before_script:
 
 build:
   stage: build
+  image: node:latest
+  before_script:
+    - npm install
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+dockerize:
+  stage: dockerize
   image: docker:19.03.8
   script:
-    - apk add --no-cache py-pip python python-dev make g++ gcc
-    - pip install docker-compose
-    - docker image prune -f
-    - docker-compose -f docker-compose.yml build --no--cache
-    - docker-compose -f docker-compose.yml up -d
+    - docker build --pull -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
+  needs:
+    - job: build
+      artifacts: true
 
 test:
   stage: test

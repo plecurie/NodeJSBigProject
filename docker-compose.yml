@@ -10,19 +10,10 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#      - "http.cors.allow-origin=*"
-#      - "http.cors.enabled=true"
-#      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
-#      - "http.cors.allow-credentials=true"
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
     volumes:
       - esdata:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
-      - 9300:9300
+      - "9200:9200"
     networks:
       - esnet
 
@@ -35,9 +26,8 @@ services:
       - ES_HOST=elasticsearch
       - NODE_PORT=3100
       - ELASTIC_URL=http://elasticsearch:9200
-    expose:
-      - "3100"
-    command: npm start
+    ports:
+      - "3100:3100"
     volumes:
       - .:/app
       - ./error.log:/usr/src/app/error.log
