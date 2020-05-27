@@ -36,8 +36,10 @@ dockerize:
   stage: dockerize
   image: docker:19.03.8
   script:
-    - docker-compose build -t $TEST_IMAGE .
-    - docker push $TEST_IMAGE
+    - apk add --no-cache py-pip
+    - pip install docker-compose
+    - docker-compose -f docker-compose.yml build
+    - docker-compose -f docker-compose.yml push
   needs:
     - job: build
       artifacts: true
