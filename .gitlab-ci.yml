@@ -29,7 +29,7 @@ build:
   services:
     - docker:dind
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD gitlab.scala-patrimoine.fr:5555
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
