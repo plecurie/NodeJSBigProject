@@ -1,6 +1,6 @@
 stages:
-  - test
-  - build
+#  - test
+#  - build
   - review
   - release
   - deploy
@@ -15,34 +15,34 @@ cache:
     - node_modules/
     - .npm/
 
-test:
-  stage: test
-  image: node:alpine
-  script:
-    - npm install
-    - npm run build
-    - npm run test
-
-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - docker logout
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-    - docker-compose build
-    - docker tag scala-api_app:latest $BUILD_IMAGE
-    - docker push $BUILD_IMAGE
-  artifacts:
-    paths:
-      - dist/
+#test:
+#  stage: test
+#  image: node:alpine
+#  script:
+#    - npm install
+#    - npm run build
+#    - npm run test
+#
+#build:
+#  stage: build
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  before_script:
+#    - docker logout
+#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#  script:
+#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+#    - docker-compose build
+#    - docker tag scala-api_app:latest $BUILD_IMAGE
+#    - docker push $BUILD_IMAGE
+#  artifacts:
+#    paths:
+#      - dist/
 
 deploy_staging:
   stage: review
-  image: linux:alpine
+  image: docker:latest
   before_script:
     - 'which ssh-agent || ( apk update -y && apk add install openssh-client -y )'
     - 'which sshpass || ( apk update -y -qq && apk add install sshpass -y -qq )'
@@ -57,8 +57,8 @@ deploy_staging:
     - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
     - sshpass -e ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
     - rm -f ~/.ssh/id_rsa
-  needs:
-    - job: build
+#  needs:
+#    - job: build
   only:
     - master
     - dev
