@@ -35,8 +35,9 @@ services:
       - ES_HOST=elasticsearch
       - NODE_PORT=3100
       - ELASTIC_URL=http://elasticsearch:9200
-    ports:
-      - "3100:3100"
+    expose:
+      - "3100"
+    command: npm start
     volumes:
       - .:/app
       - ./error.log:/usr/src/app/error.log
