@@ -53,7 +53,7 @@ deploy_staging:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh -p22 $USERNAME@$HOST "mkdir htdocs/_tmp && git clone git@gitlab.com:scala1/scala-api.git"
+    - sshpass -e ssh -p22 $USERNAME@$HOST "mkdir htdocs/_tmp && git clone https://$CI_DEPLOY_USER:$CI_DEPLOY_PASSWORD@gitlab.com/scala1/scala-api.git"
     - sshpass -e ssh -p22 $USERNAME@$HOST "mv htdocs/current htdocs/_old && mv htdocs/_tmp htdocs/current"
     - sshpass -e ssh -p22 $USERNAME@$HOST "rm -rf htdocs/_old"
     - sshpass -e ssh -p22 $USERNAME@$HOST "cd htdocs/_tmp/scala-api && docker-compose down && docker-compose up -d"
