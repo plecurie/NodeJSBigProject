@@ -1,6 +1,6 @@
 stages:
-  - test
-  - build
+#  - test
+#  - build
   - review
   - release
   - deploy
@@ -15,30 +15,30 @@ cache:
     - node_modules/
     - .npm/
 
-test:
-  stage: test
-  image: node:alpine
-  script:
-    - npm install
-    - npm run build
-    - npm run test
-
-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - docker logout
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-    - docker-compose build
-    - docker tag scala-api_app:latest $BUILD_IMAGE
-    - docker push $BUILD_IMAGE
-  artifacts:
-    paths:
-      - dist/
+#test:
+#  stage: test
+#  image: node:alpine
+#  script:
+#    - npm install
+#    - npm run build
+#    - npm run test
+#
+#build:
+#  stage: build
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  before_script:
+#    - docker logout
+#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#  script:
+#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+#    - docker-compose build
+#    - docker tag scala-api_app:latest $BUILD_IMAGE
+#    - docker push $BUILD_IMAGE
+#  artifacts:
+#    paths:
+#      - dist/
 
 deploy_staging:
   stage: review
@@ -49,6 +49,7 @@ deploy_staging:
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - touch ~/.ssh/id_rsa && echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - sshpass -V
@@ -58,8 +59,8 @@ deploy_staging:
     - sshpass -e ssh -p22 $USERNAME@$HOST "rm -rf htdocs/_old"
     - sshpass -e ssh -p22 $USERNAME@$HOST "cd htdocs/_tmp/scala-api && docker-compose down && docker-compose up -d"
     - rm -f ~/.ssh/id_rsa
-  needs:
-    - job: build
+#  needs:
+#    - job: build
   only:
     - master
     - dev
