@@ -48,7 +48,7 @@ deploy_staging:
     - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
     - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
-    - ssh-add < (echo "$SSH_PRIVATE_KEY")
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - touch ~/.ssh/id_rsa && echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
