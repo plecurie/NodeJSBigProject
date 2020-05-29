@@ -7,8 +7,8 @@ RUN wget -O /usr/local/bin/gitlab-runner https://gitlab-ci-multi-runner-download
 CMD npm install -g typescript && \
 	npm install -g tslint && \
 	gitlab-runner register \
-    	-u http://gitlab/ci \
-    	-r rSyUTfHxLL_qP7nYSfvA \
+    	-u https://gitlab.com/ \
+    	-r acUs6yM-ZooML1t5L4s2 \
     	-n \
     	--executor shell \
     	--tag-list "typescript,tslint"\
