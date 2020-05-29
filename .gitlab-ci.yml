@@ -18,9 +18,6 @@ cache:
 test:
   stage: test
   image: node:alpine
-  tags:
-    - typescript
-    - tslint
   script:
     - npm install
     - npm run build
@@ -67,9 +64,6 @@ deploy_staging:
     - sshpass -e ssh deployer@$H_STAGING "docker run --publish=3100:3100 -d ${STAGING_IMAGE}"
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
-  tags:
-    - deploy
-    - staging
   environment:
     name: Staging
     url: http://51.91.109.146:3111
@@ -78,39 +72,23 @@ deploy_staging:
     - dev
 
 release:
-  stage: release
-  image: gitlab/dind:latest
+  image: docker:git
   services:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay
+  stage: release
   before_script:
-    - mkdir -p ~/.ssh
-    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - eval "$(ssh-agent -s)"
-    - ssh-add ~/.ssh/id_rsa
-    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - sshpass -V
-    - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh deployer@$H_STAGING "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
-    - sshpass -e ssh deployer@$H_STAGING "docker stop ${IMAGE_TAG}" || true
-    - sshpass -e ssh deployer@$H_STAGING "docker rm ${IMAGE_TAG}" || true
-    - sshpass -e ssh deployer@$H_STAGING "docker rmi -f ${STAGING_IMAGE}" || true
-    - sshpass -e ssh deployer@$H_STAGING "docker run --publish=3100:3100 -d ${STAGING_IMAGE}"
-    - rm -f ~/.ssh/id_rsa
-    - 'echo Staging done: $(date “+%F %H:%M:%S”)'
-  when: manual
+    - docker build --tag=$IMAGE_TAG ./backend-app --pull -t $IMAGE_NAME
+    - docker push $STAGING_NAME
   only:
     - master
 
 deploy_production:
   stage: deploy
   image: node:latest
-  tags:
-    - deploy
-    - production
   environment:
     name: Production
     url: https://gitlab.scala-patrimoine.fr:3100
