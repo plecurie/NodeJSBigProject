@@ -1,7 +1,7 @@
 stages:
   - build
-  - deploy
   - release
+  - deploy
 
 variables:
   STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
@@ -77,8 +77,6 @@ deploy_staging:
   environment:
     name: Staging
     url: http://51.91.109.146:3111
-  needs:
-    - job: release
   only:
     - master
     - dev
