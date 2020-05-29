@@ -35,6 +35,21 @@ dockerize:
     - docker tag scala_nodejs:latest $STAGING_IMAGE
     - docker push $STAGING_IMAGE
 
+release:
+  stage: release
+  image: docker:git
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build --tag=$IMAGE_TAG ./backend-app --pull -t $IMAGE_NAME
+    - docker push $STAGING_NAME
+  only:
+    - master
+
 deploy_staging:
   stage: deploy
   image: gitlab/dind:latest
@@ -62,24 +77,11 @@ deploy_staging:
   environment:
     name: Staging
     url: http://51.91.109.146:3111
+  needs:
+    - job: release
   only:
     - master
     - dev
-
-release:
-  stage: release
-  image: docker:git
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  script:
-    - docker build --tag=$IMAGE_TAG ./backend-app --pull -t $IMAGE_NAME
-    - docker push $STAGING_NAME
-  only:
-    - master
 
 deploy_production:
   stage: deploy
