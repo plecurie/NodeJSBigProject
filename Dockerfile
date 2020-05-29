@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+RUN apk add --update python-dev python make g++ && rm -rf /var/cache/apk/*
+
 RUN npm ci --only=production --silent && mv node_modules ../
 
 COPY . .
