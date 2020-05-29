@@ -21,11 +21,7 @@ test:
   script:
     - npm install
     - npm run build
-    - tslint -c tslint.json index.ts
     - npm run test
-  artifacts:
-    paths:
-      - dist/
 
 build:
   stage: build
