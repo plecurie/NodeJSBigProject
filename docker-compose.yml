@@ -1,62 +1,65 @@
-version: '3'
-
+version: '2'
 services:
-  elasticsearch:
-    image: strapdata/elassandra:latest
-    container_name: elastic-scala
+  seed:
+    container_name: elassandra
+    image: "docker.io/strapdata/elassandra:6.8.4.3"
     environment:
-      - node.name=es01
-      - cluster.name=mobile-app-cluster
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - "JVM_OPTS=-Dcassandra.custom_query_handler_class=org.elassandra.index.ElasticQueryHandler"
+      - "MAX_HEAP_SIZE=1200m"
+      - "HEAP_NEWSIZE=300m"
+      - "CASSANDRA_CGROUP_MEMORY_LIMIT=true"
+      - "DEBUG=true"
+    cap_add:
+      - IPC_LOCK
+    ulimits:
+      memlock: -1
+    mem_limit: 2000m
     ports:
-      - 9200:9200
-    networks:
-      - esnet
+      - "9042:9042"
+      - "9200:9200"
+  node:
+    image: "docker.io/strapdata/elassandra:6.8.4.3"
+    environment:
+      - "JVM_OPTS=-Dcassandra.custom_query_handler_class=org.elassandra.index.ElasticQueryHandler"
+      - "MAX_HEAP_SIZE=1200m"
+      - "HEAP_NEWSIZE=300m"
+      - "CASSANDRA_CGROUP_MEMORY_LIMIT=true"
+      - "CASSANDRA_SEEDS=seed_node"
+      - "DEBUG=true"
+    links:
+      - seed
+    cap_add:
+      - IPC_LOCK
+    ulimits:
+      memlock: -1
+    mem_limit: 2000m
 
-  app:
-    container_name: node-app
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana-oss:6.8.4
+    environment:
+      - "ELASTICSEARCH_URL=http://elassandra:9200"
+    ports:
+      - "5601:5601"
+    mem_limit: 500m
+
+  nodejs:
+    container_name: app
     restart: always
     build: ./
     environment:
       - NODE_ENV=local
       - ES_HOST=elasticsearch
       - NODE_PORT=3100
-      - ELASTIC_URL=http://elasticsearch:9200
+      - "ELASTICSEARCH_URL=http://elassandra:9200"
     ports:
       - "3100:3100"
     volumes:
       - .:/app
       - ./error.log:/usr/src/app/error.log
-    depends_on:
-      - elasticsearch
     links:
-      - elasticsearch:elasticsearch
-    networks:
-      - esnet
-
-  staging:
-    image: 'nginx'
-    ports:
-      - '3111:80'
-    volumes:
-      - staging:/usr/share/nginx/html
-
-  production:
-    image: 'nginx'
-    ports:
-      - '3100:80'
-    volumes:
-      - production:/usr/share/nginx/html
+      - seed
 
 volumes:
   esdata:
     driver: local
-  staging:
-  production:
-
-networks:
-  esnet:

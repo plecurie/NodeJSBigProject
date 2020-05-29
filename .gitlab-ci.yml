@@ -1,8 +1,7 @@
 stages:
-  - test
   - build
-  - release
   - deploy
+  - release
 
 variables:
   STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
@@ -15,15 +14,15 @@ cache:
     - node_modules/
     - .npm/
 
-test:
-  stage: test
+compile:
+  stage: build
   image: node:alpine
   script:
     - npm install
     - npm run build
     - npm run test
 
-build:
+dockerize:
   stage: build
   image: docker:latest
   services:
@@ -33,7 +32,7 @@ build:
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker tag scala-api_app:latest $STAGING_IMAGE
+    - docker tag scala_nodejs:latest $STAGING_IMAGE
     - docker push $STAGING_IMAGE
 
 deploy_staging:
@@ -68,12 +67,12 @@ deploy_staging:
     - dev
 
 release:
+  stage: release
   image: docker:git
   services:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay
-  stage: release
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
