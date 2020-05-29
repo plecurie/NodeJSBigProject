@@ -1,4 +1,4 @@
-import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import { Producer } from "../../models/Producer";
 import {CrudController} from "../../utils";
 import {Portfolio} from "../../models/Portfolio";
@@ -8,7 +8,7 @@ export class ProducersController extends CrudController {
 
         const producer : Producer = { name: req.body.name, products: req.body.products };
 
-        ELASTIC_CLIENT.index({
+        client.index({
             index: 'scala',
             type: 'database',
             body : {
@@ -27,7 +27,7 @@ export class ProducersController extends CrudController {
 
     read(req, res): void {
 
-        ELASTIC_CLIENT.get({
+        client.get({
             index: 'scala',
             type: 'database',
             id: req.query.id
@@ -40,11 +40,34 @@ export class ProducersController extends CrudController {
 
     }
 
+/*    find(req, res): void {
+        const body = {
+            from: req.query.offset,
+            query: { match: {
+                    text: {
+                        query: req.query.term,
+                        operator: 'and',
+                        fuzziness: 'auto'
+                    } } },
+            highlight: { fields: { text: {} } }
+        };
+        client.search({
+            index,
+            type,
+            body
+        }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        })
+    }*/
+
     update(req, res): void {
 
         const producer : Producer = { name: req.body.name, products: req.body.products };
 
-        ELASTIC_CLIENT.update({
+        client.update({
             index: 'scala',
             type: 'database',
             id: req.query.id,
@@ -66,7 +89,7 @@ export class ProducersController extends CrudController {
 
     delete(req, res): void {
 
-        ELASTIC_CLIENT.delete({
+        client.delete({
             index: 'scala',
             type: 'database',
             id: req.query.id,

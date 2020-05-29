@@ -10,14 +10,6 @@ services:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    #      - "http.cors.allow-origin=*"
-    #      - "http.cors.enabled=true"
-    #      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
-    #      - "http.cors.allow-credentials=true"
-    #    ulimits:
-    #      memlock:
-    #        soft: -1
-    #        hard: -1
     volumes:
       - esdata:/usr/share/elasticsearch/data
     ports:
@@ -46,9 +38,34 @@ services:
     networks:
       - esnet
 
+  runner-ts:
+    build: runner-ts/.
+
+  runner-deploy:
+    build: runner-deploy/.
+    volumes:
+      - staging:/www-staging
+      - production:/www-production
+
+  staging:
+    image: 'nginx'
+    ports:
+      - '3111:80'
+    volumes:
+      - staging:/usr/share/nginx/html
+
+  production:
+    image: 'nginx'
+    ports:
+      - '3100:80'
+    volumes:
+      - production:/usr/share/nginx/html
+
 volumes:
   esdata:
     driver: local
+  staging:
+  production:
 
 networks:
   esnet:

@@ -14,6 +14,10 @@ router.get('/', (req: Request, res: Response) => {
     productsController.read(req, res)
 });
 
+/*router.get('/search', (req, res) => {
+    productsController.find(req, res);
+});*/
+
 router.post('/update',(req: Request, res: Response) => {
     productsController.update(req, res);
 });
