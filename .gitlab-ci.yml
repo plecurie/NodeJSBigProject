@@ -104,9 +104,6 @@ deploy_production:
     - sshpass -e ssh gitlab-runner@$H_PROD "docker run --publish=3100:3100 -d ${PRODUCTION_IMAGE}"
     - rm -f ~/.ssh/id_rsa
     - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
-  needs:
-    - job: release
   when: manual
   only:
     - master
-
