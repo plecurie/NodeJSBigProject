@@ -5,4 +5,6 @@ RUN apk add --update python-dev python make g++ && rm -rf /var/cache/apk/*
 RUN npm ci --only=production --silent && mv node_modules ../
 COPY . .
 EXPOSE 3100
-CMD [ "node", "dist/index.js" ]
+CMD CMD npm install -g typescript && \
+    	npm install -g tslint && \
+    	[ "node", "dist/index.js" ]
