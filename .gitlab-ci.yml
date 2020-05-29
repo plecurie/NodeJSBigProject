@@ -4,9 +4,8 @@ stages:
   - deploy
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  STAGING_IMAGE: scala_nodejs:$CI_COMMIT_REF_SLUG
   PRODUCTION_IMAGE: $CI_REGISTRY_IMAGE:latest
-  IMAGE_TAG: ${CI_COMMIT_REF_SLUG}
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -41,7 +40,7 @@ dockerize:
   script:
     - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker tag scala_nodejs $STAGING_IMAGE
+    - docker tag scala_nodejs STAGING_IMAGE
     - docker push $STAGING_IMAGE
 
 release:
