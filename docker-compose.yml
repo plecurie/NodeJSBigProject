@@ -38,15 +38,6 @@ services:
     networks:
       - esnet
 
-  runner-ts:
-    build: runner-ts/.
-
-  runner-deploy:
-    build: runner-deploy/.
-    volumes:
-      - staging:/www-staging
-      - production:/www-production
-
   staging:
     image: 'nginx'
     ports:
