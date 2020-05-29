@@ -18,8 +18,17 @@ compile:
   stage: build
   image: node:alpine
   script:
-    - npm install
+    - npm install --silent
     - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+test:
+  stage: build
+  image: node:alpine
+  script:
+    - npm install --silent
     - npm run test
 
 dockerize:
@@ -78,8 +87,7 @@ deploy_staging:
     name: Staging
     url: http://51.91.109.146:3111
   only:
-    - master
-    - dev
+    - develop
 
 deploy_production:
   stage: deploy
