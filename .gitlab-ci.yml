@@ -1,5 +1,5 @@
 stages:
-  - build
+#  - build
   - staging
   - release
   - deploy
@@ -14,35 +14,35 @@ cache:
     - node_modules/
     - .npm/
 
-compile:
-  stage: build
-  image: node:alpine
-  script:
-    - npm install --silent
-    - npm run build
-  artifacts:
-    paths:
-      - dist/
-
-test:
-  stage: build
-  image: node:alpine
-  script:
-    - npm install --silent
-    - npm run test
-
-dockerize:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-    - docker-compose build
-    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
-    - docker push $STAGING_IMAGE
+#compile:
+#  stage: build
+#  image: node:alpine
+#  script:
+#    - npm install --silent
+#    - npm run build
+#  artifacts:
+#    paths:
+#      - dist/
+#
+#test:
+#  stage: build
+#  image: node:alpine
+#  script:
+#    - npm install --silent
+#    - npm run test
+#
+#dockerize:
+#  stage: build
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  before_script:
+#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#  script:
+#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+#    - docker-compose build
+#    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
+#    - docker push $STAGING_IMAGE
 
 deploy_staging:
   stage: staging
@@ -52,6 +52,8 @@ deploy_staging:
   variables:
     DOCKER_DRIVER: overlay
   before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
     - mkdir -p ~/.ssh
     - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
@@ -89,6 +91,11 @@ release:
     - docker logout
     - docker login $CI_PROD_REGISTRY -u $CI_PROD_REGISTRY_USER -p $CI_PROD_REGISTRY_PASSWORD
     - docker push $PRODUCTION_IMAGE
+  needs:
+    - deploy_staging
+  when: manual
+  only:
+    - master
 
 deploy_production:
   stage: deploy
@@ -97,6 +104,8 @@ deploy_production:
     name: Production
     url: https://gitlab.scala-patrimoine.fr:3100
   before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which sshpass || ( apt-get update -y -qq && apt-get install sshpass -y -qq )'
     - mkdir -p ~/.ssh
     - echo "$SSH_PRODCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
@@ -113,6 +122,7 @@ deploy_production:
     - sshpass -e ssh gitlab-runner@$H_PROD "docker run --publish=3100:3100 -d ${PRODUCTION_IMAGE}"
     - rm -f ~/.ssh/id_rsa
     - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
-  when: manual
+  needs:
+    - job: release
   only:
     - master
