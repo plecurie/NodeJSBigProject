@@ -12,20 +12,24 @@ export const client = new elasticsearch.Client({
     sniffOnStart:true
 });
 
-async function checkConnection() {
-    let connected = false;
-    while(!connected) {
-        console.log(">>>> Waiting for Elasticsearch to Start...");
+export async function checkConnection() {
+    let es_started = false;
+
+    function delay(ms: number) {
+        return new Promise( resolve => setTimeout(resolve, ms) );
+    }
+
+    while(!es_started) {
+        await delay(10000);
         try {
             await client.cluster.health( {});
-            connected = true;
+            es_started = true;
             console.log(">>>> Elasticsearch started on ", ES_URL);
         } catch(err) {
-            console.log(">>>> Connection failed, Retrying... ", err);
+            console.log(">>>> Connection to Elasticsearch failed, retrying... ");
         }
     }
 }
-checkConnection();
 
 async function resetIndex () {
     if (await client.indices.exists({ index }))

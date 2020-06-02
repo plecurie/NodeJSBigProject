@@ -2,7 +2,7 @@ version: '2'
 services:
   seed:
     container_name: elassandra
-    image: "docker.io/strapdata/elassandra:6.8.4.3"
+    image: "docker.io/strapdata/elassandra:6.8.4.4"
     environment:
       - "JVM_OPTS=-Dcassandra.custom_query_handler_class=org.elassandra.index.ElasticQueryHandler"
       - "MAX_HEAP_SIZE=1200m"
@@ -18,7 +18,7 @@ services:
       - "9042:9042"
       - "9200:9200"
   node:
-    image: "docker.io/strapdata/elassandra:6.8.4.3"
+    image: "docker.io/strapdata/elassandra:6.8.4.4"
     environment:
       - "JVM_OPTS=-Dcassandra.custom_query_handler_class=org.elassandra.index.ElasticQueryHandler"
       - "MAX_HEAP_SIZE=1200m"
