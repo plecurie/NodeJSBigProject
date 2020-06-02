@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 export class AuthService {
     private static instance: AuthService;
     private index = 'scala';
-    private types = 'users';
+    private types = 'database';
     constructor() {}
 
     public static getInstance(): AuthService {

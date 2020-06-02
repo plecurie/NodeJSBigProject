@@ -255,6 +255,7 @@ export class bulkindexService {
             type: 'database',
             body: products_list
         }, (err, response) => {
+            console.log(err, response.body.items[0]);
             if (err){
                 console.log("Servor error: ", err);
             }

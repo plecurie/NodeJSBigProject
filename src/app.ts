@@ -4,6 +4,7 @@ import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
 import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
 import { ELASTIC_CLIENT } from "./utils/elasticsearch";
 import { bulkindexService } from "./services/request/bulkindex.service";
+import { ProductService } from './services'
 
 class Application {
 
@@ -29,25 +30,19 @@ class Application {
 
     start(): void {
 
-        let connected = false;
+        this.app.listen(APP_PORT, () => {
+            console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
+        });
+        
+        ELASTIC_CLIENT.ping((err, result) => {
+            if (err)
+                throw new Error('>>>> Failed to connect to ' + APP_HOST + ":" + ES_URL);
+            else
+                console.log('>>>> ElasticSearch is listening on', APP_HOST + ":" + ES_URL);
+        });
 
-        function delay(ms: number) {
-            return new Promise( resolve => setTimeout(resolve, ms) );
-        }
-        (async () => {
-            while(!connected) {
-                await delay(5000);
-                ELASTIC_CLIENT.ping( (err, result) => {
-                    if(result.statusCode != null) connected = true;
-                    else console.log(">>>> Waiting for Elasticsearch to Start...");
-                });
-            }
-            console.log(">>>> Elasticsearch started on ", ES_URL);
-            this.app.listen(APP_PORT, () => {
-                console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
-            });
-            //bulkindexService.getInstance().importExcel();
-        })();
+        //bulkindexService.getInstance().importExcel();
+        //ProductService.getInstance().loadCriteriaWithCategorie();
 
     }
 
