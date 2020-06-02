@@ -46,7 +46,7 @@ cache:
 
 deploy_staging:
   stage: staging
-  image: gitlab/dind:latest
+  image: docker:dind
   services:
     - docker:dind
   variables:
@@ -100,6 +100,8 @@ release:
 deploy_production:
   stage: deploy
   image: node:latest
+  services:
+    - docker:dind
   environment:
     name: Production
     url: https://gitlab.scala-patrimoine.fr:3100
