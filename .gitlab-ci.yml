@@ -64,13 +64,11 @@ deploy_staging:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
     - docker -H ssh://scala_vps@$H_STAGING login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    # - sshpass -e ssh scala_vps@$H_STAGING "docker login ${CI_REGISTRY} -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
-    # - sshpass -e ssh scala_vps@$H_STAGING "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api"
-    - sshpass -e ssh scala_vps@$H_STAGING "docker stop scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker rm scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker rmi -f scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker pull ${STAGING_IMAGE}"
-    - sshpass -e ssh scala_vps@$H_STAGING "docker run --name scala_app -p 127.0.0.1:3100:3100/tcp -d ${STAGING_IMAGE}"
+    - docker -H ssh://scala_vps@$H_STAGING stop scala_app || true
+    - docker -H ssh://scala_vps@$H_STAGING rm scala_app || true
+    - docker -H ssh://scala_vps@$H_STAGING rmi -f scala_app || true
+    - docker -H ssh://scala_vps@$H_STAGING pull ${STAGING_IMAGE}
+    - docker -H ssh://scala_vps@$H_STAGING run --name scala_app -p 127.0.0.1:3100:3100/tcp -d ${STAGING_IMAGE}
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
