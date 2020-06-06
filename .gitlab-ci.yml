@@ -63,7 +63,7 @@ deploy_staging:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - docker -H ssh://scala_vps@H_STAGING login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - docker -H ssh://scala_vps@$H_STAGING login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     # - sshpass -e ssh scala_vps@$H_STAGING "docker login ${CI_REGISTRY} -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
     # - sshpass -e ssh scala_vps@$H_STAGING "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api"
     - sshpass -e ssh scala_vps@$H_STAGING "docker stop scala_app" || true
