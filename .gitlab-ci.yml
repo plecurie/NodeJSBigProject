@@ -1,4 +1,6 @@
 stages:
+  - compile
+  - test
   - build
   - staging
   - release
@@ -14,8 +16,8 @@ cache:
     - node_modules/
     - .npm/
 
-compile:
-  stage: build
+build:
+  stage: compile
   image: node:alpine
   script:
     - npm install --silent
@@ -25,10 +27,10 @@ compile:
       - dist/
 
 test:
-  stage: build
+  stage: test
   image: node:alpine
   needs:
-    - job: compile
+    - job: build
       artifacts: true
   script:
     - npm run test
