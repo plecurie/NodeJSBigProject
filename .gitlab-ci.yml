@@ -27,8 +27,10 @@ compile:
 test:
   stage: build
   image: node:alpine
+  needs:
+    - job: compile
+      artifacts: true
   script:
-    - npm install --silent
     - npm run test
 
 dockerize:
@@ -36,6 +38,9 @@ dockerize:
   image: docker:latest
   services:
     - docker:dind
+  needs:
+    - job: test
+      artifacts: true
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
