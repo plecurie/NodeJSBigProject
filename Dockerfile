@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-COPY ./build ./
+COPY ./dist ./
 
 RUN apk add --update python-dev python make g++ && rm -rf /var/cache/apk/*
 
