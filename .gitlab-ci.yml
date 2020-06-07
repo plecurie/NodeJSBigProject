@@ -41,8 +41,7 @@ dockerize:
   script:
     - apk add --update --no-cache libffi-dev openssl-dev python3-dev gcc g++ make python3 py-pip && pip install cffi docker-compose
     - docker-compose build
-    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
-    - docker-compose push $STAGING_IMAGE
+    - docker-compose push seed node kibana nodejs
 
 deploy_staging:
   stage: staging
