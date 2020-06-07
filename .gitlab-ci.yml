@@ -61,10 +61,10 @@ deploy_staging:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - docker -H ssh://scala_vps@$H_STAGING login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    - docker-compose -H ssh://scala_vps@$H_STAGING down || true
-    - docker -H ssh://scala_vps@$H_STAGING rm $STAGING_IMAGE || true
-    - docker-compose -H ssh://scala_vps@$H_STAGING up || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker login -u {$CI_REGISTRY_USER} -p {$CI_REGISTRY_PASSWORD} {$CI_REGISTRY}"
+    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose down" || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker rm {$STAGING_IMAGE}" || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose up" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
