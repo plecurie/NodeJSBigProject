@@ -16,8 +16,8 @@ cache:
     - node_modules/
     - .npm/
 
-check:
-  stage: compile
+compile:
+  stage: check
   image: node:alpine
   script:
     - npm install --silent
@@ -26,22 +26,22 @@ check:
     paths:
       - dist/
 
-test:
-  stage: unittest
+unittest:
+  stage: test
   image: node:alpine
   needs:
-    - job: build
+    - job: compile
       artifacts: true
   script:
     - npm run test
 
-build:
-  stage: dockerize
+dockerize:
+  stage: build
   image: docker:latest
   services:
     - docker:dind
   needs:
-    - job: test
+    - job: unittest
       artifacts: true
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -81,8 +81,8 @@ deploy_staging:
     - master
     - develop
 
-release:
-  stage: release_image
+release_image:
+  stage: release
   image: docker:latest
   services:
     - docker:dind
@@ -138,6 +138,6 @@ deploy_production:
     - rm -f ~/.ssh/id_rsa
     - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
   needs:
-    - job: release
+    - job: release_image
   only:
     - master
