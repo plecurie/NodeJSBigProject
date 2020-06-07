@@ -61,6 +61,7 @@ deploy_staging:
   needs:
     - job: compile
       artifacts: true
+    - job: dockerize
   before_script:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
