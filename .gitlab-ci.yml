@@ -5,8 +5,8 @@ stages:
   - deploy
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  PRODUCTION_IMAGE: $CI_REGISTRY_IMAGE:latest
+  STAGING_IMAGE: $CI_REGISTRY:latest
+  PRODUCTION_IMAGE: $CI_REGISTRY_PRODUCTION:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -39,9 +39,8 @@ dockerize:
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - apk add --update --no-cache libffi-dev openssl-dev python3-dev gcc g++ make python3 py-pip && pip install cffi docker-compose
-    - docker-compose build
-    - docker-compose push seed node kibana nodejs
+    - docker build --tag $STAGING_IMAGE .
+    - docker push $STAGING_IMAGE
 
 deploy_staging:
   stage: staging
@@ -63,16 +62,14 @@ deploy_staging:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
     - docker -H ssh://scala_vps@$H_STAGING login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-    - docker -H ssh://scala_vps@$H_STAGING stop scala_app || true
-    - docker -H ssh://scala_vps@$H_STAGING rm scala_app || true
-    - docker -H ssh://scala_vps@$H_STAGING rmi -f scala_app || true
-    - docker -H ssh://scala_vps@$H_STAGING pull ${STAGING_IMAGE}
-    - docker -H ssh://scala_vps@$H_STAGING run --name scala_app -p 127.0.0.1:3100:3100/tcp -d ${STAGING_IMAGE}
+    - docker-compose -H ssh://scala_vps@$H_STAGING down || true
+    - docker -H ssh://scala_vps@$H_STAGING rm $STAGING_IMAGE || true
+    - docker-compose -H ssh://scala_vps@$H_STAGING up || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
     name: Staging
-    url: http://51.91.109.146:3111
+    url: http://$H_STAGING:3100
   only:
     - master
     - develop
@@ -82,9 +79,19 @@ release:
   image: docker:latest
   services:
     - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - 'which ssh-agent || ( apk add openssh-client )'
+    - 'which sshpass || ( apk add sshpass )'
+    - mkdir -p ~/.ssh
+    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
   script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $STAGING_IMAGE
     - docker tag $STAGING_IMAGE $PRODUCTION_IMAGE
     - docker logout
