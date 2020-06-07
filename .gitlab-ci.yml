@@ -125,15 +125,6 @@ release_image:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay
-  before_script:
-    - 'which ssh-agent || ( apk add openssh-client )'
-    - 'which sshpass || ( apk add sshpass )'
-    - mkdir -p ~/.ssh
-    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - eval "$(ssh-agent -s)"
-    - ssh-add ~/.ssh/id_rsa
-    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
   script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $STAGING_IMAGE
