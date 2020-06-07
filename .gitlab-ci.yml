@@ -48,6 +48,8 @@ dockerize:
   script:
     - docker build --pull -t $STAGING_IMAGE .
     - docker push $STAGING_IMAGE
+  only:
+    - master
 
 deploy_staging:
   stage: staging
@@ -68,10 +70,10 @@ deploy_staging:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh scala_vps@$H_STAGING "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
-    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose down" || true
-    - sshpass -e scp dist/ scala_vps@H_STAGING
-    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose up -d" || true
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose down" || true
+    - sshpass -e scp -r dist/ $U_STAGING@$H_STAGING
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose up -d" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
@@ -79,7 +81,6 @@ deploy_staging:
     url: http://$H_STAGING:3100
   only:
     - master
-    - develop
 
 release_image:
   stage: release
@@ -109,6 +110,33 @@ release_image:
   when: manual
   only:
     - master
+
+#release_source:
+#  stage: release
+#  image: docker:dind
+#  services:
+#    - docker:dind
+#  variables:
+#    DOCKER_DRIVER: overlay
+#  before_script:
+#    - 'which ssh-agent || ( apk add openssh-client )'
+#    - 'which sshpass || ( apk add sshpass )'
+#    - mkdir -p ~/.ssh
+#    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#    - chmod 600 ~/.ssh/id_rsa
+#    - eval "$(ssh-agent -s)"
+#    - ssh-add ~/.ssh/id_rsa
+#    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
+#  script:
+#    - sshpass -V
+#    - export SSHPASS=$SSH_PASS
+#    - sshpass -e ssh $U_PROD@$H_PROD "mkdir _tmp"
+#    - git clone
+#  needs:
+#    - deploy_staging
+#  when: manual
+#  only:
+#    - master
 
 deploy_production:
   stage: deploy
