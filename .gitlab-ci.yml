@@ -47,7 +47,6 @@ dockerize:
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - ls -lla
     - docker build --pull -t $STAGING_IMAGE .
     - docker push $STAGING_IMAGE
   only:
