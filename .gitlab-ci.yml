@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY:latest
+  STAGING_IMAGE: registry.gitlab.com/scala1/scala-api:latest
   PRODUCTION_IMAGE: $CI_REGISTRY_PRODUCTION:latest
 
 cache:
@@ -37,7 +37,7 @@ dockerize:
   services:
     - docker:dind
   before_script:
-    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin registry.gitlab.com/scala1/scala-api
+    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
     - docker build --pull -t $STAGING_IMAGE .
     - docker push $STAGING_IMAGE
