@@ -1,5 +1,5 @@
 stages:
-  - compile
+  - check
   - test
   - build
   - staging
@@ -16,7 +16,7 @@ cache:
     - node_modules/
     - .npm/
 
-build:
+check:
   stage: compile
   image: node:alpine
   script:
@@ -27,7 +27,7 @@ build:
       - dist/
 
 test:
-  stage: test
+  stage: unittest
   image: node:alpine
   needs:
     - job: build
@@ -35,8 +35,8 @@ test:
   script:
     - npm run test
 
-dockerize:
-  stage: build
+build:
+  stage: dockerize
   image: docker:latest
   services:
     - docker:dind
@@ -70,8 +70,8 @@ deploy_staging:
     - export SSHPASS=$SSH_PASS
     - sshpass -e ssh scala_vps@$H_STAGING "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
     - sshpass -e ssh scala_vps@$H_STAGING "docker-compose down" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker rm ${STAGING_IMAGE}" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose up" || true
+    - sshpass -e scp dist/ scala_vps@H_STAGING
+    - sshpass -e ssh scala_vps@$H_STAGING "docker-compose up -d" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
@@ -82,7 +82,7 @@ deploy_staging:
     - develop
 
 release:
-  stage: release
+  stage: release_image
   image: docker:latest
   services:
     - docker:dind
