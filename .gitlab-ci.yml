@@ -41,7 +41,7 @@ dockerize:
   services:
     - docker:dind
   needs:
-    - job: unittest
+    - job: compile
       artifacts: true
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -59,7 +59,7 @@ deploy_staging:
   variables:
     DOCKER_DRIVER: overlay
   needs:
-    - job: dockerize
+    - job: compile
       artifacts: true
   before_script:
     - 'which ssh-agent || ( apk add openssh-client )'
@@ -85,7 +85,36 @@ deploy_staging:
   only:
     - master
 
-#test staging
+#test_staging:
+#  stage: staging
+#  image: docker:dind
+#  services:
+#    - docker:dind
+#  variables:
+#    DOCKER_DRIVER: overlay
+#  before_script:
+#    - 'which ssh-agent || ( apk add openssh-client )'
+#    - 'which sshpass || ( apk add sshpass )'
+#    - mkdir -p ~/.ssh
+#    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#    - chmod 600 ~/.ssh/id_rsa
+#    - eval "$(ssh-agent -s)"
+#    - ssh-add ~/.ssh/id_rsa
+#    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
+#  script:
+#    - sshpass -V
+#    - export SSHPASS=$SSH_PASS
+#    - sshpass -e ssh $U_STAGING@$H_STAGING "curl localhost:3100"
+#    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose down" || true
+#    - sshpass -e scp -r dist/ $U_STAGING@$H_STAGING
+#    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose up -d" || true
+#    - rm -f ~/.ssh/id_rsa
+#    - 'echo Staging done: $(date “+%F %H:%M:%S”)'
+#  environment:
+#    name: Staging
+#    url: http://$H_STAGING:3100
+#  only:
+#    - master
 
 release_image:
   stage: release
