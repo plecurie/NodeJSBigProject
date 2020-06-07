@@ -3,7 +3,6 @@ import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
     profileRouter, portfolioRouter } from "./routes";
 import { APP_HOST, APP_PORT } from "./utils/constants";
 import { checkConnection } from "./utils/elasticsearch"
-import { bulkindexService } from "./services/request/bulkindex.service";
 
 class Application {
 
@@ -29,10 +28,10 @@ class Application {
 
     async start(): Promise<void> {
         await checkConnection();
+
         this.app.listen(APP_PORT, () => {
             console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
         });
-        bulkindexService.getInstance().importExcel();
     }
 
 }

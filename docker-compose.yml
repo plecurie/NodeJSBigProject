@@ -18,6 +18,7 @@ services:
       - "9042:9042"
       - "9200:9200"
   node:
+    container_name: elassandra_node
     image: "docker.io/strapdata/elassandra:6.8.4.4"
     environment:
       - "JVM_OPTS=-Dcassandra.custom_query_handler_class=org.elassandra.index.ElasticQueryHandler"
@@ -44,7 +45,7 @@ services:
     mem_limit: 500m
 
   nodejs:
-    container_name: app
+    container_name: nodejs
     restart: always
     build: ./
     environment:

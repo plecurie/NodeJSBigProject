@@ -1,5 +1,5 @@
 stages:
-  #  - build
+  - build
   - staging
   - release
   - deploy
@@ -14,35 +14,35 @@ cache:
     - node_modules/
     - .npm/
 
-#compile:
-#  stage: build
-#  image: node:alpine
-#  script:
-#    - npm install --silent
-#    - npm run build
-#  artifacts:
-#    paths:
-#      - dist/
-#
-#test:
-#  stage: build
-#  image: node:alpine
-#  script:
-#    - npm install --silent
-#    - npm run test
-#
-#dockerize:
-#  stage: build
-#  image: docker:latest
-#  services:
-#    - docker:dind
-#  before_script:
-#    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-#  script:
-#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-#    - docker-compose build
-#    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
-#    - docker push $STAGING_IMAGE
+compile:
+  stage: build
+  image: node:alpine
+  script:
+    - npm install --silent
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+test:
+  stage: build
+  image: node:alpine
+  script:
+    - npm install --silent
+    - npm run test
+
+dockerize:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+    - docker-compose build
+    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
+    - docker-compose push $STAGING_IMAGE
 
 deploy_staging:
   stage: staging
