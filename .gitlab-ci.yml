@@ -39,7 +39,7 @@ dockerize:
   before_script:
     - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+    - apk add --update --no-cache libffi-dev openssl-dev python3-dev gcc g++ make python3 py-pip && pip install cffi docker-compose
     - docker-compose build
     - docker tag scala-api_nodejs:latest $STAGING_IMAGE
     - docker-compose push $STAGING_IMAGE
