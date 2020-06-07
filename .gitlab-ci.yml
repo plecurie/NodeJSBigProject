@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY:latest
+  STAGING_IMAGE: $CI_REGISTRY:$CI_COMMIT_REF_SLUG
   PRODUCTION_IMAGE: $CI_REGISTRY_PRODUCTION:latest
 
 cache:
