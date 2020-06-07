@@ -4,7 +4,7 @@ stages:
   - build
   - staging
   - release
-  - deploy
+  - production
 
 variables:
   STAGING_IMAGE: registry.gitlab.com/scala1/scala-api:latest
@@ -58,6 +58,9 @@ deploy_staging:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay
+  needs:
+    - job: dockerize
+      artifacts: true
   before_script:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
@@ -81,6 +84,8 @@ deploy_staging:
     url: http://$H_STAGING:3100
   only:
     - master
+
+#test staging
 
 release_image:
   stage: release
@@ -107,6 +112,7 @@ release_image:
     - docker push $PRODUCTION_IMAGE
   needs:
     - deploy_staging
+  allow_failure: false
   when: manual
   only:
     - master
@@ -139,7 +145,7 @@ release_image:
 #    - master
 
 deploy_production:
-  stage: deploy
+  stage: production
   image: node:latest
   services:
     - docker:dind
