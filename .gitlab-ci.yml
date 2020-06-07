@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY:$CI_COMMIT_REF_SLUG
+  STAGING_IMAGE: $CI_REGISTRY:latest
   PRODUCTION_IMAGE: $CI_REGISTRY_PRODUCTION:latest
 
 cache:
@@ -37,9 +37,9 @@ dockerize:
   services:
     - docker:dind
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - docker build --tag $STAGING_IMAGE .
+    - docker build --pull -t $STAGING_IMAGE .
     - docker push $STAGING_IMAGE
 
 deploy_staging:
