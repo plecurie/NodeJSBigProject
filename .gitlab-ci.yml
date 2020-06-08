@@ -126,7 +126,7 @@ deploy_production:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRODCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - echo "$SSH_PRODUCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - eval "$(ssh-agent -s)"
     - ssh-add ~/.ssh/id_rsa
