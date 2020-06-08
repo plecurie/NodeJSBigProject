@@ -114,9 +114,11 @@ release_image:
 
 deploy_production:
   stage: production
-  image: node:latest
+  image: docker:dind
   services:
     - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
   environment:
     name: Production
     url: https://gitlab.scala-patrimoine.fr:3100
