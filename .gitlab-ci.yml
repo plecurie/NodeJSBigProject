@@ -1,12 +1,12 @@
 stages:
-  - test
-  - build
-  - review
-#  - release
+#  - build
+  - staging
+  - release
   - deploy
 
 variables:
-  RELEASE_IMAGE: scala-api_app:latest
+  STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  PRODUCTION_IMAGE: $CI_REGISTRY_IMAGE:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -14,80 +14,118 @@ cache:
     - node_modules/
     - .npm/
 
-test:
-  stage: test
-  image: node:alpine
-  script:
-    - npm install
-    - npm run build
-    - npm run test
+#compile:
+#  stage: build
+#  image: node:alpine
+#  script:
+#    - npm install --silent
+#    - npm run build
+#  artifacts:
+#    paths:
+#      - dist/
+#
+#test:
+#  stage: build
+#  image: node:alpine
+#  script:
+#    - npm install --silent
+#    - npm run test
+#
+#dockerize:
+#  stage: build
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  before_script:
+#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#  script:
+#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
+#    - docker-compose build
+#    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
+#    - docker push $STAGING_IMAGE
 
-build:
-  stage: build
+deploy_staging:
+  stage: staging
+  image: docker:dind
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+  before_script:
+    - 'which ssh-agent || ( apk add openssh-client )'
+    - 'which sshpass || ( apk add sshpass )'
+    - mkdir -p ~/.ssh
+    - echo "$SSH_STAGING_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $H_STAGING >> ~/.ssh/known_hosts
+  script:
+    - sshpass -V
+    - export SSHPASS=$SSH_PASS
+    - sshpass -e ssh scala_vps@$H_STAGING "docker login ${CI_REGISTRY} -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
+#    - sshpass -e ssh scala_vps@$H_STAGING "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api"
+    - sshpass -e ssh scala_vps@$H_STAGING "docker stop scala_app" || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker rm scala_app" || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker rmi -f scala_app" || true
+    - sshpass -e ssh scala_vps@$H_STAGING "docker pull ${STAGING_IMAGE}"
+    - sshpass -e ssh scala_vps@$H_STAGING "docker run --name scala_app -p 127.0.0.1:3100:3100/tcp -d ${STAGING_IMAGE}"
+    - rm -f ~/.ssh/id_rsa
+    - 'echo Staging done: $(date “+%F %H:%M:%S”)'
+  environment:
+    name: Staging
+    url: http://51.91.109.146:3111
+  only:
+    - master
+    - develop
+
+release:
+  stage: release
   image: docker:latest
   services:
     - docker:dind
   before_script:
-    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-    - docker-compose build
-    - docker push $RELEASE_IMAGE
-  artifacts:
-    paths:
-      - dist/
-
-deploy_staging:
-  stage: review
-  image: ubuntu
-  before_script:
-    - apk add openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  script:
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
+    - docker pull $STAGING_IMAGE
+    - docker tag $STAGING_IMAGE $PRODUCTION_IMAGE
+    - docker logout
+    - docker login $CI_PROD_REGISTRY -u $CI_PROD_REGISTRY_USER -p $CI_PROD_REGISTRY_PASSWORD
+    - docker push $PRODUCTION_IMAGE
   needs:
-    - job: build
+    - deploy_staging
+  when: manual
   only:
-    - dev
-
-#release:
-#  stage: release
-#  image: docker:19.03.8
-#  script:
-#    - docker pull $TEST_IMAGE
-#    - docker tag $TEST_IMAGE $RELEASE_IMAGE
-#    - docker push $RELEASE_IMAGE
-#  when: manual
-#  only:
-#    - master
+    - master
 
 deploy_production:
   stage: deploy
-  image: ubuntu
+  image: node:latest
+  services:
+    - docker:dind
+  environment:
+    name: Production
+    url: https://gitlab.scala-patrimoine.fr:3100
   before_script:
-    - apk add openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - 'which ssh-agent || ( apk add openssh-client )'
+    - 'which sshpass || ( apk add sshpass )'
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan gitlab.scala-patrimoine.fr >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo "$SSH_PRODCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H $H_PROD >> ~/.ssh/known_hosts
   script:
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker pull $RELEASE_IMAGE"
-    - ssh -p22 gitlab_runner@gitlab.scala-patrimoine.fr "docker run $RELEASE_IMAGE -d"
-#  needs:
-#    - job: release
+    - sshpass -V
+    - export SSHPASS=$SSH_PASS
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker stop ${IMAGE_TAG}" || true
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker rm ${IMAGE_TAG}" || true
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker rmi -f ${PRODUCTION_IMAGE}" || true
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker run --publish=3100:3100 -d ${PRODUCTION_IMAGE}"
+    - rm -f ~/.ssh/id_rsa
+    - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
+  needs:
+    - job: release
   only:
     - master

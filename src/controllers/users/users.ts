@@ -1,5 +1,5 @@
 import { CrudController } from "../../utils";
-import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import { client } from "../../utils/elasticsearch";
 import { User } from "../../models/User";
 import { GeneratorService } from '../../services';
 const generatorService = GeneratorService.getInstance();
@@ -12,7 +12,7 @@ export class UsersController extends CrudController {
             email: req.body.email, password: req.body.password, username: req.body.username };
         const mdpCrypted = await generatorService.hashPassword(req.body.password);
         
-        ELASTIC_CLIENT.index({
+        client.index({
             index: 'scala',
             type: 'database',
             body : {
@@ -34,7 +34,7 @@ export class UsersController extends CrudController {
     }
 
     read(req, res): void {
-        ELASTIC_CLIENT.get({
+        client.get({
                 index: 'scala',
                 type: 'database',
                 id: req.query.id
@@ -51,7 +51,7 @@ export class UsersController extends CrudController {
         const user : User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
             email: req.body.email, password: req.body.password, username: req.body.username };
 
-         ELASTIC_CLIENT.update({
+         client.update({
              index: 'scala',
              type: 'database',
              id: req.query.id,
@@ -75,7 +75,7 @@ export class UsersController extends CrudController {
     }
 
     delete(req, res): void {
-        ELASTIC_CLIENT.delete({
+        client.delete({
             index: 'scala',
             type: 'database',
             id: req.query.id,

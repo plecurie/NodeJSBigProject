@@ -1,4 +1,4 @@
-import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import { client } from "../../utils/elasticsearch";
 import { Portfolio } from "../../models/Portfolio";
 import {CrudController} from "../../utils";
 
@@ -8,7 +8,7 @@ export class PortfolioController extends CrudController{
 
         const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
 
-        ELASTIC_CLIENT.index({
+        client.index({
             index: 'scala',
             type: 'database',
             body : {
@@ -27,7 +27,7 @@ export class PortfolioController extends CrudController{
 
     read(req, res): void {
 
-        ELASTIC_CLIENT.get({
+        client.get({
             index: 'scala',
             type: 'database',
             id: req.query.id
@@ -44,7 +44,7 @@ export class PortfolioController extends CrudController{
 
         const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
 
-        ELASTIC_CLIENT.update({
+        client.update({
             index: 'scala',
             type: 'database',
             id: req.query.id,
@@ -65,7 +65,7 @@ export class PortfolioController extends CrudController{
 
     delete(req, res): void {
 
-        ELASTIC_CLIENT.delete({
+        client.delete({
             index: 'scala',
             type: 'database',
             id: req.query.id,

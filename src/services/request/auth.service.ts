@@ -1,4 +1,4 @@
-import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import { client } from "../../utils/elasticsearch";
 const bcrypt = require('bcrypt');
 
 export class AuthService {
@@ -15,7 +15,7 @@ export class AuthService {
     }
 
     public async updateUserPassword(user: any): Promise<any> {
-        return await ELASTIC_CLIENT.update({
+        return await client.update({
             index: this.index,
             type: this.types,
             id: user.id,
@@ -24,18 +24,18 @@ export class AuthService {
     }
 
     public async searchUser(user: any) {
-        return await ELASTIC_CLIENT.search({
+        return client.search({
             index: this.index,
             type: this.types,
-            body: { query: { match: user }}
+            body: {query: {match: user}}
         });
     }
 
     public async checkValidPassword(passwordUser: string, hash: string) {
         try {
             const verifyPassword = await bcrypt.compare(passwordUser, hash);
-            if (verifyPassword) return true;
-            return false
+            return !!verifyPassword;
+
         } catch(err) {
           throw err;  
         }

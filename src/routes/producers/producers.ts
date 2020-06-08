@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as express from 'express'
-import  { producersController } from '../../controllers'
+import {producersController, productsController} from '../../controllers'
 
 export const router = express.Router({
     strict: true
@@ -13,6 +13,10 @@ router.post('/', (req: Request, res: Response) => {
 router.get('/', (req: Request, res: Response) => {
     producersController.read(req, res)
 });
+
+/*router.get('/search', (req, res) => {
+    producersController.find(req, res);
+});*/
 
 router.post('/update',(req: Request, res: Response) => {
     producersController.update(req, res);

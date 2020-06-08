@@ -1,4 +1,4 @@
-import { ELASTIC_CLIENT } from "../../utils/elasticsearch";
+import { client, index, type } from "../../utils/elasticsearch";
 import {CrudController} from "../../utils";
 import { Product } from "../../models/Product";
 
@@ -10,7 +10,7 @@ export class ProductsController extends CrudController {
 
         product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);
 
-        ELASTIC_CLIENT.index({
+        client.index({
             index: 'scala',
             type: 'database',
             body : {
@@ -31,7 +31,7 @@ export class ProductsController extends CrudController {
 
     read(req, res): void {
 
-        ELASTIC_CLIENT.get({
+        client.get({
             index: 'scala',
             type: 'database',
             id: req.query.id
@@ -41,16 +41,38 @@ export class ProductsController extends CrudController {
             else
                 res.json(response)
         })
-
     }
+
+/*    find(req, res): void {
+        const body = {
+            from: req.query.offset,
+            query: { match: {
+                    text: {
+                        query: req.query.term,
+                        operator: 'and',
+                        fuzziness: 'auto'
+                    } } },
+            highlight: { fields: { text: {} } }
+        };
+        client.search({
+            index,
+            type,
+            body
+        }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        })
+    }*/
 
     update(req, res): void {
 
         product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);
 
-        ELASTIC_CLIENT.update({
-            index: 'scala',
-            type: 'database',
+        client.update({
+            index,
+            type,
             id: req.query.id,
             body: {
                 doc: {
@@ -72,7 +94,7 @@ export class ProductsController extends CrudController {
 
     delete(req, res): void {
 
-        ELASTIC_CLIENT.delete({
+        client.delete({
             index: 'scala',
             type: 'database',
             id: req.query.id,
