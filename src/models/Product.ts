@@ -1,5 +1,3 @@
-import { Categorie } from "./Categorie";
-
 export class Product {
 
     isin_code: String;
@@ -20,13 +18,4 @@ export class Product {
             return obj;
         }, {});
     };
-}
-
-export class ProductView {
-
-    id_product: number;
-    name: string;
-    isin_code: string;
-    ongoing_charge: string;
-    categories: Array<Categorie>
 }

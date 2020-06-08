@@ -1,12 +1,14 @@
 stages:
-#  - build
+  - check
+  - test
+  - build
   - staging
   - release
-  - deploy
+  - production
 
 variables:
-  STAGING_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  PRODUCTION_IMAGE: $CI_REGISTRY_IMAGE:latest
+  STAGING_IMAGE: registry.gitlab.com/scala1/scala-api:latest
+  PRODUCTION_IMAGE: $CI_REGISTRY_PRODUCTION:latest
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -14,35 +16,41 @@ cache:
     - node_modules/
     - .npm/
 
-#compile:
-#  stage: build
-#  image: node:alpine
-#  script:
-#    - npm install --silent
-#    - npm run build
-#  artifacts:
-#    paths:
-#      - dist/
-#
-#test:
-#  stage: build
-#  image: node:alpine
-#  script:
-#    - npm install --silent
-#    - npm run test
-#
-#dockerize:
-#  stage: build
-#  image: docker:latest
-#  services:
-#    - docker:dind
-#  before_script:
-#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#  script:
-#    - apk add --update libffi-dev openssl-dev python-dev gcc g++ make python py-pip && pip install cffi docker-compose
-#    - docker-compose build
-#    - docker tag scala-api_nodejs:latest $STAGING_IMAGE
-#    - docker push $STAGING_IMAGE
+compile:
+  stage: check
+  image: node:alpine
+  script:
+    - npm install --silent
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+unittest:
+  stage: test
+  image: node:alpine
+  needs:
+    - job: compile
+      artifacts: true
+  script:
+    - npm run test
+
+dockerize:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  needs:
+    - job: compile
+      artifacts: true
+    - job: unittest
+  before_script:
+    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  script:
+    - docker build --pull -t $STAGING_IMAGE .
+    - docker push $STAGING_IMAGE
+  only:
+    - master
 
 deploy_staging:
   stage: staging
@@ -51,6 +59,10 @@ deploy_staging:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay
+  needs:
+    - job: compile
+      artifacts: true
+    - job: dockerize
   before_script:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
@@ -63,30 +75,29 @@ deploy_staging:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh scala_vps@$H_STAGING "docker login ${CI_REGISTRY} -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
-#    - sshpass -e ssh scala_vps@$H_STAGING "docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} https://gitlab.scala-patrimoine.fr:5555/scala1/scala-api"
-    - sshpass -e ssh scala_vps@$H_STAGING "docker stop scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker rm scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker rmi -f scala_app" || true
-    - sshpass -e ssh scala_vps@$H_STAGING "docker pull ${STAGING_IMAGE}"
-    - sshpass -e ssh scala_vps@$H_STAGING "docker run --name scala_app -p 127.0.0.1:3100:3100/tcp -d ${STAGING_IMAGE}"
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose down" || true
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose pull nodejs" || true
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose up -d" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Staging done: $(date “+%F %H:%M:%S”)'
   environment:
     name: Staging
-    url: http://51.91.109.146:3111
+    url: http://$H_STAGING:3100
   only:
     - master
-    - develop
 
-release:
+#test_staging
+
+release_image:
   stage: release
   image: docker:latest
   services:
     - docker:dind
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  variables:
+    DOCKER_DRIVER: overlay
   script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull $STAGING_IMAGE
     - docker tag $STAGING_IMAGE $PRODUCTION_IMAGE
     - docker logout
@@ -94,15 +105,20 @@ release:
     - docker push $PRODUCTION_IMAGE
   needs:
     - deploy_staging
+  allow_failure: false
   when: manual
   only:
     - master
 
+#release_source
+
 deploy_production:
-  stage: deploy
-  image: node:latest
+  stage: production
+  image: docker:dind
   services:
     - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
   environment:
     name: Production
     url: https://gitlab.scala-patrimoine.fr:3100
@@ -110,7 +126,7 @@ deploy_production:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRODCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - echo "$SSH_PRODUCTION_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - eval "$(ssh-agent -s)"
     - ssh-add ~/.ssh/id_rsa
@@ -118,14 +134,13 @@ deploy_production:
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh gitlab-runner@$H_PROD "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
-    - sshpass -e ssh gitlab-runner@$H_PROD "docker stop ${IMAGE_TAG}" || true
-    - sshpass -e ssh gitlab-runner@$H_PROD "docker rm ${IMAGE_TAG}" || true
-    - sshpass -e ssh gitlab-runner@$H_PROD "docker rmi -f ${PRODUCTION_IMAGE}" || true
-    - sshpass -e ssh gitlab-runner@$H_PROD "docker run --publish=3100:3100 -d ${PRODUCTION_IMAGE}"
+    - sshpass -e ssh gitlab-runner@$H_PROD "docker login ${CI_PROD_REGISTRY} -u ${CI_PROD_REGISTRY_USER} -p ${CI_PROD_REGISTRY_PASSWORD}"
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose down" || true
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose pull nodejs" || true
+    - sshpass -e ssh $U_STAGING@$H_STAGING "docker-compose up -d" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
   needs:
-    - job: release
+    - job: release_image
   only:
     - master

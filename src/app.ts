@@ -3,7 +3,8 @@ import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
     profileRouter, portfolioRouter } from "./routes";
 import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
 import { bulkindexService } from "./services/request/bulkindex.service";
-import { ProductService } from './services'
+import { ProductService } from './services';
+import { checkConnection } from "./utils/elasticsearch"
 
 class Application {
 
@@ -27,7 +28,8 @@ class Application {
 
     }
 
-    start(): void {
+    async start(): Promise<void> {
+        await checkConnection();
 
         this.app.listen(APP_PORT, () => {
             console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
@@ -40,8 +42,8 @@ class Application {
         //         console.log('>>>> ElasticSearch is listening on', APP_HOST + ":" + ES_URL);
         // });
         
-        bulkindexService.getInstance().importExcel();
-        //ProductService.getInstance().loadCriteriaWithCategorie();
+        //bulkindexService.getInstance().importExcel();
+        ProductService.getInstance().associateDataDbWithCategorie();
 
     }
 

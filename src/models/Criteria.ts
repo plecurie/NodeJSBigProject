@@ -209,7 +209,7 @@ export interface Criteria {
 }
 
 export interface CriteriaView {
-    id_cat: number,
     name: string,
-    values: number
+    value: any,
+    categoryCriteria: string
 }

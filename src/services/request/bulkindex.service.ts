@@ -245,12 +245,11 @@ export class bulkindexService {
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
             ]);
-            products_list.push({ update: { _index: 'scala', _type: 'database'}});
+            products_list.push({ index: { _index: 'scala', _type: 'database'}});
             products_list.push(this.mapToObj(dict_products));
         }
-        console.log(client
-            )
-       client.bulk({
+
+        client.bulk({
             index: 'scala',
             type: 'database',
             body: products_list
@@ -258,16 +257,14 @@ export class bulkindexService {
             console.log(err)
             console.log(err, response.body.items[0]);
             if (err){
-                console.log("Servor error: ", err);
+                console.log("Servor Error: ", err);
             }
             else if (response.body.items[0].index.status == 201){
                 console.log('>>>> Bulk index done.');
             }
             else {
-                console.log('Malformed Exception.')
+                console.log('Bulk Error: Malformed Exception.')
             }
         });
-
-
     }
 }
