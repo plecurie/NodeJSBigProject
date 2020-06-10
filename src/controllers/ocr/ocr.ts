@@ -1,6 +1,7 @@
-import { OcrService } from '../../services';
+import { OcrService, ProductService } from '../../services';
 
 const ocrService = OcrService.getInstance();
+const productService = ProductService.getInstance();
 
 export class OcrController {
     async ocr(req, res): Promise<void> {
@@ -8,6 +9,9 @@ export class OcrController {
         // console.log(data);
         // ocrService.removeImageOcr(path);
         const result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
-        return res.json({data: result});
+        const assWithDCat = await productService.associateDataDbWithCategorie();
+        const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
+        console.log(matchIsinCode);
+        return res.json({data: matchIsinCode});
     }
 }

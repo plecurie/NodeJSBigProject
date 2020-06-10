@@ -3,3 +3,4 @@ export * from './mailer.service';
 export * from './request/auth.service';
 export * from './generator.service';
 export * from './request/product.service';
+export * from './request/product.service';
