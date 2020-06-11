@@ -43,7 +43,7 @@ class Application {
         // });
         
         //bulkindexService.getInstance().importExcel();
-        ProductService.getInstance().associateDataDbWithCategorie();
+        //ProductService.getInstance().associateDataDbWithCategorie();
 
     }
 

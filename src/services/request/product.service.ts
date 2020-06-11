@@ -21,8 +21,8 @@ export class ProductService {
         const criteriaXlsx: any = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}criteria.xlsx`);
         const categories: Array<Categorie> = [];
         const categorieWithCriteria: Array<CategorieWithItsCriteria> = [];
-
-       categoriesXlsx.forEach(catx => categories.push({id: catx.id, name: catx.name, type: catx.type}));
+       
+        categoriesXlsx.forEach(catx => categories.push({id: catx.id, name: catx.name, type: catx.type}));
        
        for (const cat of categories) {
            for (const critXl of criteriaXlsx) {
@@ -44,7 +44,7 @@ export class ProductService {
                 const lcwc = loadCriteriaWithCategorie.find(d => d.criteriaName.toLowerCase() == c.name.toLowerCase());
                 return {
                     name: c.name, 
-                    value: c.value, 
+                    value: typeof c.value == 'string' ? this.transformStringToInt(c.value) : c.value, 
                     categoryCriteria: lcwc ? lcwc.cateogryName : 'Other Category'
                 }
             });
@@ -74,4 +74,19 @@ export class ProductService {
             console.error(err.meta.body.error);
         }
     }
-}
+
+    private transformStringToInt(value: any) {
+            switch(value.toLowerCase()) {
+                case 'low': return 1;
+                case 'below average': return 2;
+                case 'average': return 3;
+                case 'above average': return 4;
+                case 'high': return 5;
+                case 'low risk': return 1;
+                case 'medium risk': return 2;
+                case 'high risk': return 3;
+                case 'yes': return 1;
+                case 'no': return 0;
+        }
+    }
+};
