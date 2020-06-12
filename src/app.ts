@@ -6,7 +6,7 @@ import { checkConnection } from "./utils/elasticsearch"
 
 class Application {
 
-    private app: express.Application;
+    public app: express.Application;
 
     constructor() {
         require('dotenv').config();

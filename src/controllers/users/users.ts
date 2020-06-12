@@ -20,7 +20,7 @@ export class UsersController extends CrudController {
                 firstname: user.firstname,
                 lastname: user.lastname,
                 username: user.username,
-                birthday: user.birthdate,
+                birthdate: user.birthdate,
                 email: user.email,
                 password: mdpCrypted
             }
@@ -29,7 +29,7 @@ export class UsersController extends CrudController {
                 res.status(404).send(err);
                 return;
             }
-            res.status(200).json(response);
+            res.status(201).json(response);
         });
     }
 
@@ -37,7 +37,7 @@ export class UsersController extends CrudController {
         client.get({
                 index: 'scala',
                 type: 'database',
-                id: req.query.id
+                id: req.query.email
             }, (err, response) => {
             if (err)
                 res.send(err);
