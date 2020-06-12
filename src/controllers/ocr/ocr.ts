@@ -13,8 +13,11 @@ export class OcrController {
         const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
         
         for (const mIC of matchIsinCode) {
-            const average = mIC._source.criteria.reduce((a, b) => a + b.value, 0) / mIC._source.criteria.length;
-            mIC._source['criteriaCategorieAverage'] = average;
+            // const average = mIC._source.criteria.reduce((a, b) => a + b.value, 0) / mIC._source.criteria.length;
+            // console.log(mIC._source)
+            // mIC._source['criteriaCategorieAverage'] = average;
+            const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+            mIC._source['criteriaCategorieAverage'] = morningCriteria.value;
         }
         return res.json({data: matchIsinCode});
     }
