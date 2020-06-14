@@ -1,5 +1,5 @@
 import { Profile } from "../../models/Profile";
-import { client } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import {CrudController} from "../../utils";
 import {Portfolio} from "../../models/Portfolio";
 
@@ -9,8 +9,8 @@ export class ProfileController extends CrudController {
         const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
 
         client.index({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body : {
                 "type": "profile",
                 "username": profile.username,
@@ -28,8 +28,8 @@ export class ProfileController extends CrudController {
     read(req, res): void {
 
         client.get({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id
         }, (err, response) => {
             if (err)
@@ -45,8 +45,8 @@ export class ProfileController extends CrudController {
         const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
 
         client.update({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
             body: {
                 doc: {
@@ -67,8 +67,8 @@ export class ProfileController extends CrudController {
     delete(req, res): void {
 
         client.delete({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
         }, (err, response) => {
             if (err)

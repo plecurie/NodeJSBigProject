@@ -9,8 +9,8 @@ export class ProducersController extends CrudController {
         const producer : Producer = { name: req.body.name, products: req.body.products };
 
         client.index({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body : {
                 "type": "producer",
                 "name": producer.name,
@@ -28,8 +28,8 @@ export class ProducersController extends CrudController {
     read(req, res): void {
 
         client.get({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id
         }, (err, response) => {
             if (err)
@@ -68,8 +68,8 @@ export class ProducersController extends CrudController {
         const producer : Producer = { name: req.body.name, products: req.body.products };
 
         client.update({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
             body: {
                 doc: {
@@ -90,8 +90,8 @@ export class ProducersController extends CrudController {
     delete(req, res): void {
 
         client.delete({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
         }, (err, response) => {
             if (err)

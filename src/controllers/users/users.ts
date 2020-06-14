@@ -7,8 +7,8 @@ export class UsersController extends CrudController {
 
     read(req, res): void {
         client.get({
-                index: 'scala',
-                type: 'database',
+                index: index,
+                type: type,
                 id: req.query.email
             }, (err, response) => {
             if (err)
@@ -53,8 +53,8 @@ export class UsersController extends CrudController {
             email: req.body.email, password: req.body.password, username: req.body.username };
 
          client.update({
-             index: 'scala',
-             type: 'database',
+             index: index,
+             type: type,
              id: req.query.id,
              body: {
                  doc: {
@@ -77,8 +77,8 @@ export class UsersController extends CrudController {
 
     delete(req, res): void {
         client.delete({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
         }, (err, response) => {
             if (err)

@@ -1,7 +1,7 @@
 import { MailerService, AuthService, GeneratorService } from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 import {User} from "../../models/User";
-import {client} from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 
 const mailerService = MailerService.getInstance();
 const userService = AuthService.getInstance();
@@ -18,8 +18,8 @@ export class AuthController {
         const mdpCrypted = await generatorService.hashPassword(req.body.password);
 
         return client.index({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body : {
                 "type": "user",
                 firstname: user.firstname,

@@ -12,7 +12,7 @@ export const USER_BIRTHDATE = new Date('01/01/1970');
 export const ACCESS_TOKEN = 'xyz';
 
 export const mockSignin = jest.fn(
-    async (email: string, password: string): Promise<User> => {
+    async (email: string, password: string): Promise<any> => {
         if (email === USER_EMAIL && password === USER_PASSWORD)
             return {
                 firstname: USER_FIRSTNAME,
@@ -22,7 +22,9 @@ export const mockSignin = jest.fn(
                 password: USER_PASSWORD_HASH,
                 username: USER_USERNAME
             } as User;
-        return null;
+        else {
+            return { status: 400 }
+        }
     }
 );
 const mock = jest.fn().mockImplementation(() => {

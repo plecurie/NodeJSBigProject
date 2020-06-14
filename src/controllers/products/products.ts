@@ -11,8 +11,8 @@ export class ProductsController extends CrudController {
         product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);
 
         client.index({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body : {
                 "type": "product",
                 "isin_code": product.isin_code,
@@ -32,8 +32,8 @@ export class ProductsController extends CrudController {
     read(req, res): void {
 
         client.get({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id
         }, (err, response) => {
             if (err)
@@ -95,8 +95,8 @@ export class ProductsController extends CrudController {
     delete(req, res): void {
 
         client.delete({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
         }, (err, response) => {
             if (err)

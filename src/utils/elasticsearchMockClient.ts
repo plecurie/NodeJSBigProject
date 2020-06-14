@@ -15,14 +15,14 @@ client.info(console.log);
 client.ping(console.log);
 
 client.search({
-    index: 'scala',
+    index: index,
     body: {
         query: { match_all: {} }
     }
 }, console.log);
 
 client.search({
-    index: 'scala',
+    index: index,
     body: {
         query: {
             match: { foo: 'bar' }
@@ -32,7 +32,7 @@ client.search({
 
 mock.add({
     method: 'POST',
-    path: '/indexName/_search'
+    path: '/scala/_search'
 }, () => {
     return {
         hits: {
@@ -44,7 +44,7 @@ mock.add({
 
 mock.add({
     method: 'POST',
-    path: '/indexName/_search',
+    path: '/scala/_search',
     body: { query: { match: { foo: 'bar' } } }
 }, () => {
     return {

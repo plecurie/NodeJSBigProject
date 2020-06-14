@@ -1,10 +1,9 @@
-import { client } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 const bcrypt = require('bcrypt');
 
 export class AuthService {
     private static instance: AuthService;
-    private index = 'scala';
-    private types = 'users';
+
     constructor() {}
 
     public static getInstance(): AuthService {
@@ -16,8 +15,8 @@ export class AuthService {
 
     public async updateUserPassword(user: any): Promise<any> {
         return await client.update({
-            index: this.index,
-            type: this.types,
+            index: index,
+            type: type,
             id: user.id,
             body: { doc: { password: user.password }}
         }).then(pu => pu.body);
@@ -25,8 +24,8 @@ export class AuthService {
 
     public async searchUser(user: any) {
         return client.search({
-            index: this.index,
-            type: this.types,
+            index: index,
+            type: type,
             body: {query: {match: user}}
         });
     }

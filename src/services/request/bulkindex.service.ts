@@ -1,4 +1,4 @@
-import { client } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import { excelToJsonService } from "../excelToJson.service";
 import { Criteria } from "../../models/Criteria";
 
@@ -246,13 +246,13 @@ export class bulkindexService {
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
             ]);
-            products_list.push({ index: { _index: 'scala', _type: 'database'}});
+            products_list.push({ index: { _index: index, _type: type}});
             products_list.push(this.mapToObj(dict_products));
         }
 
         client.bulk({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body: products_list
         }, (err, response) => {
             if (err){

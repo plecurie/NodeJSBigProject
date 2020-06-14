@@ -1,4 +1,4 @@
-import { client } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import { Portfolio } from "../../models/Portfolio";
 import {CrudController} from "../../utils";
 
@@ -9,8 +9,8 @@ export class PortfolioController extends CrudController{
         const portfolio: Portfolio = { username: req.body.username, products: req.body.products };
 
         client.index({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body : {
                 "type": "portfolio",
                 "username": portfolio.username,
@@ -28,8 +28,8 @@ export class PortfolioController extends CrudController{
     read(req, res): void {
 
         client.get({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id
         }, (err, response) => {
             if (err)
@@ -45,8 +45,8 @@ export class PortfolioController extends CrudController{
         const portfolio: Portfolio = { username: req.body.username, products: req.body.products };
 
         client.update({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
             body: {
                 doc: {
@@ -66,8 +66,8 @@ export class PortfolioController extends CrudController{
     delete(req, res): void {
 
         client.delete({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             id: req.query.id,
         }, (err, response) => {
             if (err)
