@@ -33,7 +33,6 @@ class Application {
             console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
         });
     }
-
 }
 
 export default Application;

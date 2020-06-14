@@ -11,11 +11,11 @@ export class GeneratorService {
         return GeneratorService.instance;
     }
 
-    public randomPassword(): String {
+    public randomPassword(): string {
         return String.fromCodePoint(...Array.from({length: 16}, () => Math.floor(Math.random() * 57) + 65));
     }
 
-    public async hashPassword(password: String) {
+    public async hashPassword(password: string) {
         try {
             return await bcrypt.hash(password, 15);
         } catch(err) {

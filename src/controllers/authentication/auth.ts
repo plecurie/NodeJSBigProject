@@ -1,12 +1,44 @@
 import { MailerService, AuthService, GeneratorService } from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
+import {User} from "../../models/User";
+import {client} from "../../utils/elasticsearch";
 
 const mailerService = MailerService.getInstance();
 const userService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
 
 export class AuthController {
-    async login(req, res): Promise<void> {
+    
+    constructor() {}
+
+    async signup(req, res) {
+
+        const user: User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
+            email: req.body.email, password: req.body.password, username: req.body.username };
+        const mdpCrypted = await generatorService.hashPassword(req.body.password);
+
+        return client.index({
+            index: 'scala',
+            type: 'database',
+            body : {
+                "type": "user",
+                firstname: user.firstname,
+                lastname: user.lastname,
+                username: user.username,
+                birthdate: user.birthdate,
+                email: user.email,
+                password: mdpCrypted
+            }
+        }, (err, response) => {
+            if (err) {
+                res.status(400).send(err);
+                return;
+            }
+            res.status(201).json(response);
+        });
+    }
+
+    async signin(req, res): Promise<void> {
         try {
             const searchUser = await userService.searchUser({ email: req.body.email })
             .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
@@ -56,7 +88,7 @@ export class AuthController {
     }
 
     async checkToken(req, res): Promise<void> {
-        jsonwebtoken.verify(req.body.token, process.env.JWT_KEY, (err, _) => {
+        jsonwebtoken.verify(req.body.token, process.env.JWT_KEY, (err) => {
             if (err) {
                 res.json({valid: false});
                 return;

@@ -7,12 +7,16 @@ export const router = express.Router({
     mergeParams: true
 });
 
+router.post('/signup', (req: Request, res: Response) => {
+    authController.signup(req, res);
+});
+
 router.put('/forgot-password', (req: Request, res: Response) => {
     authController.forgotPassword(req, res);
 });
 
 router.post('/login', (req: Request, res: Response) => {
-    authController.login(req, res);
+    authController.signin(req, res);
 });
 
 router.post('/checkToken', (req: Request, res: Response) => {

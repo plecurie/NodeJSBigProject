@@ -3,7 +3,7 @@ import { ProducersController } from "./producers/producers";
 import { ProductsController } from "./products/products";
 import { PortfolioController } from "./portfolio/portfolio";
 import { ProfileController } from "./profile/profile";
-import { AuthController } from './authentification/auth';
+import { AuthController } from './authentication/auth';
 import { OcrController } from './ocr/ocr';
 
 const userController = new UsersController();

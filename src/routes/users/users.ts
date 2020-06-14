@@ -7,10 +7,6 @@ export const router = express.Router({
     mergeParams: true
 });
 
-router.post('/', (req: Request, res: Response) => {
-    userController.create(req, res)
-});
-
 router.get('/', (req: Request, res: Response) => {
     userController.read(req, res)
 });

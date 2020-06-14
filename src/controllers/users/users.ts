@@ -1,37 +1,9 @@
 import { CrudController } from "../../utils";
-import { client } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import { User } from "../../models/User";
-import { GeneratorService } from '../../services';
-const generatorService = GeneratorService.getInstance();
+import {TransportRequestCallback} from "@elastic/elasticsearch/lib/Transport";
 
 export class UsersController extends CrudController {
-
-    async create(req, res) {
-
-        const user : User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
-            email: req.body.email, password: req.body.password, username: req.body.username };
-        const mdpCrypted = await generatorService.hashPassword(req.body.password);
-        
-        client.index({
-            index: 'scala',
-            type: 'database',
-            body : {
-                "type": "user",
-                firstname: user.firstname,
-                lastname: user.lastname,
-                username: user.username,
-                birthdate: user.birthdate,
-                email: user.email,
-                password: mdpCrypted
-            }
-        }, (err, response) => {
-            if (err) {
-                res.status(404).send(err);
-                return;
-            }
-            res.status(201).json(response);
-        });
-    }
 
     read(req, res): void {
         client.get({
@@ -39,6 +11,35 @@ export class UsersController extends CrudController {
                 type: 'database',
                 id: req.query.email
             }, (err, response) => {
+            if (err)
+                res.send(err);
+            else
+                res.json(response)
+        })
+    }
+
+    search(req, res): TransportRequestCallback {
+        let matches = req.body.matches;
+        let fields = req.body.fields;
+
+        return client.search({
+            index,
+            type,
+            body : {
+                query: {
+                    match: {
+                        matches
+                    }
+                },
+                aggs: {
+                    tags: {
+                        terms: {
+                            fields
+                        }
+                    }
+                }
+            }
+        }, (err, response) => {
             if (err)
                 res.send(err);
             else
@@ -86,4 +87,6 @@ export class UsersController extends CrudController {
                 res.json(response)
         });
     }
+
+    create(req, res): void {}
 }

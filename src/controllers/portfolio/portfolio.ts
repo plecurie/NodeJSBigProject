@@ -6,7 +6,7 @@ export class PortfolioController extends CrudController{
 
     create(req, res): void {
 
-        const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
+        const portfolio: Portfolio = { username: req.body.username, products: req.body.products };
 
         client.index({
             index: 'scala',
@@ -42,7 +42,7 @@ export class PortfolioController extends CrudController{
 
     update(req, res): void {
 
-        const portfolio : Portfolio = { username: req.body.username, products: req.body.products };
+        const portfolio: Portfolio = { username: req.body.username, products: req.body.products };
 
         client.update({
             index: 'scala',
