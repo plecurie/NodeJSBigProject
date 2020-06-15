@@ -41,7 +41,7 @@ export class AuthController {
                             res.status(400).send(err);
                             return;
                         }
-                        res.status(201).json(response);
+                        res.status(201).json({created: true});
                     });
                 }
             }
