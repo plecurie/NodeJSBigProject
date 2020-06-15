@@ -12,7 +12,7 @@ router.post('/signup', (req: Request, res: Response) => {
 });
 
 router.put('/forgot-password', (req: Request, res: Response) => {
-    authController.forgotPassword(req, res);
+    authController.generateNewPassword(req, res);
 });
 
 router.post('/login', (req: Request, res: Response) => {

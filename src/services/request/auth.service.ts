@@ -18,15 +18,23 @@ export class AuthService {
             index: index,
             type: type,
             id: user.id,
-            body: { doc: { password: user.password }}
+            body: {
+                doc: {
+                    password: user.password
+                }
+            }
         }).then(pu => pu.body);
     }
 
-    public async searchUser(user: any) {
+    public async findByEmail(email: any) {
         return client.search({
             index: index,
             type: type,
-            body: {query: {match: user}}
+            body: {
+                query: {
+                    match: email
+                }
+            }
         });
     }
 
