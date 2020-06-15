@@ -91,7 +91,6 @@ export class AuthController {
                     res.status(404).json({updated: false})
                 }
             } else {
-                console.log('ss');
                 res.status(403).json({updated: false});
             }
         } catch(err) {

@@ -138,7 +138,32 @@ describe("Authentication tests", () => {
 
     describe("Forgot Pasword", () => {
 
-        it('should send an email to the user', function (done) {
+        const endpoint = "/auth/forgot-password/";
+
+        it('should send an email to the user with a new password', function (done) {
+            mockApi
+                .post(endpoint, {
+                    email: USER_EMAIL,
+                })
+                .reply(200, {
+                    "status": 200,
+                    "updated": true
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    email: USER_EMAIL,
+                })
+                .end((err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(200);
+                    expect(res.body.updated).to.equal(true);
+                    done();
+                });
+
 
         })
     });
