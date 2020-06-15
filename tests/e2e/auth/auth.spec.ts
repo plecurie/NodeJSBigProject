@@ -15,10 +15,7 @@ export const USER_USERNAME = "random";
 export const USER_FIRSTNAME = "random";
 export const USER_LASTNAME = "random";
 export const USER_BIRTHDATE = "1970/01/01";
-export const ACCESS_TOKEN = "xyz";
-export const DATATYPE = "user";
 
-const email = 'abc@xyz.com';
 const baseApi = "http://localhost:3100";
 
 const nock = require('nock');
@@ -29,7 +26,6 @@ const expect = chai.expect;
 
 
 describe("Authentication tests", () => {
-
 
     const mockApi = nock(baseApi);
     const request = supertest(baseApi);
@@ -89,7 +85,7 @@ describe("Authentication tests", () => {
                 .reply(200, {
                     "status": 200,
                     "connect": true,
-                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiVC11bnVISUJDTHlBc3M4Y18wUVEiLCJpYXQiOjE1OTIyMzU5MjcsImV4cCI6MTU5MjMyMjMyN30.e2p9WM-xXdWS7R6PaS9AZRpTMjCnuW1J5KzuVmnRT4A"
+                    "token": "xyz"
                 });
 
             request
@@ -104,7 +100,7 @@ describe("Authentication tests", () => {
 
                     expect(res.body.status).to.equal(200);
                     expect(res.body.connect).to.equal(true);
-                    expect(res.body.token).to.equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiVC11bnVISUJDTHlBc3M4Y18wUVEiLCJpYXQiOjE1OTIyMzU5MjcsImV4cCI6MTU5MjMyMjMyN30.e2p9WM-xXdWS7R6PaS9AZRpTMjCnuW1J5KzuVmnRT4A");
+                    expect(res.body.token).to.equal("xyz");
                     done();
                 });
         })
@@ -112,8 +108,31 @@ describe("Authentication tests", () => {
 
     describe("CheckToken", () => {
 
-        it('should check the token of the user', function (done) {
+        const endpoint = "/auth/checkToken/";
 
+        it('should check the token of the user', function (done) {
+            mockApi
+                .post(endpoint, {
+                    token: "xyz"
+                })
+                .reply(200, {
+                    "status": 200,
+                    "valid": true,
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    token: "xyz"
+                })
+                .end((err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(200);
+                    expect(res.body.valid).to.equal(true);
+                    done();
+                });
         })
     });
 
