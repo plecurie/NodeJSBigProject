@@ -11,7 +11,7 @@ const generatorService = GeneratorService.getInstance();
 
 describe("Users E2E tests", () => {
 
-    describe("Find one", () => {
+    describe("Find one user", () => {
 
         const endpoint = "/users/";
 
@@ -73,6 +73,51 @@ describe("Users E2E tests", () => {
                             }
                         }
                     ]);
+                    done();
+                });
+        });
+
+    });
+
+    describe("Update one user", () => {
+
+        const endpoint = "/users/update";
+
+        it('should update an existing user', async function (done) {
+
+            mockApi
+                .post(endpoint, {
+                    "firstname": "test",
+                    "lastname": "test",
+                    "birthdate": "1970/01/01",
+                    "email": USER_EMAIL,
+                    "newmail": "test@test",
+                    "password": "test",
+                    "username": "test"
+                })
+                .reply(200, {
+                    "status": 200,
+                    "updated": true
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    "firstname": "test",
+                    "lastname": "test",
+                    "birthdate": "1970/01/01",
+                    "email": USER_EMAIL,
+                    "newmail": "test@test",
+                    "password": "test",
+                    "username": "test"
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(200);
+                    expect(res.body.updated).to.equal(true);
+
                     done();
                 });
         });
