@@ -893,6 +893,10 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
+        "id_user": {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
         "isincode" : {
             "type" : "keyword",
             "cql_collection" : "singleton"

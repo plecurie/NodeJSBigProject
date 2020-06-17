@@ -26,9 +26,9 @@ export class PortfolioController extends CrudController{
                 }
             }, (err, response) => {
                 if (err)
-                    res.send(err);
+                    res.status(500).json(err);
                 else
-                    res.json(response)
+                    res.status(200).json({ created: true });
             })
         }
         else {
