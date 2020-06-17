@@ -165,7 +165,7 @@ describe("Users E2E tests", () => {
                 });
         });
 
-        it("should return not found when email doesn't exit", async function (done) {
+        it("should return not found when email doesn't exist", async function (done) {
 
             mockApi
                 .post(endpoint, {
@@ -201,6 +201,47 @@ describe("Users E2E tests", () => {
                     expect(res.body.status).to.equal(404);
                     expect(res.body.updated).to.equal(false);
                     expect(res.body.reason).to.equal("no user with this email");
+
+                    done();
+                });
+        });
+
+        it("should return already exits when email does exist", async function (done) {
+
+            mockApi
+                .post(endpoint, {
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    newmail: "used_email",
+                    password: "test",
+                    username: "test",
+                    email: USER_EMAIL
+                })
+                .reply(409, {
+                    status: 409,
+                    updated: false,
+                    reason: "email already in use"
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    newmail: "used_email",
+                    password: "test",
+                    username: "test",
+                    email: USER_EMAIL
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(409);
+                    expect(res.body.updated).to.equal(false);
+                    expect(res.body.reason).to.equal("email already in use");
 
                     done();
                 });

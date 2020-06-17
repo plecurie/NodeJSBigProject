@@ -108,7 +108,7 @@ describe("Authentication E2E tests", () => {
                 })
                 .reply(200, {
                     status: 200,
-                    connected: true,
+                    connect: true,
                     token: "xyz"
                 });
 
@@ -123,7 +123,7 @@ describe("Authentication E2E tests", () => {
                         console.log(err);
 
                     expect(res.body.status).to.equal(200);
-                    expect(res.body.connected).to.equal(true);
+                    expect(res.body.connect).to.equal(true);
                     expect(res.body.token).to.equal("xyz");
                     done();
                 });
@@ -138,7 +138,7 @@ describe("Authentication E2E tests", () => {
                 })
                 .reply(403, {
                     status: 403,
-                    connected: false,
+                    connect: false,
                     reason: "access forbidden"
                 });
 
@@ -153,7 +153,7 @@ describe("Authentication E2E tests", () => {
                         console.log(err);
 
                     expect(res.body.status).to.equal(403);
-                    expect(res.body.connected).to.equal(false);
+                    expect(res.body.connect).to.equal(false);
                     expect(res.body.reason).to.equal("access forbidden");
                     done();
                 });
@@ -168,7 +168,7 @@ describe("Authentication E2E tests", () => {
                 })
                 .reply(403, {
                     status: 403,
-                    connected: false,
+                    connect: false,
                     reason: "access forbidden"
                 });
 
@@ -183,7 +183,7 @@ describe("Authentication E2E tests", () => {
                         console.log(err);
 
                     expect(res.body.status).to.equal(403);
-                    expect(res.body.connected).to.equal(false);
+                    expect(res.body.connect).to.equal(false);
                     expect(res.body.reason).to.equal("access forbidden");
                     done();
                 });

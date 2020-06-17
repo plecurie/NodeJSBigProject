@@ -62,16 +62,16 @@ export class AuthController {
                 );
                 if (isValidPassword) {
                     const token = jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "1d"});
-                    res.status(200).json({connected: true, token: token});
+                    res.status(200).json({connect: true, token: token});
                 } else {
-                    res.status(403).json({connected: false, reason: "access forbidden"});
+                    res.status(403).json({connect: false, reason: "access forbidden"});
                 }
             } else {
-                res.status(403).json({connected: false, reason: "access forbidden"})
+                res.status(403).json({connect: false, reason: "access forbidden"})
             }
         }
         catch(err) {
-            res.status(500).json({connected: false, error: err});
+            res.status(500).json({connect: false, error: err});
         }
     }
 

@@ -41,7 +41,10 @@ export class UsersController extends CrudController {
         const userExist = await authService.findByEmail({ email: req.body.email })
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
 
-        if (userExist) {
+        const isUsed = await authService.findByEmail({ email: newMail })
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
+
+        if (userExist && !isUsed) {
 
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
 
@@ -76,8 +79,11 @@ export class UsersController extends CrudController {
                     res.status(200).json({ updated: true });
             })
         }
-        else {
+        else if(!userExist) {
             res.status(404).json({updated: false, reason: "no user with this email"});
+        }
+        else if(isUsed) {
+            res.status(409).json({updated: false, reason: "email already in use"});
         }
 
     }
