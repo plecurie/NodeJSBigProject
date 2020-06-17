@@ -15,6 +15,7 @@ export class UsersController extends CrudController {
             body : {
                 query: {
                     match: {
+                        type: "user",
                         email: req.body.email
                     }
                 }
@@ -53,7 +54,9 @@ export class UsersController extends CrudController {
                 type: type,
                 body: {
                     query: {
-                        match: { _id: userExist._id }
+                        match: {
+                            _id: userExist._id
+                        }
                     },
                     script: {
                         source:
@@ -95,6 +98,7 @@ export class UsersController extends CrudController {
             body: {
                 query: {
                     match: {
+                        type: "user",
                         email: req.body.email
                     }
                 }

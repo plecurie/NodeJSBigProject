@@ -1,6 +1,5 @@
 import * as elasticsearch from '@elastic/elasticsearch'
 import { ES_URL } from "./constants";
-import {bulkindexService} from "../services/request/bulkindex.service";
 
 export const index = 'scala';
 export const type = 'database';
@@ -1785,7 +1784,6 @@ async function putMapping () {
         }
     };
     await client.indices.putMapping({ index, type, body: { properties: schema } });
-    await bulkindexService.getInstance().importExcel();
 }
 
 module.exports = {

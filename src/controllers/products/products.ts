@@ -1,110 +1,88 @@
 import { client, index, type } from "../../utils/elasticsearch";
 import {CrudController} from "../../utils";
 import { Product } from "../../models/Product";
-
-var product: Product;
-
+import {bulkindexService} from "../../services/request/bulkindex.service";
 
 export class ProductsController extends CrudController {
-    create(req, res): void {
 
-        product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);
+    async create(req, res): Promise<void> {
 
-        client.index({
+        try {
+            await bulkindexService.getInstance().importExcel();
+            res.status(200).json({created: true})
+        }
+        catch (err) {
+            res.status(500).json({created: false, error: err})
+        }
+    }
+
+    findAll(req, res): void {
+
+        client.search({
             index: index,
             type: type,
             body : {
-                "type": "product",
-                "isin_code": product.isin_code,
-                "name": product.name,
-                "category": product.category,
-                "criteria": product.criteria
-            }
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
-
-    }
-
-    read(req, res): void {
-
-        client.get({
-            index: index,
-            type: type,
-            id: req.query.id
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
-    }
-
-/*    find(req, res): void {
-        const body = {
-            from: req.query.offset,
-            query: { match: {
-                    text: {
-                        query: req.query.term,
-                        operator: 'and',
-                        fuzziness: 'auto'
-                    } } },
-            highlight: { fields: { text: {} } }
-        };
-        client.search({
-            index,
-            type,
-            body
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
-    }*/
-
-    update(req, res): void {
-
-        product = new Product(req.body.isin_code, req.body.name, req.body.category, req.body.criteria);
-
-        client.update({
-            index,
-            type,
-            id: req.query.id,
-            body: {
-                doc: {
-                    "type": "product",
-                    "isin_code": product.isin_code,
-                    "name": product.name,
-                    "category": product.category,
-                    "criteria": product.criteria
+                query: {
+                    match: {
+                        type: "product"
+                    }
                 }
             }
         }, (err, response) => {
             if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
+                res.status(500).json(err);
+            else if (response.body.hits.hits.length != 0) {
+                res.status(200).json({found: true, products: response.body.hits.hits});
+            }
+            else {
+                res.status(404).json({found: false, reason: "no products found"});
+            }
 
-    }
-
-    delete(req, res): void {
-
-        client.delete({
-            index: index,
-            type: type,
-            id: req.query.id,
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
         });
 
     }
+
+    async search(req, res): Promise<void>{
+
+        client.search({
+            index: index,
+            type: type,
+            body : {
+                query: {
+                    bool: {
+                        must: [
+                            {
+                                match: {
+                                    type: "product"
+                                }
+                            }
+                        ],
+                        filter: [
+                            {
+                                term:  req.body.filter
+                            },
+                        ]
+                    }
+                }
+            }
+        }, (err, response) => {
+            if (err)
+                res.status(500).json(err);
+            else if (response.body.hits.hits.length != 0) {
+                res.status(200).json({found: true, products: response.body.hits.hits});
+            }
+            else {
+                res.status(404).json({found: false, reason: "no products found"});
+            }
+
+        });
+
+    }
+
+    read(req, res): void {}
+
+    update(req, res): void {}
+
+    delete(req, res): void {}
 
 }

@@ -1,4 +1,4 @@
-import {client, index, type} from "../../utils/elasticsearch";
+import { client, index, type } from "../../utils/elasticsearch";
 import { excelToJsonService } from "../excelToJson.service";
 import { Criteria } from "../../models/Criteria";
 
@@ -23,7 +23,7 @@ export class bulkindexService {
         return JSON.stringify(Array.from(m.entries()))
     };
 
-    public importExcel(filename = 'Input Questionnaire v2'): void {
+    public importExcel(filename = 'Input.xlsx'): void {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];

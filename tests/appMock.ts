@@ -20,7 +20,7 @@ export function appMock() {
     });
     app.use(express.json());
     app.use('/users', usersRouter);
-    app.use('/firm', producersRouter);
+    app.use('/firms', producersRouter);
     app.use('/products', productsRouter);
     app.use('/portfolio', portfolioRouter);
     app.use('/profile', profileRouter);

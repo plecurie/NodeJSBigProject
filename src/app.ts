@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter } from "./routes";
+import { usersRouter, productsRouter, authRouter, ocrRouter } from "./routes";
 import { APP_HOST, APP_PORT } from "./utils/constants";
 import { checkConnection } from "./utils/elasticsearch"
 
@@ -16,7 +16,6 @@ class Application {
     private routes (): void {
         this.app.use(express.json());
         this.app.use('/users', usersRouter);
-        this.app.use('/firm', producersRouter);
         this.app.use('/products', productsRouter);
         this.app.use('/auth', authRouter);
         this.app.use('/ocr', ocrRouter);

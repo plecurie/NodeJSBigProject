@@ -48,6 +48,7 @@ export class PortfolioController extends CrudController{
                 body : {
                     query: {
                         match: {
+                            type: "portfolio",
                             id_user: user.id_user
                         }
                     }
@@ -80,7 +81,10 @@ export class PortfolioController extends CrudController{
                 type: type,
                 body: {
                     query: {
-                        match: {id_user: portfolio.id_user}
+                        match: {
+                            type: "portfolio",
+                            id_user: portfolio.id_user
+                        }
                     },
                     script: {
                         source:
@@ -111,6 +115,7 @@ export class PortfolioController extends CrudController{
                 body: {
                     query: {
                         match: {
+                            type: "portfolio",
                             id_user: user._id
                         }
                     }

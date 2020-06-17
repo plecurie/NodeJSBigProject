@@ -11,17 +11,9 @@ router.post('/', (req: Request, res: Response) => {
 });
 
 router.get('/', (req: Request, res: Response) => {
-    productsController.read(req, res)
+    productsController.findAll(req, res)
 });
 
-/*router.get('/search', (req, res) => {
-    productsController.find(req, res);
-});*/
-
-router.post('/update',(req: Request, res: Response) => {
-    productsController.update(req, res);
-});
-
-router.delete('/', (req: Request, res: Response) => {
-    productsController.delete(req, res);
+router.get('/search', (req, res) => {
+    productsController.search(req, res);
 });
