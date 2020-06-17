@@ -18,7 +18,7 @@ export class AuthController {
                 const userExist = await authService.findByEmail({ email: req.body.email })
                     .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
                 if(userExist) {
-                    res.status(409).json({created: false});
+                    res.status(409).json({created: false, reason: "email already exists"});
                 }
                 else {
 
@@ -38,7 +38,7 @@ export class AuthController {
                         }
                     }, (err, response) => {
                         if (err) {
-                            res.status(400).send(err);
+                            res.status(500).json(err);
                             return;
                         }
                         res.status(201).json({created: true});
@@ -46,7 +46,7 @@ export class AuthController {
                 }
             }
             catch(err) {
-                res.status(500).json({created: false, error: err});
+                res.status(500).json(err);
             }
 
     }
@@ -62,16 +62,16 @@ export class AuthController {
                 );
                 if (isValidPassword) {
                     const token = jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "1d"});
-                    res.status(200).json({connect: true, token: token});
+                    res.status(200).json({connected: true, token: token});
                 } else {
-                    res.status(403).json({connect: false});
+                    res.status(403).json({connected: false, reason: "access forbidden"});
                 }
             } else {
-                res.status(403).json({connect: false})
+                res.status(403).json({connected: false, reason: "access forbidden"})
             }
         }
         catch(err) {
-            res.status(500).json({connect: false, error: err});
+            res.status(500).json({connected: false, error: err});
         }
     }
 
@@ -87,14 +87,12 @@ export class AuthController {
                 if (passwordUpdated._shards.failed == 0) {
                     await mailerService.sendEmail(req.body.email, generatedPassword);
                     res.status(200).json({updated: true});
-                } else {
-                    res.status(404).json({updated: false})
                 }
             } else {
-                res.status(403).json({updated: false});
+                res.status(404).json({updated: false, reason: "no user with this email"});
             }
         } catch(err) {
-            console.error(err);
+            res.status(500).json(err);
             return;
         }
     }
@@ -102,10 +100,10 @@ export class AuthController {
     async checkToken(req, res): Promise<void> {
         jsonwebtoken.verify(req.body.token, process.env.JWT_KEY, (err) => {
             if (err) {
-                res.json({valid: false});
+                res.status(403).json({ valid: false, reason: "invalid token" });
                 return;
             }
-            res.json({valid: true});
+            res.status(200).json({ valid: true });
         });
     }
 }

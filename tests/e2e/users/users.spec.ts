@@ -17,7 +17,7 @@ describe("Users E2E tests", () => {
 
         it('should find an existing user by email', async function (done) {
 
-            const mdpCrypted = await generatorService.hashPassword("abc123");
+            const mdpCrypted = await generatorService.hashPassword(USER_PASSWORD);
 
             mockApi
                 .post(endpoint, {
@@ -77,6 +77,49 @@ describe("Users E2E tests", () => {
                 });
         });
 
+        it("should return not found when email doesn't exit", async function (done) {
+
+            const mdpCrypted = await generatorService.hashPassword(USER_PASSWORD);
+
+            mockApi
+                .post(endpoint, {
+                    type: "user",
+                    firstname: USER_FIRSTNAME,
+                    lastname: USER_LASTNAME,
+                    username: USER_USERNAME,
+                    birthdate: USER_BIRTHDATE,
+                    password: mdpCrypted,
+                    email: "wrong_email"
+                })
+                .reply(404, {
+                    status: 404,
+                    found: false,
+                    reason: "no user with this email"
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    type: "user",
+                    firstname: USER_FIRSTNAME,
+                    lastname: USER_LASTNAME,
+                    username: USER_USERNAME,
+                    birthdate: USER_BIRTHDATE,
+                    password: mdpCrypted,
+                    email: "wrong_email"
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(404);
+                    expect(res.body.found).to.equal(false);
+                    expect(res.body.reason).to.equal("no user with this email");
+
+                    done();
+                });
+        });
+
     });
 
     describe("Update one user", () => {
@@ -87,13 +130,13 @@ describe("Users E2E tests", () => {
 
             mockApi
                 .post(endpoint, {
-                    "firstname": "test",
-                    "lastname": "test",
-                    "birthdate": "1970/01/01",
-                    "email": USER_EMAIL,
-                    "newmail": "test@test",
-                    "password": "test",
-                    "username": "test"
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    email: USER_EMAIL,
+                    newmail: "test@test",
+                    password: "test",
+                    username: "test"
                 })
                 .reply(200, {
                     "status": 200,
@@ -103,13 +146,13 @@ describe("Users E2E tests", () => {
             request
                 .post(endpoint)
                 .send({
-                    "firstname": "test",
-                    "lastname": "test",
-                    "birthdate": "1970/01/01",
-                    "email": USER_EMAIL,
-                    "newmail": "test@test",
-                    "password": "test",
-                    "username": "test"
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    email: USER_EMAIL,
+                    newmail: "test@test",
+                    password: "test",
+                    username: "test"
                 })
                 .end( (err, res) => {
                     if (err)
@@ -117,6 +160,47 @@ describe("Users E2E tests", () => {
 
                     expect(res.body.status).to.equal(200);
                     expect(res.body.updated).to.equal(true);
+
+                    done();
+                });
+        });
+
+        it("should return not found when email doesn't exit", async function (done) {
+
+            mockApi
+                .post(endpoint, {
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    newmail: "test@test",
+                    password: "test",
+                    username: "test",
+                    email: "wrong_email"
+                })
+                .reply(404, {
+                    status: 404,
+                    updated: false,
+                    reason: "no user with this email"
+                });
+
+            request
+                .post(endpoint)
+                .send({
+                    firstname: "test",
+                    lastname: "test",
+                    birthdate: "1970/01/01",
+                    newmail: "test@test",
+                    password: "test",
+                    username: "test",
+                    email: "wrong_email"
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(404);
+                    expect(res.body.updated).to.equal(false);
+                    expect(res.body.reason).to.equal("no user with this email");
 
                     done();
                 });
@@ -132,17 +216,17 @@ describe("Users E2E tests", () => {
 
             mockApi
                 .delete(endpoint, {
-                    "email": USER_EMAIL
+                    email: USER_EMAIL
                 })
                 .reply(200, {
-                    "status": 200,
-                    "deleted": true
+                    status: 200,
+                    deleted: true
                 });
 
             request
                 .delete(endpoint)
                 .send({
-                    "email": USER_EMAIL
+                    email: USER_EMAIL
                 })
                 .end( (err, res) => {
                     if (err)
@@ -150,6 +234,35 @@ describe("Users E2E tests", () => {
 
                     expect(res.body.status).to.equal(200);
                     expect(res.body.deleted).to.equal(true);
+
+                    done();
+                });
+        });
+
+        it('should delete an existing user', async function (done) {
+
+            mockApi
+                .delete(endpoint, {
+                    email: "wrong_email"
+                })
+                .reply(404, {
+                    status: 404,
+                    deleted: false,
+                    reason: "no user with this email"
+                });
+
+            request
+                .delete(endpoint)
+                .send({
+                    email: "wrong_email"
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(404);
+                    expect(res.body.deleted).to.equal(false);
+                    expect(res.body.reason).to.equal("no user with this email");
 
                     done();
                 });

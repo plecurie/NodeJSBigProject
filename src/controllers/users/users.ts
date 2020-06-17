@@ -96,12 +96,10 @@ export class UsersController extends CrudController {
         }, (err, response) => {
             if (err)
                 res.status(500).json(err);
-            else if (response.body.deleted !== 0) {
-                res.status(200).json({deleted: true});
-            }
-            else {
+            else if (response.body.deleted === 0) {
                 res.status(404).json({deleted: false, reason: "no user with this email"});
             }
+            res.status(200).json({deleted: true});
         });
 
     }
