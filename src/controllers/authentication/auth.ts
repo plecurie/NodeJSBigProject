@@ -18,7 +18,7 @@ export class AuthController {
                 const userExist = await authService.findByEmail({ email: req.body.email })
                     .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
                 if(userExist) {
-                    res.status(409).json({connect: false});
+                    res.status(409).json({created: false});
                 }
                 else {
 
@@ -46,7 +46,7 @@ export class AuthController {
                 }
             }
             catch(err) {
-                res.status(500).json({connect: false, error: err});
+                res.status(500).json({created: false, error: err});
             }
 
     }

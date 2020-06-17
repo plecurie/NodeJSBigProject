@@ -1,34 +1,17 @@
-// @ts-ignore
-import { mockSignin } from '../../unit/auth/_mocks_/mockSignin';
-// @ts-ignore
-import { mockSignup } from '../../unit/auth/_mocks_/mockSignup';
-// @ts-ignore
-import { mockForgotPassword } from '../../unit/auth/_mocks_/mockForgotPassword';
-// @ts-ignore
-import { mockCheckToken } from '../../unit/auth/_mocks_/mockCheckToken';
-import * as http from "http";
-import exp = require("constants");
-
-export const USER_EMAIL = "random@test.com";
-export const USER_PASSWORD = "abc123";
-export const USER_USERNAME = "random";
-export const USER_FIRSTNAME = "random";
-export const USER_LASTNAME = "random";
-export const USER_BIRTHDATE = "1970/01/01";
-
-const baseApi = "http://localhost:3100";
-
-const nock = require('nock');
-const supertest = require('supertest');
+import {
+    mockApi, request,
+    USER_BIRTHDATE,
+    USER_EMAIL,
+    USER_FIRSTNAME,
+    USER_LASTNAME,
+    USER_PASSWORD,
+    USER_USERNAME
+} from "../mockConfig";
 
 const chai = require('chai');
 const expect = chai.expect;
 
-
-describe("Authentication tests", () => {
-
-    const mockApi = nock(baseApi);
-    const request = supertest(baseApi);
+describe("Authentication E2E tests", () => {
 
     describe("Signup", () => {
 
