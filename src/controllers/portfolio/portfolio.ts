@@ -1,7 +1,7 @@
-import {client, index, type} from "../../utils/elasticsearch";
+import { client, index, type } from "../../utils/elasticsearch";
 import { Portfolio } from "../../models/Portfolio";
-import {CrudController} from "../../utils";
-import {AuthService} from "../../services";
+import { CrudController } from "../../utils";
+import { AuthService } from "../../services";
 
 const authService = AuthService.getInstance();
 
@@ -37,57 +37,93 @@ export class PortfolioController extends CrudController{
 
     }
 
-    read(req, res): void {
+    async read(req, res): Promise<void> {
 
-        client.get({
-            index: index,
-            type: type,
-            id: req.query.id
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
+        const user = await authService.findByEmail({email: req.body.email})
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
 
-    }
-
-    update(req, res): void {
-
-        const portfolio: Portfolio = { username: req.body.username, products: req.body.products };
-
-        client.update({
-            index: index,
-            type: type,
-            id: req.query.id,
-            body: {
-                doc: {
-                    "type": "portfolio",
-                    "username": portfolio.username,
-                    "products": portfolio.products
+        if (user) {
+            client.search({
+                index: index,
+                body : {
+                    query: {
+                        match: {
+                            id_user: user.id_user
+                        }
+                    }
                 }
-            }
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        })
+            }, (err, response) => {
+                if (err)
+                    res.status(500).json(err);
+                else if (response.body.hits.hits) {
+                    res.status(200).json({found: true, portfolio: response.body.hits.hits});
+                }
+                else {
+                    res.status(404).json({found: false, reason: "no portfolio found"});
+                }
+
+            });
+        }
     }
 
-    delete(req, res): void {
+    async update(req, res): Promise<void> {
 
-        client.delete({
-            index: index,
-            type: type,
-            id: req.query.id,
-        }, (err, response) => {
-            if (err)
-                res.send(err);
-            else
-                res.json(response)
-        });
+        const user = await authService.findByEmail({email: req.body.email})
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
 
+        if (user) {
+
+            const portfolio: Portfolio = {id_user: user._id, products: req.body.products};
+
+            client.updateByQuery({
+                index: index,
+                type: type,
+                body: {
+                    query: {
+                        match: {id_user: portfolio.id_user}
+                    },
+                    script: {
+                        source:
+                            "ctx._source.products ='"
+                            + portfolio.products + "';",
+                        lang: "painless"
+                    }
+                }
+            }, (err, response) => {
+                if (err)
+                    res.status(500).json(err);
+                else
+                    res.status(200).json({updated: true});
+            })
+        }
+
+    }
+
+    async delete(req, res): Promise<void> {
+
+        const user = await authService.findByEmail({email: req.body.email})
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
+
+        if (user) {
+            client.deleteByQuery({
+                index: index,
+                type: type,
+                body: {
+                    query: {
+                        match: {
+                            id_user: user._id
+                        }
+                    }
+                }
+            }, (err, response) => {
+                if (err)
+                    res.status(500).json(err);
+                else if (response.body.deleted === 0) {
+                    res.status(404).json({deleted: false, reason: "no portfolio found"});
+                }
+                res.status(200).json({deleted: true});
+            });
+        }
     }
 
 }

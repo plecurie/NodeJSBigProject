@@ -889,6 +889,10 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
+        "firmname" : {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
         "firstname" : {
             "type" : "keyword",
             "cql_collection" : "singleton"

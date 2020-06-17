@@ -23,7 +23,7 @@ export class bulkindexService {
         return JSON.stringify(Array.from(m.entries()))
     };
 
-    public importExcel(filename = 'Base Projet IT v5.xlsx'): void {
+    public importExcel(filename = 'Input Questionnaire v2'): void {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
@@ -242,6 +242,7 @@ export class bulkindexService {
                 ["type","product"],
                 ["isincode", data[i]['ISIN']],
                 ["productname", data[i]['Name']],
+                ["firmname", data[i]['Firm Name']],
                 ["ongoingcharge", data[i]['KIID Ongoing Charge']],
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]

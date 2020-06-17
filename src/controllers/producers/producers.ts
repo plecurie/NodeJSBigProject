@@ -1,12 +1,12 @@
 import {client, index, type} from "../../utils/elasticsearch";
-import { Producer } from "../../models/Producer";
+import { Firm } from "../../models/Firm";
 import {CrudController} from "../../utils";
 import {Portfolio} from "../../models/Portfolio";
 
 export class ProducersController extends CrudController {
     create(req, res): void {
 
-        const producer : Producer = { name: req.body.name, products: req.body.products };
+        const producer : Firm = { name: req.body.name, products: req.body.products };
 
         client.index({
             index: index,
@@ -65,7 +65,7 @@ export class ProducersController extends CrudController {
 
     update(req, res): void {
 
-        const producer : Producer = { name: req.body.name, products: req.body.products };
+        const producer : Firm = { name: req.body.name, products: req.body.products };
 
         client.update({
             index: index,

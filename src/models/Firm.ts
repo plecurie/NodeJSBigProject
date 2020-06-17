@@ -1,6 +1,6 @@
 import {Product} from "./Product";
 
-export interface Producer {
+export interface Firm {
     name: String;
     products: Product[];
 }

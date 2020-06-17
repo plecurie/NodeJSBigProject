@@ -16,7 +16,7 @@ class Application {
     private routes (): void {
         this.app.use(express.json());
         this.app.use('/users', usersRouter);
-        this.app.use('/producers', producersRouter);
+        this.app.use('/firm', producersRouter);
         this.app.use('/products', productsRouter);
         this.app.use('/auth', authRouter);
         this.app.use('/ocr', ocrRouter);
