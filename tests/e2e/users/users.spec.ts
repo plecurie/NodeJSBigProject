@@ -81,7 +81,7 @@ describe("Users E2E tests", () => {
 
     describe("Update one user", () => {
 
-        const endpoint = "/users/update";
+        const endpoint = "/users/update/";
 
         it('should update an existing user', async function (done) {
 
@@ -123,4 +123,38 @@ describe("Users E2E tests", () => {
         });
 
     });
+
+    describe("Delete one user", () => {
+
+        const endpoint = "/users/";
+
+        it('should delete an existing user', async function (done) {
+
+            mockApi
+                .delete(endpoint, {
+                    "email": USER_EMAIL
+                })
+                .reply(200, {
+                    "status": 200,
+                    "deleted": true
+                });
+
+            request
+                .delete(endpoint)
+                .send({
+                    "email": USER_EMAIL
+                })
+                .end( (err, res) => {
+                    if (err)
+                        console.log(err);
+
+                    expect(res.body.status).to.equal(200);
+                    expect(res.body.deleted).to.equal(true);
+
+                    done();
+                });
+        });
+
+    });
+
 });

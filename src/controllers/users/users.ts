@@ -2,16 +2,15 @@ import { CrudController } from "../../utils";
 import { client, index, type } from "../../utils/elasticsearch";
 import { User } from "../../models/User";
 import { AuthService, GeneratorService } from "../../services";
-import { TransportRequestCallback } from "@elastic/elasticsearch/lib/Transport";
 
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
 
 export class UsersController extends CrudController {
 
-    async findOneByEmail(req, res): Promise<TransportRequestCallback> {
+    async findOneByEmail(req, res) :  Promise<void> {
 
-        return client.search({
+        client.search({
             index: index,
             body : {
                 query: {
@@ -23,8 +22,13 @@ export class UsersController extends CrudController {
         }, (err, response) => {
             if (err)
                 res.status(500).json(err);
-            else
-                res.status(200).json({user: response.body.hits.hits});
+            else if (response.body.hits.hits) {
+                res.status(200).json({found: true, user: response.body.hits.hits});
+            }
+            else {
+                res.status(404).json({found: false, reason: "no user with this email"});
+            }
+
         })
     }
 
@@ -69,7 +73,7 @@ export class UsersController extends CrudController {
                 if (err)
                     res.status(500).json(err);
                 else
-                    res.status(200).json({updated: true});
+                    res.status(200).json({ updated: true });
             })
         }
         else {
@@ -79,9 +83,9 @@ export class UsersController extends CrudController {
     }
 
     delete(req, res): void {
+
         client.deleteByQuery({
             index: index,
-            type: type,
             body: {
                 query: {
                     match: {
@@ -92,9 +96,14 @@ export class UsersController extends CrudController {
         }, (err, response) => {
             if (err)
                 res.status(500).json(err);
-            else
+            else if (response.body.deleted !== 0) {
                 res.status(200).json({deleted: true});
+            }
+            else {
+                res.status(404).json({deleted: false, reason: "no user with this email"});
+            }
         });
+
     }
 
     create(req, res): void {}
