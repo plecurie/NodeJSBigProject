@@ -43,6 +43,7 @@ export async function resetIndex () {
         await putMapping()
     });
 }
+
 async function putMapping () {
     const schema = {
         "birthdate" : {

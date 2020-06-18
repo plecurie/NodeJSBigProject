@@ -6,7 +6,7 @@ export const router = express.Router({
     strict: true
 });
 
-router.get('/_updatedb', (req: Request, res: Response) => {
+router.post('/_updatedb', (req: Request, res: Response) => {
     productsController.update(req, res)
 });
 
