@@ -40,7 +40,11 @@ router.post('/portfolio', (req: Request, res: Response) => {
 });
 
 router.get('/portfolio', (req: Request, res: Response) => {
-    portfolioController.read(req, res)
+    portfolioController.findAll(req, res)
+});
+
+router.get('/portfolio/:name', (req: Request, res: Response) => {
+    portfolioController.findOne(req, res)
 });
 
 router.post('/portfolio/update',(req: Request, res: Response) => {

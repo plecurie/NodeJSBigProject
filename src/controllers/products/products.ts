@@ -1,6 +1,5 @@
 import { client, index, type } from "../../utils/elasticsearch";
 import {CrudController} from "../../utils";
-import { Product } from "../../models/Product";
 import {bulkindexService} from "../../services/request/bulkindex.service";
 
 export class ProductsController extends CrudController {
@@ -52,7 +51,7 @@ export class ProductsController extends CrudController {
             if (err)
                 res.status(500).json(err);
             else if (response.body.hits.hits.length != 0) {
-                res.status(200).json({found: true, product: response.body.hits.hits});
+                res.status(200).json({found: true, product: response.body.hits.hits._source});
             }
             else {
                 res.status(404).json({found: false, reason: "not found"});
@@ -78,10 +77,14 @@ export class ProductsController extends CrudController {
             if (err)
                 res.status(500).json(err);
             else if (response.body.hits.hits.length != 0) {
-                res.status(200).json({found: true, products: response.body.hits.hits});
+                let list_product = [];
+                for (let i=0; i < response.body.hits.hits.length; i++) {
+                    list_product.push(response.body.hits.hits[i]._source)
+                }
+                res.status(200).json({ found: true, products: list_product });
             }
             else {
-                res.status(404).json({found: false, reason: "no products found"});
+                res.status(404).json({ found: false, reason: "no products found" });
             }
 
         });

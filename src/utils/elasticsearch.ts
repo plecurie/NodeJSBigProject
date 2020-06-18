@@ -916,6 +916,10 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
+        "portfolioname": {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
         "productname" : {
             "type" : "keyword",
             "cql_collection" : "singleton"

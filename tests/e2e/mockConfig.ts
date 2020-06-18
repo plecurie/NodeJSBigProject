@@ -4,6 +4,7 @@ export const USER_USERNAME = "random";
 export const USER_FIRSTNAME = "random";
 export const USER_LASTNAME = "random";
 export const USER_BIRTHDATE = "1970/01/01";
+export const PRODUCT_ISINCODE = "random_isin";
 
 export const baseApi = "http://localhost:3100";
 

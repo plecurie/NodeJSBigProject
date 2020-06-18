@@ -5,7 +5,7 @@ import { AuthService } from "../../services";
 
 const authService = AuthService.getInstance();
 
-export class PortfolioController extends CrudController{
+export class PortfolioController extends CrudController {
 
     async create(req, res): Promise<void> {
 
@@ -14,7 +14,7 @@ export class PortfolioController extends CrudController{
 
         if (user) {
 
-            const portfolio: Portfolio = {id_user: user._id, products: req.body.products};
+            const portfolio: Portfolio = { id_user: user._id, name: req.body.name, products: req.body.products };
 
             client.index({
                 index: index,
@@ -22,6 +22,7 @@ export class PortfolioController extends CrudController{
                 body: {
                     type: "portfolio",
                     id_user: portfolio.id_user,
+                    portfolioname: portfolio.name,
                     products: portfolio.products
                 }
             }, (err, response) => {
@@ -37,7 +38,7 @@ export class PortfolioController extends CrudController{
 
     }
 
-    async read(req, res): Promise<void> {
+    async findAll(req, res): Promise<void> {
 
         const user = await authService.findByEmail({email: req.body.email})
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
@@ -67,6 +68,40 @@ export class PortfolioController extends CrudController{
         }
     }
 
+    async findOne(req, res): Promise<void> {
+        const user = await authService.findByEmail({email: req.body.email})
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
+
+        if (user) {
+
+            const portfolio: Portfolio = { id_user: user._id, name: req.body.name, products: req.body.products };
+
+            client.search({
+                index: index,
+                body : {
+                    query: {
+                        match: {
+                            type: "portfolio",
+                            id_user: user.id_user,
+                            portfolioname: portfolio.name
+                        }
+                    }
+                }
+            }, (err, response) => {
+                if (err)
+                    res.status(500).json(err);
+                else if (response.body.hits.hits) {
+                    res.status(200).json({found: true, portfolio: response.body.hits.hits});
+                }
+                else {
+                    res.status(404).json({found: false, reason: "no portfolio found"});
+                }
+
+            });
+        }
+    }
+
+
     async update(req, res): Promise<void> {
 
         const user = await authService.findByEmail({email: req.body.email})
@@ -74,7 +109,7 @@ export class PortfolioController extends CrudController{
 
         if (user) {
 
-            const portfolio: Portfolio = {id_user: user._id, products: req.body.products};
+            const portfolio: Portfolio = { id_user: user._id, name: req.body.name, products: req.body.products };
 
             client.updateByQuery({
                 index: index,
@@ -83,7 +118,8 @@ export class PortfolioController extends CrudController{
                     query: {
                         match: {
                             type: "portfolio",
-                            id_user: portfolio.id_user
+                            id_user: portfolio.id_user,
+                            portfolioname: portfolio.name
                         }
                     },
                     script: {
@@ -109,6 +145,9 @@ export class PortfolioController extends CrudController{
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
 
         if (user) {
+
+            const portfolio: Portfolio = { id_user: user._id, name: req.body.name, products: req.body.products };
+
             client.deleteByQuery({
                 index: index,
                 type: type,
@@ -116,7 +155,8 @@ export class PortfolioController extends CrudController{
                     query: {
                         match: {
                             type: "portfolio",
-                            id_user: user._id
+                            id_user: user._id,
+                            portfolioname: portfolio.name
                         }
                     }
                 }
@@ -130,5 +170,7 @@ export class PortfolioController extends CrudController{
             });
         }
     }
+
+    read(req, res): void {}
 
 }
