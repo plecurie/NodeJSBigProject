@@ -20,13 +20,13 @@ export async function checkConnection() {
     }
 
     while(!es_started) {
-        await delay(10000);
         try {
             await client.cluster.health( {});
             es_started = true;
             console.log(">>>> Elasticsearch started on ", ES_URL);
         } catch(err) {
             console.log(">>>> Connection to Elasticsearch failed, retrying... ");
+            await delay(10000);
         }
     }
     await resetIndex()

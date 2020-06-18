@@ -6,14 +6,18 @@ export const router = express.Router({
     strict: true
 });
 
-router.post('/', (req: Request, res: Response) => {
-    productsController.create(req, res)
+router.post('/_updatedb', (req: Request, res: Response) => {
+    productsController.update(req, res)
 });
 
 router.get('/', (req: Request, res: Response) => {
     productsController.findAll(req, res)
 });
 
-router.get('/search', (req, res) => {
+router.get('/:isincode', (req: Request, res: Response) => {
+    productsController.findOne(req, res)
+});
+
+router.post('/search', (req, res) => {
     productsController.search(req, res);
 });

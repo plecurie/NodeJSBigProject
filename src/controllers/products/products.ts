@@ -5,15 +5,61 @@ import {bulkindexService} from "../../services/request/bulkindex.service";
 
 export class ProductsController extends CrudController {
 
-    async create(req, res): Promise<void> {
+    async update(req, res): Promise<void> {
 
-        try {
-            await bulkindexService.getInstance().importExcel();
-            res.status(200).json({created: true})
-        }
-        catch (err) {
-            res.status(500).json({created: false, error: err})
-        }
+        await client.deleteByQuery({
+            index: index,
+            body: {
+                query: {
+                    match: {
+                        type: "product",
+                    }
+                }
+            }
+        }, async (err, response) => {
+            if (err)
+                res.status(500).json(err);
+
+            try {
+                await bulkindexService.getInstance().importExcel();
+                res.status(200).json({updated: true})
+            }
+            catch (err) {
+                res.status(500).json({updated: false, error: err})
+            }
+        });
+
+
+    }
+
+    findOne(req, res): void {
+
+        client.search({
+            index: index,
+            type: type,
+            body : {
+                query: {
+                    bool: {
+                        must: {
+                            match: {
+                                isincode: req.params.isincode
+                            }
+                        }
+                    }
+                }
+            }
+        }, (err, response) => {
+            if (err)
+                res.status(500).json(err);
+            else if (response.body.hits.hits.length != 0) {
+                res.status(200).json({found: true, product: response.body.hits.hits});
+            }
+            else {
+                res.status(404).json({found: false, reason: "not found"});
+            }
+
+        });
+
     }
 
     findAll(req, res): void {
@@ -44,35 +90,48 @@ export class ProductsController extends CrudController {
 
     async search(req, res): Promise<void>{
 
-        client.search({
+        client.msearch({
             index: index,
             type: type,
-            body : {
-                query: {
-                    bool: {
-                        must: [
-                            {
-                                match: {
-                                    type: "product"
+            body : [
+                {
+                    query: {
+                        bool: {
+                            must: [
+                                {
+                                    match: { type: "product" }
                                 }
-                            }
-                        ],
-                        filter: [
-                            {
-                                term:  req.body.filter
-                            },
-                        ]
+                            ],
+                            filter: [req.body.filter1]
+                        }
+                    }
+                },
+                {
+                    query: {
+                        bool: {
+                            must: [
+                                {
+                                    match: { type: "product" }
+                                }
+                            ],
+                            filter: [req.body.filter2]
+                        }
                     }
                 }
-            }
+            ]
         }, (err, response) => {
             if (err)
                 res.status(500).json(err);
-            else if (response.body.hits.hits.length != 0) {
-                res.status(200).json({found: true, products: response.body.hits.hits});
+
+            else if (response.body.responses[0].hits.hits.length != 0) {
+                let list_product = [];
+                for (let i=0; i < response.body.responses[0].hits.hits.length; i++) {
+                    list_product.push(response.body.responses[0].hits.hits[i]._source)
+                }
+                res.status(200).json({ found: true, products: list_product });
             }
             else {
-                res.status(404).json({found: false, reason: "no products found"});
+                res.status(404).json({ found: false, reason: "no products found" });
             }
 
         });
@@ -81,8 +140,8 @@ export class ProductsController extends CrudController {
 
     read(req, res): void {}
 
-    update(req, res): void {}
-
     delete(req, res): void {}
+
+    create(req, res): void {}
 
 }
