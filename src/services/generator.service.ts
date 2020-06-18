@@ -17,8 +17,7 @@ export class GeneratorService {
 
     public async hashPassword(password: string) {
         try {
-            const passwordHased = await bcrypt.hash(password, 15);
-            return passwordHased;
+            return await bcrypt.hash(password, 15);
         } catch(err) {
             throw err;
         }

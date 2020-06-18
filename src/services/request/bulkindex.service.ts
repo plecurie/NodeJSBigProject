@@ -1,4 +1,4 @@
-import { client } from "../../utils/elasticsearch";
+import { client, index, type } from "../../utils/elasticsearch";
 import { excelToJsonService } from "../excelToJson.service";
 import { Criteria } from "../../models/Criteria";
 
@@ -23,7 +23,8 @@ export class bulkindexService {
         return JSON.stringify(Array.from(m.entries()))
     };
 
-    public importExcel(filename = 'Base Projet IT v5.xlsx'): void {
+    public importExcel(filename = 'Input.xlsx'): void {
+
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
 
@@ -241,17 +242,18 @@ export class bulkindexService {
                 ["type","product"],
                 ["isincode", data[i]['ISIN']],
                 ["productname", data[i]['Name']],
+                ["firmname", data[i]['Firm Name']],
                 ["ongoingcharge", data[i]['KIID Ongoing Charge']],
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
             ]);
-            products_list.push({ index: { _index: 'scala', _type: 'database'}});
+            products_list.push({ index: { _index: index, _type: type}});
             products_list.push(this.mapToObj(dict_products));
         }
 
         client.bulk({
-            index: 'scala',
-            type: 'database',
+            index: index,
+            type: type,
             body: products_list
         }, (err, response) => {
             console.log(err)

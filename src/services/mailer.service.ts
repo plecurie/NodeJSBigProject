@@ -22,7 +22,7 @@ export class MailerService {
         return MailerService.instance;
     }
 
-    public async sendEmail(to: string, newPassword: string) {
+    public async sendEmail(to: string, newPassword: String) {
         let info = await this.transporter.sendMail({
             from: process.env.MAILER_EMAIL,
             to: to,

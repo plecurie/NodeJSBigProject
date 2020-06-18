@@ -1,6 +1,5 @@
 import * as elasticsearch from '@elastic/elasticsearch'
 import { ES_URL } from "./constants";
-import {bulkindexService} from "../services/request/bulkindex.service";
 
 export const index = 'scala';
 export const type = 'database';
@@ -21,13 +20,13 @@ export async function checkConnection() {
     }
 
     while(!es_started) {
-        await delay(10000);
         try {
             await client.cluster.health( {});
             es_started = true;
             console.log(">>>> Elasticsearch started on ", ES_URL);
         } catch(err) {
             console.log(">>>> Connection to Elasticsearch failed, retrying... ");
+            await delay(10000);
         }
     }
     await resetIndex()
@@ -889,7 +888,15 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
+        "firmname" : {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
         "firstname" : {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
+        "id_user": {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
@@ -906,6 +913,10 @@ async function putMapping () {
             "cql_collection" : "singleton"
         },
         "password" : {
+            "type" : "keyword",
+            "cql_collection" : "singleton"
+        },
+        "portfolioname": {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
@@ -1777,7 +1788,6 @@ async function putMapping () {
         }
     };
     await client.indices.putMapping({ index, type, body: { properties: schema } });
-    //await bulkindexService.getInstance().importExcel();
 }
 
 module.exports = {

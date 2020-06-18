@@ -11,6 +11,6 @@ export const router = express.Router({
 });
 
 router.post('/process', upload.array('file'), (req: Request, res: Response) => {
-    ocrController.ocr(req, res)
+    ocrController.recognize(req, res)
 });
 

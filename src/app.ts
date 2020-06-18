@@ -1,14 +1,11 @@
 import * as express from 'express'
-import { usersRouter, producersRouter, productsRouter, authRouter, ocrRouter,
-    profileRouter, portfolioRouter } from "./routes";
-import { APP_HOST, APP_PORT, ES_URL } from "./utils/constants";
-import { bulkindexService } from "./services/request/bulkindex.service";
-import { ProductService } from './services';
+import { usersRouter, productsRouter, authRouter, ocrRouter } from "./routes";
+import { APP_HOST, APP_PORT } from "./utils/constants";
 import { checkConnection } from "./utils/elasticsearch"
 
 class Application {
 
-    private app: express.Application;
+    public app: express.Application;
 
     constructor() {
         require('dotenv').config();
@@ -19,10 +16,7 @@ class Application {
     private routes (): void {
         this.app.use(express.json());
         this.app.use('/users', usersRouter);
-        this.app.use('/producers', producersRouter);
         this.app.use('/products', productsRouter);
-        this.app.use('/portfolio', portfolioRouter);
-        this.app.use('/profile', profileRouter);
         this.app.use('/auth', authRouter);
         this.app.use('/ocr', ocrRouter);
 
@@ -46,7 +40,6 @@ class Application {
         //ProductService.getInstance().associateDataDbWithCategorie();
 
     }
-
 }
 
 export default Application;
