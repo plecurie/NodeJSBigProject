@@ -207,3 +207,9 @@ export interface Criteria {
     portfolioEmissionsVsBenchmarkScope2: number;
 
 }
+
+export interface CriteriaView {
+    name: string,
+    value: any,
+    categoryCriteria: string
+}

@@ -16,7 +16,7 @@ export class OcrService {
     }
 
     public filterOcr(array: Array<string>): Array<string> {
-        return array.filter(d => this.regExOcr.test(d.toUpperCase()))
+        return array.filter(d => d.toUpperCase().match(this.regExOcr))
         .filter(v => codes.includes(v.substring(0, 2).toUpperCase()));
     }
 

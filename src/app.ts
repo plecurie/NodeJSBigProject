@@ -28,6 +28,17 @@ class Application {
         this.app.listen(APP_PORT, () => {
             console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
         });
+        
+        // ELASTIC_CLIENT.ping((err, result) => {
+        //     if (err)
+        //         throw new Error('>>>> Failed to connect to ' + APP_HOST + ":" + ES_URL);
+        //     else
+        //         console.log('>>>> ElasticSearch is listening on', APP_HOST + ":" + ES_URL);
+        // });
+        
+        //bulkindexService.getInstance().importExcel();
+        //ProductService.getInstance().associateDataDbWithCategorie();
+
     }
 }
 
