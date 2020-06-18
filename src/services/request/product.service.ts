@@ -35,6 +35,9 @@ export class ProductService {
        return categorieWithCriteria;
     }
 
+    // public loadThematics() {
+    //     const categoriesXlsx: any = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}categorie.xlsx`);
+    // }
     public async associateDataDbWithCategorie() {
         const loadCriteriaWithCategorie = this.loadCriteriaWithCategorie();
         const products = await this.allProduct();
@@ -48,6 +51,7 @@ export class ProductService {
                     categoryCriteria: lcwc ? lcwc.cateogryName : 'Other Category'
                 }
             });
+            console.log(categoryProduct)
             products[i]._source.criteria = categoryProduct;
         }
         return products;
