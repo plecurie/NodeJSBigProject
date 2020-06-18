@@ -2,6 +2,7 @@ import { excelToJsonService } from "../excelToJson.service";
 import { Categorie, CategorieWithItsCriteria } from "../../models/Categorie";
 import { client } from "../../utils/elasticsearch";
 import { CriteriaView } from '../../models/Criteria';
+import { Thematic, EmployExclusion } from '../../models/OtherModel'
 
 export class ProductService {
     private static instance: ProductService;
@@ -35,15 +36,34 @@ export class ProductService {
        return categorieWithCriteria;
     }
 
-    // public loadThematics() {
-    //     const categoriesXlsx: any = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}categorie.xlsx`);
-    // }
+    public loadSimpleXlsx(xlsxName: string) {
+        const thematicsXlsx = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}${xlsxName}.xlsx`) as Array<Thematic> | Array<EmployExclusion>;
+        return thematicsXlsx.map(item => {
+            item.name = item.name.replace(/[^a-zA-Z ]/g, "");
+            item.fieldName = item.name.replace(/\s/g,'').replace(/[^a-zA-Z ]/g, "");
+            return item
+        });
+    }
+
+    public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[]) {
+        return array.map(t => {
+            const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1')
+            if (findCriteria) {
+                return t.name.replace(/  +/g, ' ');
+            }
+            return findCriteria
+        }).filter(c => c !== undefined);
+    }
+
     public async associateDataDbWithCategorie() {
         const loadCriteriaWithCategorie = this.loadCriteriaWithCategorie();
         const products = await this.allProduct();
+        const thematics: Array<Thematic> = this.loadSimpleXlsx("thematics");
+        const employsExclusion: Array<EmployExclusion> = this.loadSimpleXlsx("employs_exclusion");
         
         for (let i = 0; i < products.length; i++) {
-            const categoryProduct: CriteriaView = products[i]._source.criteria.map(c => {
+            const criterias = products[i]._source.criteria;
+            const categoryProduct: CriteriaView = criterias.map(c => {
                 const lcwc = loadCriteriaWithCategorie.find(d => d.criteriaName.toLowerCase() == c.name.toLowerCase());
                 return {
                     name: c.name, 
@@ -51,7 +71,9 @@ export class ProductService {
                     categoryCriteria: lcwc ? lcwc.cateogryName : 'Other Category'
                 }
             });
-            console.log(categoryProduct)
+
+            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics);
+            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion);
             products[i]._source.criteria = categoryProduct;
         }
         return products;
@@ -79,7 +101,7 @@ export class ProductService {
         }
     }
 
-    private transformStringToInt(value: any) {
+    private transformStringToInt(value: any): number {
             switch(value.toLowerCase()) {
                 case 'low': return 1;
                 case 'below average': return 2;
@@ -89,8 +111,9 @@ export class ProductService {
                 case 'low risk': return 1;
                 case 'medium risk': return 2;
                 case 'high risk': return 3;
-                case 'yes': return 1;
-                case 'no': return 0;
+                case '1': return 1;
+                case '0': return 0;
+                default: return 0
         }
     }
 };
