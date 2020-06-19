@@ -1,10 +1,9 @@
-import {client, index, type} from "../../utils/elasticsearch";
+import { client, index, type } from "../../utils/elasticsearch";
 const bcrypt = require('bcrypt');
 
 export class AuthService {
     private static instance: AuthService;
-    private index = 'scala';
-    private types = 'database';
+
     constructor() {}
 
     public static getInstance(): AuthService {
@@ -20,8 +19,12 @@ export class AuthService {
             type: type,
             id: user.id,
             body: {
-                doc: {
-                    password: user.password
+                query: {
+                    match: { _id: user._id }
+                },
+                script: {
+                    source: "ctx._source.password ='" + user.password + "';",
+                    lang: "painless"
                 }
             }
         }).then(pu => pu.body);

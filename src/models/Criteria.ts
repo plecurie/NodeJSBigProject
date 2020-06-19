@@ -211,5 +211,5 @@ export interface Criteria {
 export interface CriteriaView {
     name: string,
     value: any,
-    categoryCriteria: string
+    familyName: string
 }

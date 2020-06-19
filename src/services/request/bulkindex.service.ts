@@ -19,11 +19,7 @@ export class bulkindexService {
         }, {});
     };
 
-    toJson = m => {
-        return JSON.stringify(Array.from(m.entries()))
-    };
-
-    public importExcel(filename = 'Input.xlsx'): void {
+    public importExcel(filename = 'Input.xlsx') {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
@@ -241,8 +237,8 @@ export class bulkindexService {
             const dict_products : Map<String, String> = new Map<String, String>([
                 ["type","product"],
                 ["isincode", data[i]['ISIN']],
-                ["productname", data[i]['Name']],
-                ["firmname", data[i]['Firm Name']],
+                ["product_name", data[i]['Name']],
+                ["firm_name", data[i]['Firm Name']],
                 ["ongoingcharge", data[i]['KIID Ongoing Charge']],
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
@@ -251,22 +247,24 @@ export class bulkindexService {
             products_list.push(this.mapToObj(dict_products));
         }
 
-        client.bulk({
-            index: index,
-            type: type,
-            body: products_list
-        }, (err, response) => {
-            console.log(err)
-            console.log(err, response.body.items[0]);
-            if (err){
-                console.log("Servor Error: ", err);
-            }
-            else if (response.body.items[0].index.status == 201){
-                console.log('>>>> Bulk index done.');
-            }
-            else {
-                console.log('Bulk Error: Malformed Exception.')
-            }
-        });
+        try {
+            return client.bulk({
+                index: index,
+                type: type,
+                body: products_list
+            }).then((data) => {
+                if (data.body.items[0].index.status == 201){
+                    console.log('>>>> Bulk index done.');
+                    return true;
+                }
+                else {
+                    console.log(data);
+                    return false;
+                }
+            });
+        } catch (err) {
+            throw err;
+        }
+
     }
 }

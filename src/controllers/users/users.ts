@@ -8,32 +8,38 @@ const authService = AuthService.getInstance();
 
 export class UsersController extends CrudController {
 
-    async findOneByEmail(req, res) :  Promise<void> {
+    async findOneByEmail(req, res) {
 
-        client.search({
-            index: index,
-            body : {
-                query: {
-                    match: {
-                        type: "user",
-                        email: req.body.email
+        try {
+            return await client.search({
+                index: index,
+                body : {
+                    query: {
+                        bool: {
+                            must: [
+                                {match: {type: "user"}},
+                                {match: {email: req.body.email}}
+                            ]
+                        }
                     }
                 }
-            }
-        }, (err, response) => {
-            if (err)
-                res.status(500).json(err);
-            else if (response.body.hits.hits) {
-                res.status(200).json({found: true, user: response.body.hits.hits});
-            }
-            else {
-                res.status(404).json({found: false, reason: "no user with this email"});
-            }
-
-        })
+            }).then((data)=> {
+                if (data.body.hits.hits.length != 0) {
+                    res.status(200).json({found: true, user: data.body.hits.hits[0]._source});
+                    return true;
+                }
+                else {
+                    res.status(404).json({found: false, reason: "no user with this email"});
+                    return false;
+                }
+            })
+        } catch (err) {
+            res.status(500).json(err);
+            return false;
+        }
     }
 
-    async update(req, res): Promise<void> {
+    async update(req, res) {
 
         const user: User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate, email: req.body.email, password: req.body.password, username: req.body.username };
 
@@ -49,68 +55,79 @@ export class UsersController extends CrudController {
 
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
 
-            client.updateByQuery({
-                index: index,
-                type: type,
-                body: {
-                    query: {
-                        match: {
-                            _id: userExist._id
+            try {
+                return await client.updateByQuery({
+                    index: index,
+                    type: type,
+                    body : {
+                        query: {
+                            bool: {
+                                must: [
+                                    { match: { type: "user" }},
+                                    { match: { _id: userExist._id }}
+                                ]
+                            }
+                        },
+                        script: {
+                            source:
+                                "ctx._source.firstname ='" + user.firstname + "';"
+                                + "ctx._source.lastname = '" + user.lastname + "';"
+                                + "ctx._source.username ='" + user.username + "';"
+                                + "ctx._source.birthdate ='" + user.birthdate + "';"
+                                + "ctx._source.email = '" + newMail + "';"
+                                + "ctx._source.password ='" + mdpCrypted + "';",
+                            lang: "painless"
                         }
-                    },
-                    script: {
-                        source:
-                            "ctx._source.firstname ='"
-                            + user.firstname + "';" +
-                            "ctx._source.lastname = '"
-                            + user.lastname + "';" +
-                            "ctx._source.username ='"
-                            + user.username + "';" +
-                            "ctx._source.birthdate ='"
-                            + user.birthdate + "';" +
-                            "ctx._source.email = '"
-                            + newMail + "';" +
-                            "ctx._source.password ='"
-                            + mdpCrypted + "';",
-                        lang: "painless"
                     }
-                }
-            }, (err, response) => {
-                if (err)
-                    res.status(500).json(err);
-                else
+                }).then(() => {
                     res.status(200).json({ updated: true });
-            })
+                    return true;
+                })
+
+            } catch (err) {
+                res.status(500).json(err);
+                return false;
+            }
         }
         else if(!userExist) {
             res.status(404).json({updated: false, reason: "no user with this email"});
+            return false;
         }
         else if(isUsed) {
             res.status(409).json({updated: false, reason: "email already in use"});
+            return false;
         }
 
     }
 
-    delete(req, res): void {
+    async delete(req, res) {
 
-        client.deleteByQuery({
-            index: index,
-            body: {
-                query: {
-                    match: {
-                        type: "user",
-                        email: req.body.email
+        try {
+            return await client.deleteByQuery({
+                index: index,
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { type: "user" }},
+                                { match: { email: req.body.email }}
+                            ]
+                        }
                     }
                 }
-            }
-        }, (err, response) => {
-            if (err)
-                res.status(500).json(err);
-            else if (response.body.deleted === 0) {
-                res.status(404).json({deleted: false, reason: "no user with this email"});
-            }
-            res.status(200).json({deleted: true});
-        });
+            }).then((response) => {
+                if (response.body.deleted === 0) {
+                    res.status(404).json({deleted: false, reason: "no user with this email"});
+                    return false;
+                } else {
+                    res.status(200).json({deleted: true});
+                    return true;
+                }
+            })
+        } catch (err) {
+            res.status(500).json(err);
+            return false;
+        }
 
     }
 

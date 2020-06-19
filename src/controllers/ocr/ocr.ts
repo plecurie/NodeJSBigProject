@@ -1,7 +1,7 @@
-import { OcrService, ProductService } from '../../services';
+import { OcrService, CriteriaService } from '../../services';
 
 const ocrService = OcrService.getInstance();
-const productService = ProductService.getInstance();
+const criteriaService = CriteriaService.getInstance();
 
 export class OcrController {
     async recognize(req, res): Promise<void> {
@@ -12,7 +12,7 @@ export class OcrController {
         const result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
         result.forEach((item, i) => result[i] = item.replace(/O/g, "0"));
         //console.log(result);
-        const assWithDCat = await productService.associateDataDbWithCategorie();
+        const assWithDCat = await criteriaService.mapProductCriteria();
         const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
         console.log(matchIsinCode);
         for (const mIC of matchIsinCode) {

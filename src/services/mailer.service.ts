@@ -23,13 +23,12 @@ export class MailerService {
     }
 
     public async sendEmail(to: string, newPassword: String) {
-        let info = await this.transporter.sendMail({
+        return await this.transporter.sendMail({
             from: process.env.MAILER_EMAIL,
             to: to,
             subject: 'Reset Password',
             html: `<p> Here, your new password generated ${newPassword} (write it down somewhere), 
             if you want to change your password, login to your account.</p>`,
         });
-        return info;
     }
 }

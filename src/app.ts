@@ -37,7 +37,7 @@ class Application {
         // });
         
         //bulkindexService.getInstance().importExcel();
-        //ProductService.getInstance().associateDataDbWithCategorie();
+        //CriteriaService.getInstance().associateDataDbWithCategorie();
 
     }
 }
