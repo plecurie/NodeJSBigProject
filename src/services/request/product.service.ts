@@ -113,7 +113,7 @@ export class ProductService {
                 case 'high risk': return 3;
                 case '1': return 1;
                 case '0': return 0;
-                default: return 0
+                default: return parseInt(value, 10)
         }
     }
 };

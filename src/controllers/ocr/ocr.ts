@@ -15,6 +15,7 @@ export class OcrController {
         const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
         for (const mIC of matchIsinCode) {
             const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+            //console.log(morningCriteria, mIC._source.isincode)
             mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
         }
         return res.status(200).json({recognized: true,data: matchIsinCode});
