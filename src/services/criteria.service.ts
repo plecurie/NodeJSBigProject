@@ -2,8 +2,7 @@ import {excelToJsonService} from "./excelToJson.service";
 import {CriteriaFamily, Family} from "../models/Family";
 import {client, index, type} from "../utils/elasticsearch";
 import {CriteriaView} from '../models/Criteria';
-import {IncomingMessage, ServerResponse} from "http";
-import {productsController} from "../controllers";
+import { Thematic, EmployExclusion } from '../models/OtherModel'
 
 export class CriteriaService {
     private static instance: CriteriaService;
@@ -16,35 +15,15 @@ export class CriteriaService {
         return CriteriaService.instance;
     }
 
-    public async mapProductCriteria() {
-        const criteriaFamilies = this.loadCriteriaFamily();
-        const products = await this.loadCriteria();
-
-        for (let i = 0; i < products.length; i++) {
-            const criteriaView: CriteriaView = products[i]._source.criteria.map(criteria => {
-                const criteriaFamily = criteriaFamilies.find(data => data.criteriaName.toLowerCase() == criteria.name.toLowerCase());
-                return {
-                    name: criteria.name,
-                    value: typeof criteria.value == 'string' ? CriteriaService.classify(criteria.value) : criteria.value,
-                    familyName: criteriaFamily ? criteriaFamily.familyName : 'Other Category'
-                }
-            });
-            console.log(criteriaView);
-            products[i]._source.criteria = criteriaView;
-        }
-        return products;
-    }
-
     public loadCriteriaFamily() {
 
         const families_xlsx: any = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}families.xlsx`);
         const criteria_xlsx: any = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}criteria.xlsx`);
-
         const families: Array<Family> = [];
         const criteriaFamilies: Array<CriteriaFamily> = [];
 
         families_xlsx.forEach(family => families.push({id: family.id, name: family.name, type: family.type}));
-       
+
         for (const family of families) {
             for (const criteria of criteria_xlsx) {
                 if (family.id == criteria.id_category) {
@@ -56,10 +35,53 @@ export class CriteriaService {
         return criteriaFamilies;
     }
 
+    public loadSimpleXlsx(xlsxName: string) {
+        const thematicsXlsx = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}${xlsxName}.xlsx`) as Array<Thematic> | Array<EmployExclusion>;
+        return thematicsXlsx.map(item => {
+            item.name = item.name.replace(/[^a-zA-Z ]/g, "");
+            item.fieldName = item.name.replace(/\s/g,'').replace(/[^a-zA-Z ]/g, "");
+            return item
+        });
+    }
+
+    public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[]) {
+        return array.map(t => {
+            const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1');
+            if (findCriteria) {
+                return t.name.replace(/  +/g, ' ');
+            }
+            return findCriteria
+        }).filter(c => c !== undefined);
+    }
+
+    public async mapProductCriteria() {
+        const criteriaFamilies = this.loadCriteriaFamily();
+        const products = await this.loadCriteria();
+        const thematics: Array<Thematic> = this.loadSimpleXlsx("thematics");
+        const employsExclusion: Array<EmployExclusion> = this.loadSimpleXlsx("employs_exclusion");
+
+        for (let i = 0; i < products.length; i++) {
+            const criterias = products[i]._source.criteria;
+            const categoryProduct: CriteriaView = criterias.map(c => {
+                const lcwc = criteriaFamilies.find(d => d.criteriaName.toLowerCase() == c.name.toLowerCase());
+                return {
+                    name: c.name,
+                    value: typeof c.value == 'string' ? this.classify(c.value) : c.value,
+                    familyName: lcwc ? lcwc.familyName : 'Other Category'
+                }
+            });
+
+            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics);
+            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion);
+            products[i]._source.criteria = categoryProduct;
+        }
+        return products;
+    }
+
+
     public async loadCriteria() {
 
         try {
-
             const products = await client.search({
                 index: index, type: type, body : { query: { match: { type: "product" } } }
             }).then(data => data.body.hits.hits);
@@ -77,18 +99,20 @@ export class CriteriaService {
 
     }
 
-    private static classify(value: any) {
-            switch(value.toLowerCase()) {
-                case 'low': return 1;
-                case 'below average': return 2;
-                case 'average': return 3;
-                case 'above average': return 4;
-                case 'high': return 5;
-                case 'low risk': return 1;
-                case 'medium risk': return 2;
-                case 'high risk': return 3;
-                case 'yes': return 1;
-                case 'no': return 0;
+    private classify(value: any): number {
+        switch(value.toLowerCase()) {
+            case 'low': return 1;
+            case 'below average': return 2;
+            case 'average': return 3;
+            case 'above average': return 4;
+            case 'high': return 5;
+            case 'low risk': return 1;
+            case 'medium risk': return 2;
+            case 'high risk': return 3;
+            case '1': return 1;
+            case '0': return 0;
+            default: return parseInt(value, 10)
         }
     }
+
 }
