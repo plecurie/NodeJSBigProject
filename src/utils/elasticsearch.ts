@@ -909,7 +909,7 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
-        "ongoing_charge" : {
+        "ongoingcharge" : {
             "type" : "float",
             "cql_collection" : "singleton"
         },

@@ -89,7 +89,6 @@ export class ProductsController extends CrudController {
     }
 
     async search(req, res) {
-
         try {
             return await client.search({
                 index: index,
@@ -105,6 +104,7 @@ export class ProductsController extends CrudController {
                         }
                     }
             }).then(data => {
+                console.log(data);
                 if (data.body.hits.hits.length != 0) {
                     res.status(200).json({ found: true, products: data.body.hits.hits[0]._source });
                     return data.body.hits.hits[0]._source;
