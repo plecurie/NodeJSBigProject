@@ -1,10 +1,9 @@
 import { client, index, type } from "../../utils/elasticsearch";
-import { CrudController } from "../../utils";
 import { bulkindexService } from "../../services/request/bulkindex.service";
 
-export class ProductsController extends CrudController {
+export class ProductsController {
 
-    async update(req, res) {
+    async update_db(req, res): Promise<boolean> {
 
         try {
             return await client.deleteByQuery({
@@ -17,7 +16,7 @@ export class ProductsController extends CrudController {
                     res.status(200).json({ updated: true });
                     return true;
                 } else {
-                    res.status(500).json({updated: false });
+                    res.status(500).json({ updated: false });
                     return false
                 }
             })
@@ -27,7 +26,7 @@ export class ProductsController extends CrudController {
         }
     }
 
-    async findOne(req, res) {
+    async findOne(req, res): Promise<boolean> {
 
         try {
             return await client.search({
@@ -60,7 +59,7 @@ export class ProductsController extends CrudController {
 
     }
 
-    async findAll(req, res) {
+    async findAll(req, res): Promise<boolean> {
 
         try {
             return await client.search({
@@ -88,23 +87,23 @@ export class ProductsController extends CrudController {
 
     }
 
-    async search(req, res) {
+    async search(req, res): Promise<boolean> {
+
         try {
             return await client.search({
                 index: index,
                 type: type,
                 body : {
-                        query: {
-                            bool: {
-                                must: [
-                                    { match: { type: "product" } },
-                                    req.body.matches
-                                ]
-                            }
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { type: "product" } },
+                                req.body.matches
+                            ]
                         }
                     }
+                }
             }).then(data => {
-                console.log(data);
                 if (data.body.hits.hits.length != 0) {
                     res.status(200).json({ found: true, products: data.body.hits.hits[0]._source });
                     return data.body.hits.hits[0]._source;
@@ -120,11 +119,5 @@ export class ProductsController extends CrudController {
         }
 
     }
-
-    read(req, res): void {}
-
-    delete(req, res): void {}
-
-    create(req, res): void {}
 
 }

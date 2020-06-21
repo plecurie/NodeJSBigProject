@@ -6,7 +6,7 @@ import {
 const chai = require('chai');
 const expect = chai.expect;
 
-describe("Products E2E tests", () => {
+describe("Product E2E tests", () => {
 
     describe("Delete & Bulk", () => {
 

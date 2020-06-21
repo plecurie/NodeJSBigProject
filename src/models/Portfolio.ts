@@ -1,6 +1,7 @@
+import {Product} from "./Product";
 
 export interface Portfolio {
-    id_user: String;
-    name: String;
-    productnames: Array<String>;
+    id_user: string;
+    name: string;
+    products: Product[];
 }

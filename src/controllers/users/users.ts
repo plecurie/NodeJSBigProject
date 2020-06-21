@@ -1,4 +1,3 @@
-import { CrudController } from "../../utils";
 import { client, index, type } from "../../utils/elasticsearch";
 import { User } from "../../models/User";
 import { AuthService, GeneratorService } from "../../services";
@@ -6,9 +5,9 @@ import { AuthService, GeneratorService } from "../../services";
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
 
-export class UsersController extends CrudController {
+export class UsersController {
 
-    async findOneByEmail(req, res) {
+    async findOneByEmail(req, res): Promise<boolean> {
 
         try {
             return await client.search({
@@ -39,7 +38,7 @@ export class UsersController extends CrudController {
         }
     }
 
-    async update(req, res) {
+    async update(req, res): Promise<boolean> {
 
         const user: User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate, email: req.body.email, password: req.body.password, username: req.body.username };
 
@@ -100,7 +99,7 @@ export class UsersController extends CrudController {
 
     }
 
-    async delete(req, res) {
+    async delete(req, res): Promise<boolean> {
 
         try {
             return await client.deleteByQuery({
@@ -131,7 +130,4 @@ export class UsersController extends CrudController {
 
     }
 
-    create(req, res): void {}
-
-    read(req, res): void {}
 }

@@ -19,12 +19,12 @@ export class bulkindexService {
         }, {});
     };
 
-    public importExcel(filename = 'Input.xlsx') {
+    public async importExcel(filename = 'Input.xlsx') : Promise<boolean> {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
 
-        for (let i=0; i < Object.keys(data).length; i++) {
+        for (let i = 0; i < Object.keys(data).length; i++) {
             const criteria: Criteria = {
                 arcticOilGasExplorationCategoryAverage: data[i]['Arctic Oil & Gas Exploration Category Average'],
                 arcticOilGasExplorationInvolvement: data[i]['Arctic Oil & Gas Exploration Involvement'],
@@ -46,9 +46,9 @@ export class bulkindexService {
                 carbonOperationsRisk: data[i]['Carbon Operations Risk'],
                 carbonOperationsRiskCategoryAverage: data[i]['Carbon Operations Risk Category Average'],
                 carbonOperationsRiskPercentRankInCategory: data[i]['Carbon Operations Risk Percent Rank in Category'],
-                carbonProductsServicesRisk: data[i]['Carbon Products & Services Risk'],
-                carbonProductsServicesRiskCategoryAverage: data[i]['Carbon Products & Services Risk Category Average'],
-                carbonProductsServicesRiskPercentRankInCategory: data[i]['Carbon Products & Services Risk Percent Rank in Category'],
+                carbonProductsServicesRisk: data[i]['Carbon Product & Services Risk'],
+                carbonProductsServicesRiskCategoryAverage: data[i]['Carbon Product & Services Risk Category Average'],
+                carbonProductsServicesRiskPercentRankInCategory: data[i]['Carbon Product & Services Risk Percent Rank in Category'],
                 carbonRiskClassification: data[i]['Carbon Risk Classification'],
                 carbonRiskScore: data[i]['Carbon Risk Score'],
                 carbonRiskScoreAllFundsRank: data[i]['Carbon Risk Score All Funds Rank'],
@@ -107,8 +107,8 @@ export class bulkindexService {
                 oilGasGenerationInvolvement: data[i]['Oil & Gas Generation Involvement'],
                 oilGasProductionCategoryAverage: data[i]['Oil & Gas Production Category Average'],
                 oilGasProductionInvolvement: data[i]['Oil & Gas Production Involvement'],
-                oilGasProductsServiceInvolvement: data[i]['Oil & Gas Products & Service Involvement'],
-                oilGasProductsServicesCategoryAverage: data[i]['Oil & Gas Products & Services Category Average'],
+                oilGasProductsServiceInvolvement: data[i]['Oil & Gas Product & Service Involvement'],
+                oilGasProductsServicesCategoryAverage: data[i]['Oil & Gas Product & Services Category Average'],
                 oilSandsExtractionCategoryAverage: data[i]['Oil Sands Extraction Category Average'],
                 oilSandsExtractionInvolvement: data[i]['Oil Sands Extraction Involvement'],
                 percentAUMCoveredCarbon: data[i]['Percent AUM Covered - Carbon'],
@@ -190,8 +190,8 @@ export class bulkindexService {
                 productInvolvementTobacco: data[i]['Product Involvement % - Tobacco'],
                 renewableEnergyProductionCategoryAverage: data[i]['Renewable Energy Production Category Average'],
                 renewableEnergyProductionInvolvement: data[i]['Renewable Energy Production Involvement'],
-                renewableEnergySupportingProductsServicesCategoryAverage: data[i]['Renewable Energy Supporting Products & Services Category Average'],
-                renewableEnergySupportingProductsServicesInvolvement: data[i]['Renewable Energy Supporting Products & Services Involvement'],
+                renewableEnergySupportingProductsServicesCategoryAverage: data[i]['Renewable Energy Supporting Product & Services Category Average'],
+                renewableEnergySupportingProductsServicesInvolvement: data[i]['Renewable Energy Supporting Product & Services Involvement'],
                 socialGlobalCategoryAverage: data[i]['Social Global Category Average'],
                 socialRiskAbsoluteRankInGlobalCategory: data[i]['Social Risk Absolute Rank in Global Category'],
                 socialRiskPercentRankInGlobalCategory: data[i]['Social Risk Percent Rank in Global Category'],
@@ -234,8 +234,8 @@ export class bulkindexService {
                 thermalCoalPowerGenerationInvolvement: data[i]['Thermal Coal Power Generation Involvement']
             };
 
-            const dict_products : Map<String, String> = new Map<String, String>([
-                ["type","product"],
+            const dict_products: Map<String, String> = new Map<String, String>([
+                ["type", "product"],
                 ["isincode", data[i]['ISIN']],
                 ["product_name", data[i]['Name']],
                 ["firm_name", data[i]['Firm Name']],
@@ -243,27 +243,28 @@ export class bulkindexService {
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
             ]);
-            products_list.push({ index: { _index: index, _type: type}});
+            products_list.push({index: {_index: index, _type: type}});
             products_list.push(this.mapToObj(dict_products));
         }
 
         try {
-            return client.bulk({
-                index: index,
-                type: type,
+            return await client.bulk({
+                index: 'scala',
+                type: 'database',
                 body: products_list
-            }).then((data) => {
-                if (data.body.items[0].index.status == 201){
+            }).then((response)=>{
+                if (response.body.items[0].index.status == 201) {
                     console.log('>>>> Bulk index done.');
-                    return true;
+                    return true
+                } else {
+                    console.log('Malformed Exception.');
+                    console.log(response);
+                    return false
                 }
-                else {
-                    console.log(data);
-                    return false;
-                }
-            });
+            })
         } catch (err) {
-            throw err;
+            console.log(err);
+            return false
         }
 
     }

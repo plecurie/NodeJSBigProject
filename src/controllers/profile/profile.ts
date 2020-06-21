@@ -1,9 +1,8 @@
 import { Profile } from "../../models/Profile";
 import {client, index, type} from "../../utils/elasticsearch";
-import {CrudController} from "../../utils";
-import {Portfolio} from "../../models/Portfolio";
 
-export class ProfileController extends CrudController {
+export class ProfileController {
+    /*
     create(req, res): void {
 
         const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
@@ -25,7 +24,7 @@ export class ProfileController extends CrudController {
 
     }
 
-    read(req, res): void {
+    read(req, res): Promise<boolean> {
 
         client.get({
             index: index,
@@ -40,7 +39,7 @@ export class ProfileController extends CrudController {
 
     }
 
-    update(req, res): void {
+    update(req, res): Promise<boolean> {
 
         const profile : Profile = { username: req.body.username, criteria: req.body.criteria };
 
@@ -64,7 +63,7 @@ export class ProfileController extends CrudController {
 
     }
 
-    delete(req, res): void {
+    delete(req, res): Promise<boolean> {
 
         client.delete({
             index: index,
@@ -78,5 +77,6 @@ export class ProfileController extends CrudController {
         });
 
     }
+    */
 
 }

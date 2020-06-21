@@ -24,30 +24,40 @@ export async function checkConnection() {
             await client.cluster.health( {});
             es_started = true;
             console.log(">>>> Elasticsearch started on ", ES_URL);
+            await resetIndex()
         } catch(err) {
             console.log(">>>> Connection to Elasticsearch failed, retrying... ");
             await delay(10000);
         }
     }
-    await resetIndex()
+
 }
 
 export async function resetIndex () {
-    client.indices.exists({ index }, async (err, response) => {
-        if (err)
-            console.log("ERROR", err);
-        if (response.body) {
-            await client.indices.delete({index});
-        }
-        await client.indices.create({ index });
-        await putMapping()
-    });
-}
+    try {
+        client.indices.exists({ index }, async (err, response) => {
+            if (err)
+                console.log("ERROR", err);
+            if (response.body) {
+                await client.indices.delete({index});
+            }
+            await client.indices.create({ index });
 
+            await putMapping();
+            console.log(">>>> Elasticsearch: index recreated.");
+        });
+    }
+    catch (err) {
+        throw err
+    }
+
+}
 async function putMapping () {
+
     const schema = {
         "birthdate" : {
             "type" : "date",
+            "format": "yyyy-MM-dd",
             "cql_collection" : "singleton"
         },
         "category" : {
@@ -889,10 +899,6 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
-        "firm_name" : {
-            "type" : "keyword",
-            "cql_collection" : "singleton"
-        },
         "firstname" : {
             "type" : "keyword",
             "cql_collection" : "singleton"
@@ -917,17 +923,13 @@ async function putMapping () {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
-        "portfolio_name": {
+        "name" : {
             "type" : "keyword",
             "cql_collection" : "singleton"
         },
-        "product_name" : {
-            "type" : "keyword",
-            "cql_collection" : "singleton"
-        },
-        "productnames" : {
+        "products" : {
             "type" : "nested",
-            "cql_collection" : "singleton",
+            "cql_collection" : "list",
             "cql_udt_name" : "database_products",
             "properties" : {
                 "isincode" : {

@@ -18,7 +18,7 @@ router.post('/update',(req: Request, res: Response) => {
 router.delete('/', (req: Request, res: Response) => {
     userController.delete(req, res);
 });
-
+/*
 router.post('/profile', (req: Request, res: Response) => {
     profileController.create(req, res)
 });
@@ -34,23 +34,23 @@ router.post('/profile/update',(req: Request, res: Response) => {
 router.delete('/profile', (req: Request, res: Response) => {
     profileController.delete(req, res);
 });
-
-router.post('/portfolio', (req: Request, res: Response) => {
+*/
+router.post('/portfolio/new', (req: Request, res: Response) => {
     portfolioController.create(req, res)
 });
 
-router.get('/portfolio', (req: Request, res: Response) => {
+router.post('/portfolio', (req: Request, res: Response) => {
     portfolioController.findAll(req, res)
 });
 
-router.get('/portfolio/:name', (req: Request, res: Response) => {
+router.post('/portfolio/:name', (req: Request, res: Response) => {
     portfolioController.findOne(req, res)
 });
 
-router.post('/portfolio/update',(req: Request, res: Response) => {
+router.post('/portfolio/:name/update',(req: Request, res: Response) => {
     portfolioController.update(req, res);
 });
 
-router.delete('/portfolio', (req: Request, res: Response) => {
+router.delete('/portfolio/:name', (req: Request, res: Response) => {
     portfolioController.delete(req, res);
 });
