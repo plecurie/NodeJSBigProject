@@ -1,6 +1,3 @@
-import { Profile } from "../../models/Profile";
-import {client, index, type} from "../../utils/elasticsearch";
-
 export class ProfileController {
     /*
     create(req, res): void {

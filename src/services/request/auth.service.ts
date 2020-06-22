@@ -1,13 +1,15 @@
-import { client, index, type } from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
+
 const bcrypt = require('bcrypt');
 
 export class AuthService {
     private static instance: AuthService;
 
-    constructor() {}
+    constructor() {
+    }
 
     public static getInstance(): AuthService {
-        if(!AuthService.instance) {
+        if (!AuthService.instance) {
             AuthService.instance = new AuthService();
         }
         return AuthService.instance;
@@ -19,13 +21,7 @@ export class AuthService {
             type: type,
             id: user.id,
             body: {
-                query: {
-                    match: { _id: user._id }
-                },
-                script: {
-                    source: "ctx._source.password ='" + user.password + "';",
-                    lang: "painless"
-                }
+                doc: {password: user.password}
             }
         }).then(pu => pu.body);
     }
@@ -35,9 +31,7 @@ export class AuthService {
             index: index,
             type: type,
             body: {
-                query: {
-                    match: email
-                }
+                query: {match: email}
             }
         });
     }
@@ -46,9 +40,8 @@ export class AuthService {
         try {
             const verifyPassword = await bcrypt.compare(passwordUser, hash);
             return !!verifyPassword;
-
-        } catch(err) {
-          throw err;  
+        } catch (err) {
+            throw err;
         }
     }
 }

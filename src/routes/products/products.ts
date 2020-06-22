@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import * as express from 'express'
-import  { productsController } from '../../controllers'
+import * as express from 'express';
+import {Request, Response} from 'express';
+import {authController, productsController} from '../../controllers'
 
 export const router = express.Router({
     strict: true
@@ -18,6 +18,6 @@ router.get('/:isincode', (req: Request, res: Response) => {
     productsController.findOne(req, res)
 });
 
-router.post('/search', (req, res) => {
+router.post('/search', authController.checkToken, (req, res) => {
     productsController.search(req, res);
 });

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { authController } from '../../controllers'
 import * as express from 'express';
+import {Request, Response} from 'express';
+import {authController} from '../../controllers'
 
 export const router = express.Router({
     strict: true,
@@ -11,14 +11,10 @@ router.post('/signup', (req: Request, res: Response) => {
     authController.signup(req, res);
 });
 
-router.post('/forgot-password', (req: Request, res: Response) => {
+router.post('/forgot-password', authController.checkToken, (req: Request, res: Response) => {
     authController.generateNewPassword(req, res);
 });
 
 router.post('/login', (req: Request, res: Response) => {
     authController.signin(req, res);
-});
-
-router.post('/checkToken', (req: Request, res: Response) => {
-    authController.checkToken(req, res);
 });

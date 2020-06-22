@@ -4,7 +4,7 @@ export class excelToJsonService {
     private static instance: excelToJsonService;
 
     public static getInstance(): excelToJsonService {
-        if(!excelToJsonService.instance) {
+        if (!excelToJsonService.instance) {
             excelToJsonService.instance = new excelToJsonService();
         }
         return excelToJsonService.instance;

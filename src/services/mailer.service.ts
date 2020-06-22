@@ -13,10 +13,11 @@ export class MailerService {
         }
     });
 
-    constructor() {}
-    
+    constructor() {
+    }
+
     public static getInstance(): MailerService {
-        if(!MailerService.instance) {
+        if (!MailerService.instance) {
             MailerService.instance = new MailerService();
         }
         return MailerService.instance;

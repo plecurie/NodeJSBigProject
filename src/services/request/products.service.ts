@@ -1,18 +1,18 @@
-import {excelToJsonService} from "./excelToJson.service";
-import {CriteriaFamily, Family} from "../models/Family";
-import {client, index, type} from "../utils/elasticsearch";
-import {CriteriaView} from '../models/Criteria';
-import { Thematic, EmployExclusion } from '../models/OtherModel'
+import {excelToJsonService} from "../excelToJson.service";
+import {CriteriaFamily, Family} from "../../models/Family";
+import {client, index, type} from "../../utils/elasticsearch";
+import {CriteriaView} from '../../models/Criteria';
+import {EmployExclusion, Thematic} from '../../models/OtherModel'
 
-export class CriteriaService {
-    private static instance: CriteriaService;
+export class ProductsService {
+    private static instance: ProductsService;
     private pathFile = './src/uploads/excel/';
 
-    public static getInstance(): CriteriaService {
-        if(!CriteriaService.instance) {
-            CriteriaService.instance = new CriteriaService();
+    public static getInstance(): ProductsService {
+        if (!ProductsService.instance) {
+            ProductsService.instance = new ProductsService();
         }
-        return CriteriaService.instance;
+        return ProductsService.instance;
     }
 
     public loadCriteriaFamily() {
@@ -27,7 +27,7 @@ export class CriteriaService {
         for (const family of families) {
             for (const criteria of criteria_xlsx) {
                 if (family.id == criteria.id_category) {
-                    const criteria_name = criteria.name.replace(/\s/g,'').replace(/[^a-zA-Z ]/g, "");
+                    const criteria_name = criteria.name.replace(/\s/g, '').replace(/[^a-zA-Z ]/g, "");
                     criteriaFamilies.push({familyName: family.name, criteriaName: criteria_name})
                 }
             }
@@ -39,7 +39,7 @@ export class CriteriaService {
         const thematicsXlsx = excelToJsonService.getInstance().processXlsxToJson(`${this.pathFile}${xlsxName}.xlsx`) as Array<Thematic> | Array<EmployExclusion>;
         return thematicsXlsx.map(item => {
             item.name = item.name.replace(/[^a-zA-Z ]/g, "");
-            item.fieldName = item.name.replace(/\s/g,'').replace(/[^a-zA-Z ]/g, "");
+            item.fieldName = item.name.replace(/\s/g, '').replace(/[^a-zA-Z ]/g, "");
             return item
         });
     }
@@ -85,7 +85,7 @@ export class CriteriaService {
 
         try {
             const products = await client.search({
-                index: index, type: type, body : { query: { match: { type: "product" } } }
+                index: index, type: type, body: {query: {match: {type: "product"}}}
             }).then(data => data.body.hits.hits);
 
             for (let i = 0; i < products.length; i++)
@@ -95,25 +95,36 @@ export class CriteriaService {
 
             return products;
 
-        } catch(err) {
+        } catch (err) {
             console.error(err.meta.body.error);
         }
 
     }
 
     private classify(value: any): number {
-        switch(value.toLowerCase()) {
-            case 'low': return 1;
-            case 'below average': return 2;
-            case 'average': return 3;
-            case 'above average': return 4;
-            case 'high': return 5;
-            case 'low risk': return 1;
-            case 'medium risk': return 2;
-            case 'high risk': return 3;
-            case '1': return 1;
-            case '0': return 0;
-            default: return parseInt(value, 10)
+        switch (value.toLowerCase()) {
+            case 'low':
+                return 1;
+            case 'below average':
+                return 2;
+            case 'average':
+                return 3;
+            case 'above average':
+                return 4;
+            case 'high':
+                return 5;
+            case 'low risk':
+                return 1;
+            case 'medium risk':
+                return 2;
+            case 'high risk':
+                return 3;
+            case '1':
+                return 1;
+            case '0':
+                return 0;
+            default:
+                return parseInt(value, 10)
         }
     }
 

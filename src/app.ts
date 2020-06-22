@@ -1,7 +1,7 @@
 import * as express from 'express'
-import { usersRouter, productsRouter, authRouter, ocrRouter } from "./routes";
-import { APP_HOST, APP_PORT } from "./utils/constants";
-import { checkConnection } from "./utils/elasticsearch"
+import {authRouter, ocrRouter, productsRouter, usersRouter} from "./routes";
+import {APP_HOST, APP_PORT} from "./utils/constants";
+import {checkConnection} from "./utils/elasticsearch"
 
 class Application {
 
@@ -13,20 +13,20 @@ class Application {
         this.routes()
     }
 
-    private routes (): void {
-        this.app.use(express.json());
-        this.app.use('/users', usersRouter);
-        this.app.use('/products', productsRouter);
-        this.app.use('/auth', authRouter);
-        this.app.use('/ocr', ocrRouter);
-    }
-
     async start() {
         await checkConnection();
 
         this.app.listen(APP_PORT, () => {
             console.log('>>>> Node server is listening on', APP_HOST + ":" + APP_PORT)
         });
+    }
+
+    private routes(): void {
+        this.app.use(express.json());
+        this.app.use('/users', usersRouter);
+        this.app.use('/products', productsRouter);
+        this.app.use('/auth', authRouter);
+        this.app.use('/ocr', ocrRouter);
     }
 }
 

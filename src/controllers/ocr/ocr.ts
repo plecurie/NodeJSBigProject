@@ -1,7 +1,7 @@
-import { OcrService, CriteriaService } from '../../services';
+import {OcrService, ProductsService} from '../../services';
 
 const ocrService = OcrService.getInstance();
-const criteriaService = CriteriaService.getInstance();
+const criteriaService = ProductsService.getInstance();
 
 export class OcrController {
     async recognize(req, res): Promise<boolean> {
@@ -19,11 +19,11 @@ export class OcrController {
                 const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
                 mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
             }
-            res.status(200).json({recognized: true,data: matchIsinCode});
+            res.status(200).json({recognized: true, data: matchIsinCode});
 
             return true
 
-        } catch(err) {
+        } catch (err) {
             res.status(400).json({recognized: false});
             return false
         }

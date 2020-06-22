@@ -1,65 +1,50 @@
-import { client, index, type } from "../../utils/elasticsearch";
-import { User } from "../../models/User";
-import { AuthService, GeneratorService } from "../../services";
+import {client, index, type} from "../../utils/elasticsearch";
+import {User} from "../../models/User";
+import {AuthService, GeneratorService} from "../../services";
 
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
 
 export class UsersController {
 
-    async findOneByEmail(req, res): Promise<boolean> {
-
+    async findOne(req, res): Promise<boolean> {
         try {
-            return await client.search({
+            return await client.get({
                 index: index,
-                body : {
-                    query: {
-                        bool: {
-                            must: [
-                                {match: {type: "user"}},
-                                {match: {email: req.body.email}}
-                            ]
-                        }
-                    }
-                }
-            }).then((data)=> {
-                if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, user: data.body.hits.hits[0]._source});
-                    return true;
-                }
-                else {
-                    res.status(404).json({found: false, reason: "no user with this email"});
-                    return false;
-                }
+                type: type,
+                id: req.user_id
+            }).then((data) => {
+                res.status(200).json({found: true, user: data.body._source});
+                return true;
             })
         } catch (err) {
-            res.status(500).json(err);
+            res.status(500).json({reason: 'server error'});
             return false;
         }
     }
 
     async update(req, res): Promise<boolean> {
 
-        const user: User = { firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate, email: req.body.email, password: req.body.password, username: req.body.username };
-
+        const user: User = {
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            birthdate: req.body.birthdate,
+            email: req.body.email,
+            password: req.body.password,
+            username: req.body.username
+        };
         const newMail = req.body.newmail;
-
-        const userExist = await authService.findByEmail({ email: req.body.email })
+        const isUsed = await authService.findByEmail({email: newMail})
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
-
-        const isUsed = await authService.findByEmail({ email: newMail })
-            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
-
-        if (userExist && !isUsed) {
-
+        console.log(isUsed);
+        if (req.user_id.length != 0 && !isUsed) {
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
-
             try {
                 return await client.update({
                     index: index,
                     type: type,
-                    id: userExist._id,
-                    body : {
+                    id: req.user_id,
+                    body: {
                         query: {
                             doc: {
                                 firstname: user.firstname,
@@ -72,55 +57,36 @@ export class UsersController {
                         }
                     }
                 }).then(() => {
-                    res.status(200).json({ updated: true });
+                    res.status(200).json({updated: true});
                     return true;
                 })
-
             } catch (err) {
-                res.status(500).json(err);
+                res.status(500).json({reason: 'server error'});
                 return false;
             }
-        }
-        else if(!userExist) {
-            res.status(404).json({updated: false, reason: "no user with this email"});
+        } else if (!req.user_id) {
+            res.sendStatus(401).json({reason: 'unidentified user'});
             return false;
-        }
-        else if(isUsed) {
+        } else if (isUsed) {
             res.status(409).json({updated: false, reason: "email already in use"});
             return false;
         }
-
     }
 
     async delete(req, res): Promise<boolean> {
-
         try {
-            return await client.deleteByQuery({
+            return await client.delete({
                 index: index,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                { match: { type: "user" }},
-                                { match: { email: req.body.email }}
-                            ]
-                        }
-                    }
-                }
-            }).then((response) => {
-                if (response.body.deleted === 0) {
-                    res.status(404).json({deleted: false, reason: "no user with this email"});
-                    return false;
-                } else {
-                    res.status(200).json({deleted: true});
-                    return true;
-                }
+                type: type,
+                id: req.user_id
+            }).then(() => {
+                res.status(200).json({deleted: true});
+                return true;
             })
         } catch (err) {
-            res.status(500).json(err);
+            res.status(500).json({reason: 'server error'});
             return false;
         }
-
     }
 
 }

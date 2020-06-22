@@ -2,10 +2,12 @@ const bcrypt = require('bcrypt');
 
 export class GeneratorService {
     private static instance: GeneratorService;
-    constructor () {}
+
+    constructor() {
+    }
 
     public static getInstance(): GeneratorService {
-        if(!GeneratorService.instance) {
+        if (!GeneratorService.instance) {
             GeneratorService.instance = new GeneratorService();
         }
         return GeneratorService.instance;
@@ -18,7 +20,7 @@ export class GeneratorService {
     public async hashPassword(password: string) {
         try {
             return await bcrypt.hash(password, 15);
-        } catch(err) {
+        } catch (err) {
             throw err;
         }
     }

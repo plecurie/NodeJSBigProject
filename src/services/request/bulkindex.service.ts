@@ -1,12 +1,12 @@
-import { client, index, type } from "../../utils/elasticsearch";
-import { excelToJsonService } from "../excelToJson.service";
-import { Criteria } from "../../models/Criteria";
+import {client, index, type} from "../../utils/elasticsearch";
+import {excelToJsonService} from "../excelToJson.service";
+import {Criteria} from "../../models/Criteria";
 
 export class bulkindexService {
     private static instance: bulkindexService;
 
     public static getInstance(): bulkindexService {
-        if(!bulkindexService.instance) {
+        if (!bulkindexService.instance) {
             bulkindexService.instance = new bulkindexService();
         }
         return bulkindexService.instance;
@@ -19,7 +19,7 @@ export class bulkindexService {
         }, {});
     };
 
-    public async importExcel(filename = 'Input.xlsx') : Promise<boolean> {
+    public async importExcel(filename = 'Input.xlsx'): Promise<boolean> {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
@@ -252,13 +252,12 @@ export class bulkindexService {
                 index: 'scala',
                 type: 'database',
                 body: products_list
-            }).then((response)=>{
+            }).then((response) => {
                 if (response.body.items[0].index.status == 201) {
                     console.log('>>>> Bulk index done.');
                     return true
                 } else {
-                    console.log('Malformed Exception.');
-                    console.log(response);
+                    console.log('Error: Malformed Exception.');
                     return false
                 }
             })
