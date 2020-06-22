@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
+    "skipLibCheck": true,
     "lib": [
       "dom",
       "es6",
