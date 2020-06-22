@@ -1,7 +1,5 @@
 import { client, index, type } from "../../utils/elasticsearch";
 import { AuthService } from "../../services";
-import {Product} from "../../models/Product";
-import {Portfolio} from "../../models/Portfolio";
 
 const authService = AuthService.getInstance();
 
@@ -23,8 +21,7 @@ export class PortfolioController {
                         type: "portfolio",
                         name: req.body.name,
                         products: req.body.products
-                    },
-
+                    }
                 }).then((data) => {
                     res.status(200).json({created: true});
                     return true;
@@ -126,43 +123,46 @@ export class PortfolioController {
 
             if (user) {
 
-                return await client.updateByQuery({
+                const portfolio = await client.search({
                     index: index,
                     type: type,
                     body: {
                         query: {
                             bool: {
-                                must: [
-                                    {match: {type: "portfolio"}},
-                                    {match: {id_user: user._id}},
-                                    {match: {name: req.params.name}}
-                                ]
+                                must: [{match: {type: "portfolio"}}, {match: {id_user: user._id}}, {match: {name: req.params.name}}]
                             }
-                        },
-
-                        script: {
-                            source: "ctx._source.products ='" + req.body.products + "';"
-                                + "ctx._source.name ='" + req.body.newname + "';",
-                            lang: "painless"
                         }
                     }
-                }).then((response) => {
-                    if (response.body.updated === 0) {
-                        res.status(404).json({updated: false, reason: "no portfolio found"});
-                        return false
-                    } else {
-                        res.status(200).json({updated: true});
+                }).then(data => data.body.hits.hits[0]);
+
+                if (portfolio) {
+                    return await client.update({
+                        index: index,
+                        type: type,
+                        id: portfolio._id,
+                        body: {
+                            doc: {
+                                name: req.body.newname,
+                                products: req.body.products
+                            }
+                        }
+                    }).then(() => {
+                        res.status(200).json({ updated: true });
                         return true;
-                    }
-                })
+                    })
+                }
+                else {
+                    res.status(404).json({updated: false, reason: "no portfolio with this name"});
+                    return false;
+                }
+
             } else {
                 res.status(404).json({updated: false, reason: "no user with this email"});
-                return ;
+                return false;
             }
         } catch (err) {
-            console.log(err);
             res.status(500).json(err);
-            return
+            return false
         }
     }
 

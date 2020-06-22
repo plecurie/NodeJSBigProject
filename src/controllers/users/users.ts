@@ -55,27 +55,20 @@ export class UsersController {
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
 
             try {
-                return await client.updateByQuery({
+                return await client.update({
                     index: index,
                     type: type,
+                    id: userExist._id,
                     body : {
                         query: {
-                            bool: {
-                                must: [
-                                    { match: { type: "user" }},
-                                    { match: { _id: userExist._id }}
-                                ]
+                            doc: {
+                                firstname: user.firstname,
+                                lastname: user.lastname,
+                                username: user.username,
+                                birthdate: user.birthdate,
+                                email: newMail,
+                                password: mdpCrypted
                             }
-                        },
-                        script: {
-                            source:
-                                "ctx._source.firstname ='" + user.firstname + "';"
-                                + "ctx._source.lastname = '" + user.lastname + "';"
-                                + "ctx._source.username ='" + user.username + "';"
-                                + "ctx._source.birthdate ='" + user.birthdate + "';"
-                                + "ctx._source.email = '" + newMail + "';"
-                                + "ctx._source.password ='" + mdpCrypted + "';",
-                            lang: "painless"
                         }
                     }
                 }).then(() => {
