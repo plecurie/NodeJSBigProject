@@ -45,6 +45,7 @@ export class ProductsService {
     }
 
     public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[], wordToReplace: string) {
+
         return array.map(t => {
             const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1');
             if (findCriteria) {
@@ -55,45 +56,50 @@ export class ProductsService {
         }).filter(c => c !== undefined);
     }
 
-    public async mapProductCriteria() {
+    public async mapProductCriteria(products?) {
         const criteriaFamilies = this.loadCriteriaFamily();
-        const products = await this.loadCriteria();
+
+        if (!products) {
+            products = await this.findAll();
+        }
+
+        products = await this.loadCriteria(products);
         const thematics: Array<Thematic> = this.loadSimpleXlsx("thematics");
         const employsExclusion: Array<EmployExclusion> = this.loadSimpleXlsx("employs_exclusion");
 
         for (let i = 0; i < products.length; i++) {
             const criterias = products[i]._source.criteria;
-            const categoryProduct: CriteriaView = criterias.map(c => {
-                const lcwc = criteriaFamilies.find(d => d.criteriaName.toLowerCase() == c.name.toLowerCase());
+            const criteriaView: CriteriaView = criterias.map(criteria => {
+                const criteriaFamily = criteriaFamilies.find(family => family.criteriaName.toLowerCase() == criteria.name.toLowerCase());
                 return {
-                    name: c.name,
-                    value: typeof c.value == 'string' ? this.classify(c.value) : c.value,
-                    familyName: lcwc ? lcwc.familyName : 'Other Category'
+                    name: criteria.name,
+                    value: typeof criteria.value == 'string' ? this.classify(criteria.value) : criteria.value,
+                    familyName: criteriaFamily ? criteriaFamily.familyName : 'Other Category'
                 }
             });
+            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
+            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
+            products[i]._source.criteria = criteriaView;
+        }
 
-            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "Sustainable Investment");
-            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "Employs Exclusions");
-            products[i]._source.criteria = categoryProduct;
+        return products;
+    }
 
+    public loadCriteria(products) {
+        for (let i = 0; i < products.length; i++) {
+            products[i]._source.criteria = Object.keys(products[i]._source.criteria).map(name => {
+                return {name: name, value: products[i]._source.criteria[name], familyName: ""} as CriteriaView;
+            });
         }
         return products;
     }
 
-
-    public async loadCriteria() {
+    public async findAll() {
 
         try {
-            const products = await client.search({
+            return await client.search({
                 index: index, type: type, body: {query: {match: {type: "product"}}}
             }).then(data => data.body.hits.hits);
-
-            for (let i = 0; i < products.length; i++)
-                products[i]._source.criteria = Object.keys(products[i]._source.criteria).map(name => {
-                    return {name: name, value: products[i]._source.criteria[name], familyName: ""} as CriteriaView;
-                });
-
-            return products;
 
         } catch (err) {
             console.error(err.meta.body.error);
@@ -101,7 +107,7 @@ export class ProductsService {
 
     }
 
-    private classify(value: any): number {
+    protected classify(value: any): number {
         switch (value.toLowerCase()) {
             case 'low':
                 return 1;

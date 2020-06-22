@@ -1,5 +1,8 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {bulkindexService} from "../../services/request/bulkindex.service";
+import {ProductsService} from "../../services";
+
+const productsService = ProductsService.getInstance();
 
 export class ProductsController {
 
@@ -59,13 +62,19 @@ export class ProductsController {
             return await client.search({
                 index: index,
                 body: {
+                    size: 100,
                     query: {
-                        match: {type: "product"}
+                        term: {type: "product"}
                     }
                 }
-            }).then(data => {
+            }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, products: data.body.hits.hits[0]._source});
+                    const products = [];
+                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    for (let i = 0; i < data.body.hits.hits.length ; i++){
+                        products.push(formatted[i]._source);
+                    }
+                    res.status(200).json({found: true, products: products});
                     return data.body.hits.hits[0]._source;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
