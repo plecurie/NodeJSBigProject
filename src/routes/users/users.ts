@@ -1,6 +1,6 @@
 import * as express from 'express';
 import {Request, Response} from 'express';
-import {authController, portfolioController, userController} from '../../controllers';
+import {authController, portfolioController, profileController, userController} from '../../controllers';
 
 export const router = express.Router({
     strict: true,
@@ -18,24 +18,24 @@ router.post('/update', authController.checkToken, (req: Request, res: Response) 
 router.delete('/', authController.checkToken, (req: Request, res: Response) => {
     userController.delete(req, res);
 });
-/*
-router.post('/profile', (req: Request, res: Response) => {
+
+router.post('/profile', authController.checkToken, (req: Request, res: Response) => {
     profileController.create(req, res)
 });
 
-router.get('/profile', (req: Request, res: Response) => {
+router.get('/profile', authController.checkToken, (req: Request, res: Response) => {
     profileController.read(req, res)
 });
 
-router.post('/profile/update',(req: Request, res: Response) => {
+router.post('/profile/update', authController.checkToken,(req: Request, res: Response) => {
     profileController.update(req, res);
 });
 
-router.delete('/profile', (req: Request, res: Response) => {
+router.delete('/profile', authController.checkToken, (req: Request, res: Response) => {
     profileController.delete(req, res);
 });
-*/
-router.post('/portfolio/new', authController.checkToken, (req: Request, res: Response) => {
+
+router.post('/portfolio', authController.checkToken, (req: Request, res: Response) => {
     portfolioController.create(req, res)
 });
 
