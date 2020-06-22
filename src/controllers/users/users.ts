@@ -29,14 +29,13 @@ export class UsersController {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             birthdate: req.body.birthdate,
-            email: req.body.email,
+            email: req.body.newmail,
             password: req.body.password,
             username: req.body.username
         };
-        const newMail = req.body.newmail;
-        const isUsed = await authService.findByEmail({email: newMail})
-            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === req.body.email));
-        console.log(isUsed);
+        const isUsed = await authService.findByEmail({email: user.email})
+            .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === user.email));
+
         if (req.user_id.length != 0 && !isUsed) {
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
             try {
@@ -51,7 +50,7 @@ export class UsersController {
                                 lastname: user.lastname,
                                 username: user.username,
                                 birthdate: user.birthdate,
-                                email: newMail,
+                                email: user.email,
                                 password: mdpCrypted
                             }
                         }

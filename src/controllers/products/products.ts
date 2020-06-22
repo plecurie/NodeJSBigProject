@@ -29,7 +29,6 @@ export class ProductsController {
         try {
             return await client.search({
                 index: index,
-                type: type,
                 body: {
                     query: {
                         bool: {
@@ -59,7 +58,6 @@ export class ProductsController {
         try {
             return await client.search({
                 index: index,
-                type: type,
                 body: {
                     query: {
                         match: {type: "product"}
@@ -84,7 +82,6 @@ export class ProductsController {
         try {
             return await client.search({
                 index: index,
-                type: type,
                 body: {
                     query: {
                         bool: {

@@ -27,7 +27,6 @@ export class PortfolioController {
         try {
             return await client.search({
                 index: index,
-                type: type,
                 body: {
                     query: {
                         bool: {
@@ -87,7 +86,6 @@ export class PortfolioController {
         try {
             await client.search({
                 index: index,
-                type: type,
                 body: {
                     query: {
                         bool: {
@@ -101,7 +99,7 @@ export class PortfolioController {
                     }
                 }
             }).then(async data => {
-                if (data.body.hits.hits[0]) {
+                if (data.body.hits.hits.length != 0) {
                     return await client.update({
                         index: index,
                         type: type,
@@ -116,6 +114,10 @@ export class PortfolioController {
                         res.status(200).json({updated: true});
                         return true;
                     })
+                }
+                else {
+                    res.status(404).json({found: false, reason: "not found"});
+                    return;
                 }
             });
         } catch (err) {
