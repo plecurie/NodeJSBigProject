@@ -100,16 +100,14 @@ export class AuthController {
         }
     }
 
-    async checkToken(req, res) {
-        if (this.isValidToken(req.body.token))
-            res.status(200).json({ valid: true });
-        else
-            res.status(403).json({ valid: false, reason: "invalid token" });
-    }
-
-    async isValidToken(token) {
-        jsonwebtoken.verify(token, process.env.JWT_KEY, (err) => {
-            return !err;
+    async checkToken(req, res): Promise<void> {
+        jsonwebtoken.verify(req.body.token, process.env.JWT_KEY, (err, _) => {
+            if (err) {
+                res.json({valid: false});
+                return;
+            }
+            res.json({valid: true});
         });
     }
+
 }
