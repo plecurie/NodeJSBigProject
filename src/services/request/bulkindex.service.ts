@@ -262,7 +262,7 @@ export class bulkindexService {
                 }
             })
         } catch (err) {
-            console.log(err);
+            console.log('Error: ', err);
             return false
         }
 

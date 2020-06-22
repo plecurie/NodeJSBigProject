@@ -922,7 +922,7 @@ async function putMapping() {
             "type": "keyword",
             "cql_collection": "singleton"
         },
-        "name": {
+        "firm_name": {
             "type": "keyword",
             "cql_collection": "singleton"
         },
@@ -936,6 +936,10 @@ async function putMapping() {
                     "cql_collection": "singleton"
                 }
             }
+        },
+        "product_name": {
+            "type": "keyword",
+            "cql_collection": "singleton"
         },
         "type": {
             "type": "keyword",

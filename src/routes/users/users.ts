@@ -27,7 +27,7 @@ router.get('/profile', authController.checkToken, (req: Request, res: Response) 
     profileController.read(req, res)
 });
 
-router.post('/profile/update', authController.checkToken,(req: Request, res: Response) => {
+router.post('/profile/update', authController.checkToken, (req: Request, res: Response) => {
     profileController.update(req, res);
 });
 

@@ -1,4 +1,4 @@
-import {client, index, type} from "../../utils/elasticsearch";
+import {client, index} from "../../utils/elasticsearch";
 import {bulkindexService} from "../../services/request/bulkindex.service";
 import {ProductsService} from "../../services";
 
@@ -42,9 +42,10 @@ export class ProductsController {
                         }
                     }
                 }
-            }).then(data => {
+            }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, products: data.body.hits.hits[0]._source});
+                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    res.status(200).json({found: true, products: formatted[0]._source});
                     return data.body.hits.hits[0]._source;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
@@ -71,7 +72,7 @@ export class ProductsController {
                 if (data.body.hits.hits.length != 0) {
                     const products = [];
                     const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
-                    for (let i = 0; i < data.body.hits.hits.length ; i++){
+                    for (let i = 0; i < data.body.hits.hits.length; i++) {
                         products.push(formatted[i]._source);
                     }
                     res.status(200).json({found: true, products: products});
@@ -92,6 +93,7 @@ export class ProductsController {
             return await client.search({
                 index: index,
                 body: {
+                    size: 100,
                     query: {
                         bool: {
                             must: [
@@ -101,9 +103,14 @@ export class ProductsController {
                         }
                     }
                 }
-            }).then(data => {
+            }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, products: data.body.hits.hits[0]._source});
+                    const products = [];
+                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    for (let i = 0; i < data.body.hits.hits.length; i++) {
+                        products.push(formatted[i]._source);
+                    }
+                    res.status(200).json({found: true, products: products});
                     return data.body.hits.hits[0]._source;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
