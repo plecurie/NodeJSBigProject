@@ -44,11 +44,12 @@ export class CriteriaService {
         });
     }
 
-    public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[]) {
+    public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[], wordToReplace: string) {
         return array.map(t => {
             const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1');
             if (findCriteria) {
-                return t.name.replace(/  +/g, ' ');
+                const regex = new RegExp(wordToReplace, 'g');
+                return t.name.replace(/  +/g, ' ').replace(regex, '').trim();
             }
             return findCriteria
         }).filter(c => c !== undefined);
@@ -71,9 +72,10 @@ export class CriteriaService {
                 }
             });
 
-            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics);
-            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion);
+            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "Sustainable Investment");
+            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "Employs Exclusions");
             products[i]._source.criteria = categoryProduct;
+
         }
         return products;
     }
