@@ -56,19 +56,17 @@ export class ProductsService {
         }).filter(c => c !== undefined);
     }
 
-    public async mapProductCriteria(products?) {
+    public async mapProductCriteria(data) {
         const criteriaFamilies = this.loadCriteriaFamily();
-
-        if (!products) {
-            products = await this.findAll();
-        }
-
-        products = await this.loadCriteria(products);
         const thematics: Array<Thematic> = this.loadSimpleXlsx("thematics");
         const employsExclusion: Array<EmployExclusion> = this.loadSimpleXlsx("employs_exclusion");
 
-        for (let i = 0; i < products.length; i++) {
-            const criterias = products[i]._source.criteria;
+        if (!data.products) {
+            data.products = await this.findAll(data.isincodes);
+        }
+        data.products = await this.loadCriteria(data.products);
+        for (let i = 0; i < data.products.length; i++) {
+            const criterias = data.products[i]._source.criteria;
             const criteriaView: CriteriaView = criterias.map(criteria => {
                 const criteriaFamily = criteriaFamilies.find(family => family.criteriaName.toLowerCase() == criteria.name.toLowerCase());
                 return {
@@ -77,12 +75,12 @@ export class ProductsService {
                     familyName: criteriaFamily ? criteriaFamily.familyName : 'Other Category'
                 }
             });
-            products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
-            products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
-            products[i]._source.criteria = criteriaView;
+            data.products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
+            data.products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
+            data.products[i]._source.criteria = criteriaView;
         }
 
-        return products;
+        return data.products;
     }
 
     public loadCriteria(products) {
@@ -94,11 +92,18 @@ export class ProductsService {
         return products;
     }
 
-    public async findAll() {
-
+    public async findAll(isincodes: any) {
         try {
             return await client.search({
-                index: index, type: type, body: {query: {match: {type: "product"}}}
+                index: index, type: type, 
+                size: 10_000, 
+                body: {
+                    query: {
+                        bool: {
+                            should: isincodes
+                        }
+                    }
+                }
             }).then(data => data.body.hits.hits);
 
         } catch (err) {

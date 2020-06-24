@@ -3,6 +3,7 @@ import {bulkindexService} from "../../services/request/bulkindex.service";
 import {ProductsService} from "../../services";
 
 const productsService = ProductsService.getInstance();
+const sizeMax = 10_000;
 
 export class ProductsController {
 
@@ -44,7 +45,10 @@ export class ProductsController {
                 }
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    const formatted = await productsService.mapProductCriteria({
+                        products: data.body.hits.hits,
+                        isincodes: null
+                    });
                     res.status(200).json({found: true, products: formatted[0]._source});
                     return data.body.hits.hits[0]._source;
                 } else {
@@ -63,7 +67,7 @@ export class ProductsController {
             return await client.search({
                 index: index,
                 body: {
-                    size: 100,
+                    size: sizeMax,
                     query: {
                         term: {type: "product"}
                     }
@@ -71,7 +75,10 @@ export class ProductsController {
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
                     const products = [];
-                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    const formatted = await productsService.mapProductCriteria({
+                        products: data.body.hits.hits,
+                        isincodes: null,
+                    });
                     for (let i = 0; i < data.body.hits.hits.length; i++) {
                         products.push(formatted[i]._source);
                     }
@@ -93,7 +100,7 @@ export class ProductsController {
             return await client.search({
                 index: index,
                 body: {
-                    size: 100,
+                    size: sizeMax,
                     query: {
                         bool: {
                             must: [
@@ -106,7 +113,10 @@ export class ProductsController {
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
                     const products = [];
-                    const formatted = await productsService.mapProductCriteria(data.body.hits.hits);
+                    const formatted = await productsService.mapProductCriteria({
+                        products: data.body.hits.hits,
+                        isincodes: null
+                    });
                     for (let i = 0; i < data.body.hits.hits.length; i++) {
                         products.push(formatted[i]._source);
                     }

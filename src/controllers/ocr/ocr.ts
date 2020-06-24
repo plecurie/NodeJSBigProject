@@ -11,17 +11,17 @@ export class OcrController {
         try {
             const result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
             result.forEach((item, i) => result[i] = item.replace(/O/g, "0"));
-            //console.log(result);
-            const assWithDCat = await criteriaService.mapProductCriteria();
-            const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
-            console.log(matchIsinCode);
-            for (const mIC of matchIsinCode) {
+            const mapResult: any = result.map(item => ({"match": {"isincode": item}}));
+            //mapResult.push({match: {type: "product"}})
+            const assWithDCat = await criteriaService.mapProductCriteria({isincodes: mapResult, products: null});
+            // const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
+            for (const mIC of assWithDCat) {
                 const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
                 mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
             }
-            res.status(200).json({recognized: true, data: matchIsinCode});
+            res.status(200).json({recognized: true, data: assWithDCat});
 
-            return true
+            return true;
 
         } catch (err) {
             res.status(400).json({recognized: false});
