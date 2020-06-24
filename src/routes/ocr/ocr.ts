@@ -10,7 +10,7 @@ export const router = express.Router({
     mergeParams: true
 });
 
-router.post('/process', authController.checkToken, upload.array('file'), (req: Request, res: Response) => {
+router.post('/process', upload.array('file'), (req: Request, res: Response) => {
     ocrController.recognize(req, res)
 });
 
