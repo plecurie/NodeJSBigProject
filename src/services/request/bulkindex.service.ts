@@ -23,6 +23,7 @@ export class bulkindexService {
 
         const data = excelToJsonService.getInstance().processXlsxToJson(filename);
         const products_list = [];
+        let previous = {};
 
         for (let i = 0; i < Object.keys(data).length; i++) {
             const criteria: Criteria = {
@@ -243,8 +244,13 @@ export class bulkindexService {
                 ["category", data[i]['Global Category']],
                 ["criteria", criteria]
             ]);
-            products_list.push({index: {_index: index, _type: type}});
-            products_list.push(this.mapToObj(dict_products));
+
+            if(dict_products.get('isincode') !== previous) {
+                products_list.push({index: {_index: index, _type: type}});
+                products_list.push(this.mapToObj(dict_products));
+            }
+            previous = dict_products.get('isincode');
+
         }
 
         try {
