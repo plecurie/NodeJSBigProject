@@ -114,7 +114,8 @@ export class PortfolioController {
                         res.status(200).json({updated: true});
                         return true;
                     })
-                } else {
+                }
+                else {
                     res.status(404).json({found: false, reason: "not found"});
                     return;
                 }

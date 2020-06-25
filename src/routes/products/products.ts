@@ -10,7 +10,7 @@ router.post('/_updatedb', (req: Request, res: Response) => {
     productsController.update_db(req, res)
 });
 
-router.get('/', (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
     productsController.findAll(req, res)
 });
 

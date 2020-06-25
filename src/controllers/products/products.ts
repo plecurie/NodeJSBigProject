@@ -3,7 +3,6 @@ import {bulkindexService} from "../../services/request/bulkindex.service";
 import {ProductsService} from "../../services";
 
 const productsService = ProductsService.getInstance();
-const sizeMax = 10_000;
 
 export class ProductsController {
 
@@ -62,33 +61,31 @@ export class ProductsController {
         }
     }
 
-    async findAll(req, res): Promise<boolean> {
+    async findAll(req, res) {
         try {
-            return await client.search({
+            let pname = "";
+            if (req.body.product_name) pname = req.body.product_name;
+            const response = await client.search({
                 index: index,
                 body: {
-                    size: sizeMax,
+                    from: 0,
+                    size: 20,
                     query: {
-                        term: {type: "product"}
-                    }
-                }
-            }).then(async data => {
-                if (data.body.hits.hits.length != 0) {
-                    const products = [];
-                    const formatted = await productsService.mapProductCriteria({
-                        products: data.body.hits.hits,
-                        isincodes: null,
-                    });
-                    for (let i = 0; i < data.body.hits.hits.length; i++) {
-                        products.push(formatted[i]._source);
-                    }
-                    res.status(200).json({found: true, products: products});
-                    return data.body.hits.hits[0]._source;
-                } else {
-                    res.status(404).json({found: false, reason: "not found"});
-                    return;
+                        match: {type: "product"},
+                    },
+                    sort: [{product_name: "asc"}],
+                    search_after: [pname]
                 }
             });
+
+            let formatted = await productsService.mapProductCriteria({
+                products: response.body.hits.hits,
+                isincodes: null,
+            });
+
+            res.status(200).json({found: true, products: formatted});
+            return formatted;
+
         } catch (err) {
             res.status(500).json({reason: 'server error'});
             return;
@@ -97,10 +94,13 @@ export class ProductsController {
 
     async search(req, res): Promise<boolean> {
         try {
+            let pname = "";
+            if (req.body.product_name) pname = req.body.product_name;
+
             return await client.search({
                 index: index,
                 body: {
-                    size: sizeMax,
+                    size: 20,
                     query: {
                         bool: {
                             must: [
@@ -108,7 +108,9 @@ export class ProductsController {
                                 req.body.matches
                             ]
                         }
-                    }
+                    },
+                    sort: [{product_name: "asc"}],
+                    search_after: [pname]
                 }
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
