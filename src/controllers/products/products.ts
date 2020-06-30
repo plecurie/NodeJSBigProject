@@ -1,4 +1,4 @@
-import {client, index, type} from "../../utils/elasticsearch";
+import {client, index} from "../../utils/elasticsearch";
 import {bulkindexService} from "../../services/request/bulkindex.service";
 import {ProductsService} from "../../services";
 
@@ -14,7 +14,8 @@ export class ProductsController {
                     query: {match: {type: "product"}}
                 }
             }).then(async () => {
-                if (await bulkindexService.getInstance().importExcel()) {
+                if (await bulkindexService.getInstance().importContracts()
+                && await bulkindexService.getInstance().importProducts()) {
                     res.status(200).json({updated: true});
                     return true;
                 } else {
