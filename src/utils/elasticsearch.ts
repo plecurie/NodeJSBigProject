@@ -945,12 +945,20 @@ async function putMapping() {
             "type": "keyword",
             "cql_collection": "singleton"
         },
+        "suggest": {
+            "type": "completion"
+        },
         "username": {
             "type": "keyword",
             "cql_collection": "singleton"
         }
     };
-    await client.indices.putMapping({index, type, body: {properties: schema}});
+    try {
+        await client.indices.putMapping({index, type, body: {properties: schema}});
+    } catch (err) {
+        console.log(err.meta.body.error)
+    }
+
 }
 
 module.exports = {

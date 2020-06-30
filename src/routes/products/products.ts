@@ -10,6 +10,10 @@ router.post('/_updatedb', (req: Request, res: Response) => {
     productsController.update_db(req, res)
 });
 
+router.get('/suggest/:input', function (req, res, next) {
+    productsController.suggest(req, res)
+});
+
 router.post('/', (req: Request, res: Response) => {
     productsController.findAll(req, res)
 });

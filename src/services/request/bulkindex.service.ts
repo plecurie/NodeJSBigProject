@@ -242,7 +242,13 @@ export class bulkindexService {
                 ["firm_name", data[i]['Firm Name']],
                 ["ongoingcharge", data[i]['KIID Ongoing Charge']],
                 ["category", data[i]['Global Category']],
-                ["criteria", criteria]
+                ["criteria", criteria],
+                ["suggest", [
+                        {input: data[i]['ISIN']},
+                        {input: data[i]['Name']},
+                        {input: data[i]['Firm Name']}
+                    ]
+                ]
             ]);
 
             if(dict_products.get('isincode') !== previous) {
@@ -263,7 +269,7 @@ export class bulkindexService {
                     console.log('>>>> Bulk index done.');
                     return true
                 } else {
-                    console.log('Error: Malformed Exception.');
+                    console.log('Error: ', response.body.items[0].index.error.caused_by);
                     return false
                 }
             })

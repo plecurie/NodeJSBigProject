@@ -1,4 +1,4 @@
-import {client, index} from "../../utils/elasticsearch";
+import {client, index, type} from "../../utils/elasticsearch";
 import {bulkindexService} from "../../services/request/bulkindex.service";
 import {ProductsService} from "../../services";
 
@@ -26,6 +26,31 @@ export class ProductsController {
             res.status(500).json({reason: 'server error'});
             return false;
         }
+    }
+
+    async suggest(req, res) {
+        try {
+            await client.search({
+                index: index,
+                body: {
+                    suggest: {
+                        products: {
+                            prefix: req.params.input,
+                            completion: {
+                                field: "suggest",
+                                skip_duplicates: true
+                            }
+                        }
+                    }
+                }
+            }).then((data) => {
+                res.json(data.body.suggest.products[0].options)
+            })
+        }
+        catch (err) {
+            console.log(err.meta.body.error)
+        }
+
     }
 
     async findOne(req, res): Promise<boolean> {
