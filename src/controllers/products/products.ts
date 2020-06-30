@@ -11,11 +11,18 @@ export class ProductsController {
             return await client.deleteByQuery({
                 index: index,
                 body: {
-                    query: {match: {type: "product"}}
+                    query: {
+                        bool: {
+                            must: [
+                                {match: {type: "product"}},
+                                {match: {type: "contract"}}
+                            ]
+                        }
+                    }
                 }
             }).then(async () => {
-                if (await bulkindexService.getInstance().importContracts()
-                && await bulkindexService.getInstance().importProducts()) {
+                if (await bulkindexService.getInstance().importContracts(req.body.contracts_filename, req.body.buylist_filename)
+                && await bulkindexService.getInstance().importProducts(req.body.products_filename)) {
                     res.status(200).json({updated: true});
                     return true;
                 } else {

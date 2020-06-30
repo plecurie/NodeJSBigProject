@@ -1,6 +1,7 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {excelToJsonService} from "../excelToJson.service";
 import {Criteria} from "../../models/Criteria";
+import {Product} from "../../models/Product";
 
 export class bulkindexService {
     private static instance: bulkindexService;
@@ -30,7 +31,7 @@ export class bulkindexService {
             let buylist = [];
             for (let j = 0; j < Object.keys(products).length; j++) {
                 if ( contracts[i]['ID Contrat'] === products[j]['ID Contrat']) {
-                    buylist.push(products[j]['ISIN']);
+                    buylist.push({isincode: products[j]['ISIN']});
                 }
             }
 
@@ -56,7 +57,7 @@ export class bulkindexService {
                     console.log('>>>> Bulk index contracts done.');
                     return true
                 } else {
-                    console.log('Error: ', response.body.items[0].index.error.caused_by);
+                    console.log('Error: ', response.body.items[0]);
                     return false
                 }
             })
