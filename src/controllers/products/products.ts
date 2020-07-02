@@ -51,8 +51,17 @@ export class ProductsController {
                         }
                     }
                 }
-            }).then((data) => {
-                res.json(data.body.suggest.products[0].options)
+            }).then(async (data) => {
+                const formatted = await productsService.mapProductCriteria({
+                    products: data.body.suggest.products[0].options,
+                    isincodes: null
+                })
+                for (const mIC of formatted) {
+                    const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+                    mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+                }
+                console.log(formatted.length);
+                res.json({data: formatted})
             })
         }
         catch (err) {
@@ -81,7 +90,7 @@ export class ProductsController {
                         products: data.body.hits.hits,
                         isincodes: null
                     });
-                    res.status(200).json({found: true, products: formatted[0]._source});
+                    res.status(200).json({found: true, data: formatted[0]._source});
                     return data.body.hits.hits[0]._source;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
@@ -115,8 +124,12 @@ export class ProductsController {
                 products: response.body.hits.hits,
                 isincodes: null,
             });
-
-            res.status(200).json({found: true, products: formatted});
+            for (const mIC of formatted) {
+                const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+                mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+            }
+            
+            res.status(200).json({found: true, data: formatted});
             return formatted;
 
         } catch (err) {
@@ -155,7 +168,7 @@ export class ProductsController {
                     for (let i = 0; i < data.body.hits.hits.length; i++) {
                         products.push(formatted[i]._source);
                     }
-                    res.status(200).json({found: true, products: products});
+                    res.status(200).json({found: true, data: products});
                     return data.body.hits.hits[0]._source;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
