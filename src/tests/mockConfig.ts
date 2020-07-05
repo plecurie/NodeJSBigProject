@@ -11,5 +11,5 @@ export const baseApi = "http://localhost:3100";
 const nock = require('nock');
 const supertest = require('supertest');
 
-export const request = supertest(baseApi);
+export const mockRequest = supertest(baseApi);
 export const mockApi = nock(baseApi);

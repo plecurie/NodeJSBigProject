@@ -27,6 +27,9 @@ class Application {
         this.app.use('/products', productsRouter);
         this.app.use('/auth', authRouter);
         this.app.use('/ocr', ocrRouter);
+        this.app.use('/', (req, res) => {
+            res.status(404).send({ error: `path doesn't exist`});
+        });
     }
 }
 

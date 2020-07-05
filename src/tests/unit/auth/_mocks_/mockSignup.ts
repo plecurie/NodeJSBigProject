@@ -1,5 +1,5 @@
-import { authController } from "../../../../src/controllers";
-import { USER_EMAIL } from "../../../e2e/auth/auth.spec";
+import { authController } from "../../../../controllers";
+import { USER_EMAIL } from "../../../integration/auth/auth.spec";
 
 export const mockSignup = jest.fn(
     async (req): Promise<any> => {

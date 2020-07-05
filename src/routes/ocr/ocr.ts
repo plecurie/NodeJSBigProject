@@ -1,6 +1,6 @@
 import * as express from 'express';
 import {Request, Response} from 'express';
-import {authController, ocrController} from '../../controllers'
+import {ocrController} from '../../controllers'
 import * as multer from 'multer';
 
 const upload = multer({dest: `./src/uploads`});

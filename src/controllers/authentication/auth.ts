@@ -4,10 +4,12 @@ import {User} from "../../models/User";
 import {client} from "../../utils/elasticsearch";
 
 const mailerService = MailerService.getInstance();
-const authService = AuthService.getInstance();
+let authService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
 
 export class AuthController {
+
+    constructor() {}
 
     async signup(req, res) {
 
@@ -20,8 +22,7 @@ export class AuthController {
             const userExist = await authService.findByEmail({email: req.body.email})
                 .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
             if (userExist) {
-                res.status(409).json({created: false, reason: "email already exists"});
-                return false;
+                return res.status(409).json({created: false, reason: "email already exists"});
             } else {
                 const mdpCrypted = await generatorService.hashPassword(req.body.password);
                 return await client.index({
@@ -37,13 +38,12 @@ export class AuthController {
                         password: mdpCrypted
                     }
                 }).then(() => {
-                    res.status(201).json({created: true});
-                    return true;
+                    return res.status(201).json({created: true});
                 })
             }
         } catch (err) {
-            res.status(500).json(err);
-            return false;
+            console.log(err);
+            return res.status(500).json({reason: 'server error'});
         }
 
     }

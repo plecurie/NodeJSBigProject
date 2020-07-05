@@ -1,7 +1,6 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {excelToJsonService} from "../excelToJson.service";
 import {Criteria} from "../../models/Criteria";
-import {Product} from "../../models/Product";
 
 export class bulkindexService {
     private static instance: bulkindexService;

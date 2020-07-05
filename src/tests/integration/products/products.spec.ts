@@ -1,7 +1,7 @@
 import {
     PRODUCT_ISINCODE,
-    mockApi, request
-} from "../mockConfig";
+    mockApi, mockRequest
+} from "../../mockConfig";
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -21,7 +21,7 @@ describe("Product E2E tests", () => {
                     updated: true
                 });
 
-            request
+            mockRequest
                 .get(endpoint)
                 .end((err, res) => {
                     if (err)
@@ -65,7 +65,7 @@ describe("Product E2E tests", () => {
                     }]
                 });
 
-            request
+            mockRequest
                 .get(endpoint)
                 .end((err, res) => {
                     if (err)
@@ -102,7 +102,7 @@ describe("Product E2E tests", () => {
                     }
                 });
 
-            request
+            mockRequest
                 .get(endpoint)
                 .end((err, res) => {
                     if (err)
@@ -169,7 +169,7 @@ describe("Product E2E tests", () => {
                     }]
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     "filter1": [

@@ -2,12 +2,10 @@ const { Client } = require('@elastic/elasticsearch');
 const Mock = require('@elastic/elasticsearch-mock');
 const mock = new Mock();
 
-export const client = new Client({
+const client = new Client({
     node: 'http://localhost:9200',
     Connection: mock.getConnection()
 });
-
-client.info(console.log);
 
 mock.add({
     method: 'GET',
@@ -72,3 +70,4 @@ mock.add({
     return { status: 204 }
 });
 
+export const es_client = client;

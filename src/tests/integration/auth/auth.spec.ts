@@ -1,58 +1,91 @@
 import {
-    mockApi, request,
+    mockApi, mockRequest,
     USER_BIRTHDATE,
     USER_EMAIL,
     USER_FIRSTNAME,
     USER_LASTNAME,
     USER_PASSWORD,
     USER_USERNAME
-} from "../mockConfig";
+} from "../../mockConfig";
+import Application from '../../../app';
+import * as supertest from "supertest";
+import {AuthController} from "../../../controllers/authentication/auth";
+import {authController} from "../../../controllers";
+import {AuthService} from "../../../services";
+import {client} from "../../../utils/elasticsearch";
 
+const request = supertest(new Application().app);
 const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
 const expect = chai.expect;
+const should = chai.should();
 
-describe("Authentication E2E tests", () => {
+const sinon = require("sinon");
 
-    describe("Signup", () => {
+describe("/POST auth/", () => {
 
-        const endpoint = "/auth/signup/";
+    describe("When signup a user", () => {
 
-        it('should signup a new user', function (done) {
+        const endpoint = "/auth/signup";
+        let status, json, res, authController, authService;
 
-            mockApi
-                .post(endpoint, {
-                    firstname: USER_FIRSTNAME,
-                    lastname: USER_LASTNAME,
-                    birthdate: USER_BIRTHDATE,
-                    email: USER_EMAIL,
-                    password: USER_PASSWORD,
-                    username: USER_USERNAME
-                })
-                .reply(201, {
-                    status: 201,
-                    created: true
-                });
+        beforeEach(()=>{
+            status = sinon.stub();
+            json = sinon.spy();
+            res = { json, status };
+            status.returns(res);
+            authService = AuthService.getInstance();
+        });
+
+        it('should signup a new user', async done => {
+
+            const userData = {
+                firstname: USER_FIRSTNAME,
+                lastname: USER_LASTNAME,
+                birthdate: USER_BIRTHDATE,
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+                username: USER_USERNAME
+            };
+
+            const req = {
+                body: userData
+            };
+
+            const stubValue = {
+                body: {
+                    hits: {
+                        hits: {
+                            firstname: USER_FIRSTNAME,
+                            lastname: USER_LASTNAME,
+                            birthdate: USER_BIRTHDATE,
+                            email: USER_EMAIL,
+                            password: USER_PASSWORD,
+                            username: USER_USERNAME,
+                            find: () => {}
+                        }
+                    }
+                }
+            };
+
+            const indexStub = sinon.stub(client, 'index').resolves();
 
             request
                 .post(endpoint)
-                .send({
-                    firstname: USER_FIRSTNAME,
-                    lastname: USER_LASTNAME,
-                    birthdate: USER_BIRTHDATE,
-                    email: USER_EMAIL,
-                    password: USER_PASSWORD,
-                    username: USER_USERNAME
-                })
-                .end((err, res) => {
-                    if (err)
-                        console.log(err);
-
-                    expect(res.body.status).to.equal(201);
-                    expect(res.body.created).to.equal(true);
+                .set('Accept', 'application/json')
+                .send(userData)
+                .end((err, response) => {
+                    if (err) done(err);
+                    console.log(response);
+                    expect(response.body.created).to.equal(true);
+                    expect(response.status).to.equal(201);
                     done();
                 });
-        });
 
+        });
+    })/////////
+        /*
         it('should return email already exist', function (done) {
 
             const existing_email = "abc@xyz.com";
@@ -72,7 +105,7 @@ describe("Authentication E2E tests", () => {
                     reason: "email already exists"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     firstname: USER_FIRSTNAME,
@@ -112,7 +145,7 @@ describe("Authentication E2E tests", () => {
                     token: "xyz"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: USER_EMAIL,
@@ -142,7 +175,7 @@ describe("Authentication E2E tests", () => {
                     reason: "access forbidden"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: "wrong_email",
@@ -172,7 +205,7 @@ describe("Authentication E2E tests", () => {
                     reason: "access forbidden"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: USER_EMAIL,
@@ -204,7 +237,7 @@ describe("Authentication E2E tests", () => {
                     valid: true
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     token: "xyz"
@@ -230,7 +263,7 @@ describe("Authentication E2E tests", () => {
                     reason: "invalid token"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     token: "wrong_token"
@@ -263,7 +296,7 @@ describe("Authentication E2E tests", () => {
                     "updated": true
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: USER_EMAIL,
@@ -290,7 +323,7 @@ describe("Authentication E2E tests", () => {
                     reason: "no user with this email"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: "wrong_email",
@@ -308,5 +341,7 @@ describe("Authentication E2E tests", () => {
         })
 
     });
+
+ */
 
 });

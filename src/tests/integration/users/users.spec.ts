@@ -1,8 +1,8 @@
 import {
-    mockApi, request, USER_BIRTHDATE,
+    mockApi, mockRequest, USER_BIRTHDATE,
     USER_EMAIL, USER_FIRSTNAME, USER_LASTNAME, USER_PASSWORD, USER_USERNAME
-} from "../mockConfig";
-import {GeneratorService} from "../../../src/services";
+} from "../../mockConfig";
+import {GeneratorService} from "../../../services";
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -45,7 +45,7 @@ describe("Users E2E tests", () => {
                 ]
             });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     email: USER_EMAIL
@@ -97,7 +97,7 @@ describe("Users E2E tests", () => {
                     reason: "no user with this email"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     type: "user",
@@ -143,7 +143,7 @@ describe("Users E2E tests", () => {
                     "updated": true
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     firstname: "test",
@@ -183,7 +183,7 @@ describe("Users E2E tests", () => {
                     reason: "no user with this email"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     firstname: "test",
@@ -224,7 +224,7 @@ describe("Users E2E tests", () => {
                     reason: "email already in use"
                 });
 
-            request
+            mockRequest
                 .post(endpoint)
                 .send({
                     firstname: "test",
@@ -264,7 +264,7 @@ describe("Users E2E tests", () => {
                     deleted: true
                 });
 
-            request
+            mockRequest
                 .delete(endpoint)
                 .send({
                     email: USER_EMAIL
@@ -292,7 +292,7 @@ describe("Users E2E tests", () => {
                     reason: "no user with this email"
                 });
 
-            request
+            mockRequest
                 .delete(endpoint)
                 .send({
                     email: "wrong_email"

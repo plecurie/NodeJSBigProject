@@ -7,7 +7,7 @@ import {
     productsRouter,
     profileRouter,
     usersRouter
-} from "../src/routes";
+} from "../routes";
 
 export function appMock() {
     let app = express();
