@@ -78,24 +78,29 @@ export class AuthController {
     async generateNewPassword(req, res) {
         try {
             if (req.user_id) {
-                const newPassword = generatorService.randomPassword();
-                const newPasswordCrypted = await generatorService.hashPassword(newPassword);
-                const passwordUpdated = await authService.updateUserPassword({
-                    id: req.user_id,
-                    password: newPasswordCrypted
-                });
 
-                if (passwordUpdated._shards.failed == 0) {
-                    await mailerService.sendEmail(req.body.email, newPassword);
-                    res.status(200).json({updated: true});
-                } else {
-                    res.status(500).json({reason: 'server error'});
+                const user = await authService.findById({_id: req.user_id})
+                    .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._id === req.user_id));
+
+                if (user) {
+                    const newPassword = generatorService.randomPassword();
+                    const newPasswordCrypted = await generatorService.hashPassword(newPassword);
+                    await authService.updateUserPassword({
+                        id: req.user_id,
+                        password: newPasswordCrypted
+                    }).then(async ()=>{
+                        await mailerService.sendEmail(user._source.email, newPassword);
+                        res.status(200).json({updated: true});
+                    });
+                }
+                else {
+                    res.status(403).json({updated: false, reason: 'access refused'});
                 }
             } else {
-                res.status(403).json({reason: 'access refused'});
+                res.status(403).json({updated: false, reason: 'access refused'});
             }
         } catch (err) {
-            res.status(500).json({reason: 'server error'});
+            res.status(500).json({updated: false, reason: 'server error'});
             return;
         }
     }
@@ -103,17 +108,24 @@ export class AuthController {
     async checkToken(req, res, next): Promise<void> {
         const authHeader = req.headers.authorization;
         if (authHeader) {
-            const token = authHeader.split(' ')[1];
+            let token = authHeader;
+            if(authHeader.split(' ')[1]) {
+                token = authHeader.split(' ')[1];
+            }
+            try {
+                jsonwebtoken.verify(token, process.env.JWT_KEY, (err, user_id) => {
+                    if (err) {
+                        return res.status(403).json({reason: 'access refused'});
+                    }
+                    req.user_id = user_id.data;
+                    res.next();
+                });
+            } catch (err) {
+                return res.status(500).json({reason: 'server error'})
+            }
 
-            jsonwebtoken.verify(token, process.env.JWT_KEY, (err, user_id) => {
-                if (err) {
-                    return res.status(403).json({reason: 'access refused'});
-                }
-                req.user_id = user_id.data;
-                next();
-            });
         } else {
-            res.sendStatus(401).json({reason: 'unidentified user'});
+            return res.status(401).json({reason: 'unidentified user'});
         }
     }
 

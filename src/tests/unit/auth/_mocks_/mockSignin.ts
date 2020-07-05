@@ -1,6 +1,6 @@
-import { authController } from "../../../../controllers";
+import {authController} from "../../../../controllers";
 // @ts-ignore
-import { ACCESS_TOKEN, USER_EMAIL, USER_PASSWORD } from '../../../integration/auth/auth.spec'
+import {ACCESS_TOKEN, USER_EMAIL, USER_PASSWORD} from '../../../integration/auth/auth.spec'
 
 export const mockSignin = jest.fn(
     async (req): Promise<any> => {
@@ -11,7 +11,7 @@ export const mockSignin = jest.fn(
                 token: ACCESS_TOKEN
             };
         else
-            return { status: 403 }
+            return {status: 403}
     }
 );
 

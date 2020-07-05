@@ -1,5 +1,5 @@
-import { authController } from "../../../../controllers";
-import { USER_EMAIL } from "../../../integration/auth/auth.spec";
+import {authController} from "../../../../controllers";
+import {USER_EMAIL} from "../../../integration/auth/auth.spec";
 
 export const mockSignup = jest.fn(
     async (req): Promise<any> => {
@@ -8,8 +8,7 @@ export const mockSignup = jest.fn(
                 status: 409,
                 connect: false,
             };
-        }
-        else
+        } else
             return {
                 status: 201
             };

@@ -35,6 +35,16 @@ export class AuthService {
         });
     }
 
+    public async findById(_id: any) {
+        return client.search({
+            index: index,
+            type: type,
+            body: {
+                query: {match: _id}
+            }
+        });
+    }
+
     public async checkValidPassword(passwordUser: string, hash: string) {
         try {
             const verifyPassword = await bcrypt.compare(passwordUser, hash);

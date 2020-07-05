@@ -1,7 +1,11 @@
 import * as nodemailer from 'nodemailer';
 
+const dotenv = require("dotenv");
+dotenv.config();
+
 export class MailerService {
     private static instance: MailerService;
+
     private transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
@@ -13,8 +17,7 @@ export class MailerService {
         }
     });
 
-    constructor() {
-    }
+    constructor() {}
 
     public static getInstance(): MailerService {
         if (!MailerService.instance) {

@@ -1,11 +1,15 @@
 import {
-    USER_BIRTHDATE, USER_EMAIL,
-    USER_FIRSTNAME, USER_HASH_PASSWORD, RANDOM_ID,
+    RANDOM_ID,
+    USER_TOKEN,
+    USER_BIRTHDATE,
+    USER_EMAIL,
+    USER_FIRSTNAME,
+    USER_HASH_PASSWORD,
     USER_LASTNAME,
     USER_PASSWORD,
     USER_USERNAME
 } from "../../mockConfig";
-import {AuthService } from "../../../services";
+import {AuthService, MailerService} from "../../../services";
 import {AuthController} from "../../../controllers/authentication/auth";
 import {client} from "../../../utils/elasticsearch";
 import * as jsonwebtoken from 'jsonwebtoken';
@@ -18,24 +22,25 @@ const sinon = require("sinon");
 
 describe("Authentication Unit tests", () => {
 
-    let status, json, res, authController, authService, authStub, findStub, indexStub, tokenStub, stubResponse, stubFoundUser;
+    let status, json, res, authController, authService, mailerService, updatePasswordStub, findByIdStub,
+        findByEmailStub, findStub, indexStub, tokenStub, sendMailStub, stubResponse, stubFoundUser;
 
     beforeEach(() => {
         status = sinon.stub();
         json = sinon.spy();
-        res = { json, status };
+        res = {json, status};
         status.returns(res);
         authService = AuthService.getInstance();
     });
 
-    afterEach(()=> {
-        authStub.restore();
+    afterEach(() => {
+        findByEmailStub.restore();
         findStub.restore();
     });
 
     describe("When signup a user", () => {
 
-        afterEach(()=> {
+        afterEach(() => {
             indexStub.restore();
         });
 
@@ -55,7 +60,14 @@ describe("Authentication Unit tests", () => {
                 };
 
                 stubResponse = {
-                    body: { hits: { hits: { find: () => {} } } }
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
                 };
 
                 stubFoundUser = {
@@ -71,14 +83,14 @@ describe("Authentication Unit tests", () => {
                     }
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(stubFoundUser);
                 indexStub = sinon.stub(client, 'index').resolves();
 
                 authController = new AuthController();
                 await authController.signup(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(findByEmailStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.true;
                 expect(indexStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
@@ -108,17 +120,24 @@ describe("Authentication Unit tests", () => {
                 };
 
                 stubResponse = {
-                    body: { hits: { hits: { find: () => {} } } }
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(undefined);
                 indexStub = sinon.stub(client, 'index').resolves();
 
                 authController = new AuthController();
                 await authController.signup(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(findByEmailStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.true;
                 expect(indexStub.calledOnce).to.be.true;
                 expect(status.calledOnce).to.be.true;
@@ -147,18 +166,19 @@ describe("Authentication Unit tests", () => {
                     body: {
                         error: [Object],
                         status: 400,
-                        find: () => {}
+                        find: () => {
+                        }
                     },
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body, "find").returns(undefined);
                 indexStub = sinon.stub(client, 'index').resolves();
 
                 authController = new AuthController();
                 await authController.signup(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(findByEmailStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.false;
                 expect(indexStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
@@ -172,7 +192,7 @@ describe("Authentication Unit tests", () => {
 
     describe("When login a user", () => {
 
-        afterEach(()=> {
+        afterEach(() => {
             tokenStub.restore();
         });
 
@@ -187,7 +207,14 @@ describe("Authentication Unit tests", () => {
                 };
 
                 stubResponse = {
-                    body: { hits: { hits: { find: () => {} } } }
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
                 };
 
                 stubFoundUser = {
@@ -203,21 +230,21 @@ describe("Authentication Unit tests", () => {
                     }
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(stubFoundUser);
-                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves("random_token");
+                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves(USER_TOKEN);
 
                 authController = new AuthController();
                 await authController.signin(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(findByEmailStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.true;
                 expect(tokenStub.calledOnce).to.be.true;
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(200);
                 expect(json.calledOnce).to.be.true;
                 expect(json.args[0][0].connect).to.equal(true);
-                expect(json.args[0][0].token).to.equal("random_token");
+                expect(json.args[0][0].token).to.equal(USER_TOKEN);
                 done();
 
             });
@@ -235,7 +262,14 @@ describe("Authentication Unit tests", () => {
                 };
 
                 stubResponse = {
-                    body: { hits: { hits: { find: () => {} } } }
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
                 };
 
                 stubFoundUser = {
@@ -251,14 +285,14 @@ describe("Authentication Unit tests", () => {
                     }
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                updatePasswordStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(stubFoundUser);
-                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves("random_token");
+                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves(USER_TOKEN);
 
                 authController = new AuthController();
                 await authController.signin(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(updatePasswordStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.true;
                 expect(tokenStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
@@ -284,17 +318,24 @@ describe("Authentication Unit tests", () => {
                 };
 
                 stubResponse = {
-                    body: { hits: { hits: { find: () => {} } } }
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
                 };
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                updatePasswordStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(undefined);
-                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves("random_token");
+                tokenStub = sinon.stub(jsonwebtoken, "sign").resolves(USER_TOKEN);
 
                 authController = new AuthController();
                 await authController.signin(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(updatePasswordStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.true;
                 expect(tokenStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
@@ -322,19 +363,20 @@ describe("Authentication Unit tests", () => {
                     body: {
                         error: [Object],
                         status: 400,
-                        find: () => {}
-                    },
+                        find: () => {
+                        }
+                    }
                 };
 
                 stubFoundUser = undefined;
 
-                authStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
+                findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body, "find").returns(stubFoundUser);
 
                 authController = new AuthController();
                 await authController.signin(req, res);
 
-                expect(authStub.calledOnce).to.be.true;
+                expect(findByEmailStub.calledOnce).to.be.true;
                 expect(findStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(500);
@@ -348,9 +390,225 @@ describe("Authentication Unit tests", () => {
 
     describe("When generating new password", () => {
 
+        beforeEach(() => {
+            mailerService = MailerService.getInstance();
+        });
+
+        afterEach(() => {
+            sendMailStub.restore();
+            findByIdStub.restore();
+            updatePasswordStub.restore();
+            tokenStub.restore()
+        });
+
+        describe("if the user is known", () => {
+            it('should generate/update the password and send an email with the new password', async done => {
+                const req = {
+                    user_id: RANDOM_ID,
+                };
+
+                stubResponse = {
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
+                };
+
+                stubFoundUser = {
+                    _id: RANDOM_ID,
+                    _source: {
+                        firstname: USER_FIRSTNAME,
+                        lastname: USER_LASTNAME,
+                        birthdate: USER_BIRTHDATE,
+                        type: 'user',
+                        email: USER_EMAIL,
+                        password: USER_HASH_PASSWORD,
+                        username: USER_USERNAME
+                    }
+                };
+
+                findByIdStub = sinon.stub(authService, "findById").resolves(stubResponse);
+                findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(stubFoundUser);
+                updatePasswordStub = sinon.stub(authService, "updateUserPassword").resolves();
+                sendMailStub = sinon.stub(mailerService, "sendEmail").returns();
+
+                authController = new AuthController();
+                await authController.generateNewPassword(req, res);
+
+                expect(findByIdStub.calledOnce).to.be.true;
+                expect(findStub.calledOnce).to.be.true;
+                expect(updatePasswordStub.calledOnce).to.be.true;
+                expect(sendMailStub.calledOnce).to.be.true;
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(200);
+                expect(json.calledOnce).to.be.true;
+                expect(json.args[0][0].updated).to.equal(true);
+
+                done();
+            })
+        });
+
+        describe("if the user is not known", () => {
+            it('should return access refused', async done => {
+                const req = {
+                    user_id: 'abcxyz26'
+                };
+
+                stubResponse = {
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
+                };
+
+                stubFoundUser = {
+                    _id: RANDOM_ID,
+                    _source: {
+                        firstname: USER_FIRSTNAME,
+                        lastname: USER_LASTNAME,
+                        birthdate: USER_BIRTHDATE,
+                        type: 'user',
+                        email: USER_EMAIL,
+                        password: USER_HASH_PASSWORD,
+                        username: USER_USERNAME
+                    }
+                };
+
+                findByIdStub = sinon.stub(authService, "findById").resolves(stubResponse);
+                findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(undefined);
+                updatePasswordStub = sinon.stub(authService, "updateUserPassword").resolves();
+                sendMailStub = sinon.stub(mailerService, "sendEmail").returns();
+
+                authController = new AuthController();
+                await authController.generateNewPassword(req, res);
+
+                expect(findByIdStub.calledOnce).to.be.true;
+                expect(updatePasswordStub.calledOnce).to.be.false;
+                expect(sendMailStub.calledOnce).to.be.false;
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(403);
+                expect(json.calledOnce).to.be.true;
+                expect(json.args[0][0].updated).to.equal(false);
+                expect(json.args[0][0].reason).to.equal('access refused');
+
+                done();
+            })
+        });
+
+        describe("if the user is unidentified", () => {
+            it('should return access refused', async done => {
+                const req = {
+                    user_id: undefined,
+                };
+
+                stubResponse = {
+                    body: {
+                        hits: {
+                            hits: {
+                                find: () => {
+                                }
+                            }
+                        }
+                    }
+                };
+
+                findByIdStub = sinon.stub(authService, "findById").resolves(stubResponse);
+                findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(undefined);
+                updatePasswordStub = sinon.stub(authService, "updateUserPassword").resolves();
+                sendMailStub = sinon.stub(mailerService, "sendEmail").returns();
+
+                authController = new AuthController();
+                await authController.generateNewPassword(req, res);
+
+                expect(findByIdStub.calledOnce).to.be.false;
+                expect(updatePasswordStub.calledOnce).to.be.false;
+                expect(sendMailStub.calledOnce).to.be.false;
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(403);
+                expect(json.calledOnce).to.be.true;
+                expect(json.args[0][0].updated).to.equal(false);
+                expect(json.args[0][0].reason).to.equal('access refused');
+
+                done();
+            })
+        })
     });
 
     describe("When checking token", () => {
 
+        afterEach(() => {
+            tokenStub.restore()
+        });
+
+        describe("if the user has no token", () => {
+            it('should return unidentified user', async done => {
+                const req = {
+                    headers: {
+                        authorization: undefined
+                    }
+                };
+
+                tokenStub = sinon.stub(jsonwebtoken, "verify").resolves(USER_TOKEN);
+
+                authController = new AuthController();
+                await authController.checkToken(req, res);
+
+                expect(tokenStub.calledOnce).to.be.false;
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(401);
+                expect(json.calledOnce).to.be.true;
+                expect(json.args[0][0].reason).to.equal('unidentified user');
+
+                done();
+            })
+        });
+
+        describe("if the user has a non valid token", () => {
+            it('should return unidentified user', async done => {
+                const req = {
+                    headers: {
+                        authorization: "invalidtoken"
+                    }
+                };
+
+                authController = new AuthController();
+                await authController.checkToken(req, res);
+
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(403);
+                expect(json.calledOnce).to.be.true;
+                expect(json.args[0][0].reason).to.equal('access refused');
+
+                done();
+            })
+        });
+
+        describe("if the user has a valid token", () => {
+            it('should do next()', async done => {
+                const req = {
+                    headers: {
+                        authorization: USER_TOKEN
+                    }
+                };
+
+                tokenStub = sinon.stub(jsonwebtoken, 'verify').returns({user_id: RANDOM_ID});
+
+                authController = new AuthController();
+                await authController.checkToken(req, res);
+
+                expect(status.calledOnce).to.be.false;
+                expect(json.calledOnce).to.be.false;
+
+                done();
+            })
+        });
     });
 });
