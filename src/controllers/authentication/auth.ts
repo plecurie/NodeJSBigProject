@@ -21,6 +21,7 @@ export class AuthController {
         try {
             const userExist = await authService.findByEmail({email: req.body.email})
                 .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
+
             if (userExist) {
                 return res.status(409).json({created: false, reason: "email already exists"});
             } else {
@@ -42,8 +43,7 @@ export class AuthController {
                 })
             }
         } catch (err) {
-            console.log(err);
-            return res.status(500).json({reason: 'server error'});
+            return res.status(500).json({created: false, reason: 'server error'});
         }
 
     }
@@ -58,7 +58,7 @@ export class AuthController {
                     user._source.password
                 );
                 if (isValidPassword) {
-                    const token = jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
+                    const token = await jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
                     res.status(200).json({connect: true, token: token});
                     return true;
                 } else {
@@ -70,7 +70,7 @@ export class AuthController {
                 return false;
             }
         } catch (err) {
-            res.status(500).json({reason: 'server error'});
+            res.status(500).json({connect: false, reason: 'server error'});
             return false;
         }
     }
