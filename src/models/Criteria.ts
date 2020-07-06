@@ -1,4 +1,10 @@
 export interface Criteria {
+    name: string,
+    value: any,
+    familyName: string
+}
+
+export interface CriteriaNames {
     portfolioDate: number;
     sustainabilityRatingDate: number;
     morningstarSustainabilityRating: string;
@@ -206,10 +212,4 @@ export interface Criteria {
     portfolioEmissionsVsBenchmarkScope1: number;
     portfolioEmissionsVsBenchmarkScope2: number;
 
-}
-
-export interface CriteriaView {
-    name: string,
-    value: any,
-    familyName: string
 }

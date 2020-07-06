@@ -1,31 +1,34 @@
-import {OcrService, ProductsService} from '../../services';
-
+import {OcrService} from '../../services';
+import {client, index} from "../../utils/elasticsearch";
 const ocrService = OcrService.getInstance();
-const criteriaService = ProductsService.getInstance();
 
 export class OcrController {
-    async recognize(req, res): Promise<boolean> {
-        // const path = req.files[0].path;
-        // console.log(data);
-        // ocrService.removeImageOcr(path);
+
+    async recognize(req, res) {
         try {
-            const result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
+
+            let result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
             result.forEach((item, i) => result[i] = item.replace(/O/g, "0"));
-            const mapResult: any = result.map(item => ({"match": {"isincode": item}}));
-            //mapResult.push({match: {type: "product"}})
-            const assWithDCat = await criteriaService.mapProductCriteria({isincodes: mapResult, products: null});
-            // const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
-            for (const mIC of assWithDCat) {
-                const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
-                mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
-            }
-            res.status(200).json({recognized: true, data: assWithDCat});
 
-            return true;
-
+            return await client.search({
+                index: index,
+                body: {
+                    size: 50,
+                    query: {
+                        terms: {
+                            isincode: result
+                        }
+                    }
+                }
+            }).then(async data => {
+                if (data.body.hits.hits.length != 0) {
+                    return res.status(200).json({recognized: true, data: data.body.hits.hits});
+                } else {
+                    return res.status(404).json({recognized: false, reason: "not found"});
+                }
+            });
         } catch (err) {
-            res.status(400).json({recognized: false});
-            return false
+            return res.status(400).json({recognized: false, reason: "server error"});
         }
     }
 }

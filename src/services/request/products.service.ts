@@ -1,7 +1,7 @@
 import {excelToJsonService} from "../excelToJson.service";
 import {CriteriaFamily, Family} from "../../models/Family";
 import {client, index, type} from "../../utils/elasticsearch";
-import {CriteriaView} from '../../models/Criteria';
+import {Criteria} from '../../models/Criteria';
 import {EmployExclusion, Thematic} from '../../models/OtherModel'
 
 export class ProductsService {
@@ -47,7 +47,7 @@ export class ProductsService {
     public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[], wordToReplace: string) {
 
         return array.map(t => {
-            const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1');
+            const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == 'Yes');
             if (findCriteria) {
                 const regex = new RegExp(wordToReplace, 'g');
                 return t.name.replace(/  +/g, ' ').replace(regex, '').trim();
@@ -56,18 +56,15 @@ export class ProductsService {
         }).filter(c => c !== undefined);
     }
 
-    public async mapProductCriteria(data) {
+    public async mapProductList(products) {
         const criteriaFamilies = this.loadCriteriaFamily();
         const thematics: Array<Thematic> = this.loadSimpleXlsx("thematics");
         const employsExclusion: Array<EmployExclusion> = this.loadSimpleXlsx("employs_exclusion");
+        const list_products = [];
 
-        if (!data.products) {
-            data.products = await this.findAll(data.isincodes);
-        }
-        data.products = await this.loadCriteria(data.products);
-        for (let i = 0; i < data.products.length; i++) {
-            const criterias = data.products[i]._source.criteria;
-            const criteriaView: CriteriaView = criterias.map(criteria => {
+        for (let i = 0; i < products.length; i++) {
+            const criterias = products[i].criteria;
+            const criteria: Criteria = criterias.map(criteria => {
                 const criteriaFamily = criteriaFamilies.find(family => family.criteriaName.toLowerCase() == criteria.name.toLowerCase());
                 return {
                     name: criteria.name,
@@ -75,41 +72,17 @@ export class ProductsService {
                     familyName: criteriaFamily ? criteriaFamily.familyName : 'Other Category'
                 }
             });
-            data.products[i]._source['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
-            data.products[i]._source['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
-            data.products[i]._source.criteria = criteriaView;
+            products[i]['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
+            products[i]['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
+            products[i].criteria = criteria;
+
+            const morningCriteria = products[i].criteria.find(item => item.name == 'morningstarSustainabilityRating');
+            products[i]['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+
+            list_products.push({index: {_index: index, _type: type}});
+            list_products.push(products[i]);
         }
-
-        return data.products;
-    }
-
-    public loadCriteria(products) {
-        for (let i = 0; i < products.length; i++) {
-            products[i]._source.criteria = Object.keys(products[i]._source.criteria).map(name => {
-                return {name: name, value: products[i]._source.criteria[name], familyName: ""} as CriteriaView;
-            });
-        }
-        return products;
-    }
-
-    public async findAll(isincodes: any) {
-        try {
-            return await client.search({
-                index: index, type: type, 
-                size: 10_000, 
-                body: {
-                    query: {
-                        bool: {
-                            should: isincodes
-                        }
-                    }
-                }
-            }).then(data => data.body.hits.hits);
-
-        } catch (err) {
-            console.error(err.meta.body.error);
-        }
-
+        return list_products;
     }
 
     protected classify(value: any): number {

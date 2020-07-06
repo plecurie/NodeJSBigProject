@@ -118,7 +118,7 @@ export class AuthController {
                         return res.status(403).json({reason: 'access refused'});
                     }
                     req.user_id = user_id.data;
-                    res.next();
+                    next();
                 });
             } catch (err) {
                 return res.status(500).json({reason: 'server error'})

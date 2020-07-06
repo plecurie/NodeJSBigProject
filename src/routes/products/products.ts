@@ -22,6 +22,6 @@ router.get('/:isincode', (req: Request, res: Response) => {
     productsController.findOne(req, res)
 });
 
-router.post('/search', authController.checkToken, (req, res) => {
+router.post('/search', (req, res) => {
     productsController.search(req, res);
 });
