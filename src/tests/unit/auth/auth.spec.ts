@@ -1,24 +1,20 @@
 import {
+    expect,
     RANDOM_ID,
-    USER_TOKEN,
+    sinon,
     USER_BIRTHDATE,
     USER_EMAIL,
     USER_FIRSTNAME,
     USER_HASH_PASSWORD,
     USER_LASTNAME,
     USER_PASSWORD,
+    USER_TOKEN,
     USER_USERNAME
-} from "../../mockConfig";
+} from "../../mocks";
 import {AuthService, MailerService} from "../../../services";
 import {AuthController} from "../../../controllers/authentication/auth";
 import {client} from "../../../utils/elasticsearch";
 import * as jsonwebtoken from 'jsonwebtoken';
-
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const sinon = require("sinon");
 
 describe("Authentication Unit tests", () => {
 
@@ -563,9 +559,9 @@ describe("Authentication Unit tests", () => {
 
                 expect(tokenStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
-                expect(status.args[0][0]).to.equal(401);
+                expect(status.args[0][0]).to.equal(403);
                 expect(json.calledOnce).to.be.true;
-                expect(json.args[0][0].reason).to.equal('unidentified user');
+                expect(json.args[0][0].reason).to.equal('access refused');
 
                 done();
             })
@@ -583,9 +579,9 @@ describe("Authentication Unit tests", () => {
                 await authController.checkToken(req, res);
 
                 expect(status.calledOnce).to.be.true;
-                expect(status.args[0][0]).to.equal(403);
+                expect(status.args[0][0]).to.equal(401);
                 expect(json.calledOnce).to.be.true;
-                expect(json.args[0][0].reason).to.equal('access refused');
+                expect(json.args[0][0].reason).to.equal('unidentified user');
 
                 done();
             })

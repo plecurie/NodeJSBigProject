@@ -1,10 +1,6 @@
 import {PortfolioController} from "../../../controllers/portfolio/portfolio";
+import {sinon, expect} from "../../mocks";
 
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const sinon = require("sinon");
 
 describe("Portfolio Unit tests", () => {
 

@@ -1,10 +1,5 @@
 import {UsersController} from "../../../controllers/users/users";
-
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const sinon = require("sinon");
+import {sinon, expect} from "../../mocks";
 
 describe("Users Unit tests", () => {
 

@@ -9,10 +9,15 @@ export const USER_BIRTHDATE = "1970/01/01";
 export const USER_TOKEN = "randomtoken";
 export const PRODUCT_ISINCODE = "random_isin";
 
-export const baseApi = "http://localhost:3100";
+const baseApi = "http://localhost:3100";
 
 const nock = require('nock');
 const supertest = require('supertest');
-
 export const mockRequest = supertest(baseApi);
 export const mockApi = nock(baseApi);
+
+export const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+export const expect = chai.expect;
+export const sinon = require("sinon");

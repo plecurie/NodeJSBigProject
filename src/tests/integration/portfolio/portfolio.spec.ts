@@ -1,3 +1,4 @@
+import {sinon, expect} from "../../mocks";
 
 describe("Portfolio E2E tests", () => {
 
@@ -6,7 +7,7 @@ describe("Portfolio E2E tests", () => {
         const endpoint = "/users/portfolio/";
 
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
 
     });
