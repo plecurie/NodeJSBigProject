@@ -46,7 +46,7 @@ export class ProductsController {
                     }
                 }
             }).then(async (data) => {
-                return res.status(200).json({data: data.body.hits.hits.length != 0 ? data.body.hits.hits : []});
+                return res.status(200).json({data: data.body.suggest.products.length != 0 ? data.body.suggest.products : []});
             })
         } catch (err) {
             return res.status(500).json({reason: 'server error'});
