@@ -18,7 +18,7 @@ describe("Profile Unit tests", () => {
 
     describe('', function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 

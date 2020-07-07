@@ -18,31 +18,31 @@ describe("Portfolio Unit tests", () => {
 
     describe('When create a portfolio', function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe("When search all user's portfolios", function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When search one portfolio', function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When update one portfolio', function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When delete one portfolio', function () {
         it('Should do nothing', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 

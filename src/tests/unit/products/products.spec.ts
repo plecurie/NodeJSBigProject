@@ -18,25 +18,25 @@ describe("Products Unit tests", () => {
 
     describe('When update products & contracts', function () {
         it('Should update database', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe("When search some products", function () {
         it('Should suggest products', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When search one product', function () {
         it('Should return one product', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When search all products', function () {
         it('Should return a list of products', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
