@@ -2,9 +2,9 @@ import {client, index, type} from "../../utils/elasticsearch";
 
 export class PortfolioController {
 
-    async create(req, res): Promise<boolean> {
+    async create(req, res) {
         try {
-            return await client.index({
+            await client.index({
                 index: index,
                 type: type,
                 body: {
@@ -15,17 +15,15 @@ export class PortfolioController {
                 }
             }).then(() => {
                 res.status(200).json({created: true});
-                return true;
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
-            return false;
         }
     }
 
-    async findAll(req, res): Promise<boolean> {
+    async findAll(req, res) {
         try {
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     query: {
@@ -40,21 +38,19 @@ export class PortfolioController {
             }).then((data) => {
                 if (data.body.hits.hits.length != 0) {
                     res.status(200).json({found: true, portfolios: data.body.hits.hits});
-                    return data.body.hits.hits._source;
+                    data.body.hits.hits._source;
                 } else {
                     res.status(404).json({found: false, reason: "no portfolio found"});
-                    return
                 }
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
-            return;
         }
     }
 
-    async findOne(req, res): Promise<boolean> {
+    async findOne(req, res) {
         try {
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     query: {
@@ -70,19 +66,17 @@ export class PortfolioController {
             }).then((data) => {
                 if (data.body.hits.hits.length != 0) {
                     res.status(200).json({found: true, portfolio: data.body.hits.hits});
-                    return data.body.hits.hits;
+                    data.body.hits.hits;
                 } else {
                     res.status(404).json({found: false, reason: "not found"});
-                    return
                 }
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
-            return
         }
     }
 
-    async update(req, res): Promise<boolean> {
+    async update(req, res) {
         try {
             await client.search({
                 index: index,
@@ -100,7 +94,7 @@ export class PortfolioController {
                 }
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    return await client.update({
+                    await client.update({
                         index: index,
                         type: type,
                         id: data.body.hits.hits[0]._id,
@@ -112,23 +106,20 @@ export class PortfolioController {
                         }
                     }).then(() => {
                         res.status(200).json({updated: true});
-                        return true;
                     })
                 }
                 else {
                     res.status(404).json({found: false, reason: "not found"});
-                    return;
                 }
             });
         } catch (err) {
             res.status(500).json({reason: 'server error'});
-            return false
         }
     }
 
-    async delete(req, res): Promise<boolean> {
+    async delete(req, res) {
         try {
-            return await client.deleteByQuery({
+            await client.deleteByQuery({
                 index: index,
                 type: type,
                 body: {
@@ -145,15 +136,12 @@ export class PortfolioController {
             }).then((response) => {
                 if (response.body.deleted === 0) {
                     res.status(404).json({deleted: false, reason: "not found"});
-                    return false;
                 } else {
                     res.status(200).json({deleted: true});
-                    return true;
                 }
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
-            return false;
         }
     }
 }

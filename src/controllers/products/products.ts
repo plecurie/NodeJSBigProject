@@ -5,7 +5,7 @@ export class ProductsController {
 
     async update_db(req, res) {
         try {
-            return await client.deleteByQuery({
+            await client.deleteByQuery({
                 index: index,
                 body: {
                     query: {
@@ -20,19 +20,19 @@ export class ProductsController {
             }).then(async () => {
                 if (await bulkindexService.getInstance().importContracts(req.body.contracts_filename, req.body.buylist_filename)
                     && await bulkindexService.getInstance().importProducts(req.body.products_filename)) {
-                    return res.status(200).json({updated: true});
+                    res.status(200).json({updated: true});
                 } else {
-                    return res.status(400).json({reason: 'malformed exception'});
+                    res.status(400).json({reason: 'malformed exception'});
                 }
             })
         } catch (err) {
-            return res.status(500).json({reason: 'server error'});
+            res.status(500).json({reason: 'server error'});
         }
     }
 
     async suggest(req, res) {
         try {
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     suggest: {
@@ -46,16 +46,16 @@ export class ProductsController {
                     }
                 }
             }).then(async (data) => {
-                return res.status(200).json({data: data.body.suggest.products.length != 0 ? data.body.suggest.products : []});
+                res.status(200).json({data: data.body.suggest.products.length != 0 ? data.body.suggest.products : []});
             })
         } catch (err) {
-            return res.status(500).json({reason: 'server error'});
+            res.status(500).json({reason: 'server error'});
         }
     }
 
     async findOne(req, res) {
         try {
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     query: {
@@ -107,15 +107,15 @@ export class ProductsController {
                 }).then((data)=> {
                     if (data.body.hits.hits.length != 0) {
                         data.body.hits.hits[0]._source['contracts'] = contracts;
-                        return res.status(200).json({found: true, data: data.body.hits.hits});
+                        res.status(200).json({found: true, data: data.body.hits.hits});
                     } else {
-                        return res.status(404).json({found: false, reason: "not found"});
+                        res.status(404).json({found: false, reason: "not found"});
                     }
                 })
             });
         } catch (err) {
             console.log(err.meta.body.error);
-            return res.status(500).json({reason: 'server error'});
+            res.status(500).json({reason: 'server error'});
         }
     }
 
@@ -123,7 +123,7 @@ export class ProductsController {
         try {
             let pname = "";
             if (req.body.product_name) pname = req.body.product_name;
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     from: 0,
@@ -136,22 +136,22 @@ export class ProductsController {
                 }
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    return res.status(200).json({found: true, data: data.body.hits.hits});
+                    res.status(200).json({found: true, data: data.body.hits.hits});
                 } else {
-                    return res.status(404).json({found: false, reason: "not found"});
+                    res.status(404).json({found: false, reason: "not found"});
                 }
             });
         } catch (err) {
-            return res.status(500).json({reason: 'server error'});
+            res.status(500).json({reason: 'server error'});
         }
     }
 
-    async search(req, res): Promise<boolean> {
+    async search(req, res) {
         try {
             let pname = "";
             if (req.body.product_name) pname = req.body.product_name;
 
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     size: 20,
@@ -168,13 +168,13 @@ export class ProductsController {
                 }
             }).then(async data => {
                 if (data.body.hits.hits.length != 0) {
-                    return res.status(200).json({found: true, data: data.body.hits.hits});
+                    res.status(200).json({found: true, data: data.body.hits.hits});
                 } else {
-                    return res.status(404).json({found: false, reason: "not found"});
+                    res.status(404).json({found: false, reason: "not found"});
                 }
             });
         } catch (err) {
-            return res.status(500).json({reason: 'server error'});
+            res.status(500).json({reason: 'server error'});
         }
     }
 }

@@ -23,10 +23,10 @@ export class AuthController {
                 .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
 
             if (userExist) {
-                return res.status(409).json({created: false, reason: "email already exists"});
+                res.status(409).json({created: false, reason: "email already exists"});
             } else {
                 const mdpCrypted = await generatorService.hashPassword(req.body.password);
-                return await client.index({
+                await client.index({
                     index: 'scala',
                     type: 'database',
                     body: {
@@ -39,11 +39,11 @@ export class AuthController {
                         password: mdpCrypted
                     }
                 }).then(() => {
-                    return res.status(201).json({created: true});
+                    res.status(201).json({created: true});
                 })
             }
         } catch (err) {
-            return res.status(500).json({created: false, reason: 'server error'});
+            res.status(500).json({created: false, reason: 'server error'});
         }
 
     }
@@ -60,18 +60,18 @@ export class AuthController {
                 if (isValidPassword) {
                     const token = await jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
                     res.status(200).json({connect: true, token: token});
-                    return true;
+                    true;
                 } else {
                     res.status(403).json({connect: false, reason: "invalid password"});
-                    return false;
+                    false;
                 }
             } else {
                 res.status(403).json({connect: false, reason: "invalid email"});
-                return false;
+                false;
             }
         } catch (err) {
             res.status(500).json({connect: false, reason: 'server error'});
-            return false;
+            false;
         }
     }
 
@@ -101,11 +101,11 @@ export class AuthController {
             }
         } catch (err) {
             res.status(500).json({updated: false, reason: 'server error'});
-            return;
+
         }
     }
 
-    async checkToken(req, res, next): Promise<void> {
+    async checkToken(req, res, next) {
         const authHeader = req.headers.authorization;
         if (authHeader) {
             let token = authHeader;
@@ -115,17 +115,17 @@ export class AuthController {
             try {
                 jsonwebtoken.verify(token, process.env.JWT_KEY, (err, user_id) => {
                     if (err) {
-                        return res.status(403).json({reason: 'access refused'});
+                        res.status(403).json({reason: 'access refused'});
                     }
                     req.user_id = user_id.data;
                     next();
                 });
             } catch (err) {
-                return res.status(500).json({reason: 'server error'})
+                res.status(500).json({reason: 'server error'})
             }
 
         } else {
-            return res.status(401).json({reason: 'unidentified user'});
+            res.status(401).json({reason: 'unidentified user'});
         }
     }
 
