@@ -42,13 +42,13 @@ describe("Products Unit tests", () => {
 
     describe('When search products with criteria', function () {
         it('Should return a list of products', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 
     describe('When search personalized products', function () {
         it('Should return a list of products', async () => {
-            expect('').not.toHaveLength(5);
+            expect('').not.to.have.length(5);
         });
     });
 

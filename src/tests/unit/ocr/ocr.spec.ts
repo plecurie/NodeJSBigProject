@@ -1,5 +1,6 @@
 import {OcrController} from '../../../controllers/ocr/ocr'
-import {OcrService, ProductsService} from "../../../services";
+import {OcrService} from "../../../services";
+import {client} from "../../../utils/elasticsearch";
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -8,7 +9,7 @@ const expect = chai.expect;
 const sinon = require("sinon");
 
 describe("OCR tests", () => {
-    let status, json, res, ocrController, ocrService, criteriaService, mapCriteriaStub;
+    let status, json, res, ocrController, ocrService, searchStub;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -16,11 +17,10 @@ describe("OCR tests", () => {
         res = {json, status};
         status.returns(res);
         ocrService = OcrService.getInstance();
-        criteriaService = ProductsService.getInstance();
     });
 
     afterEach(() => {
-        mapCriteriaStub.restore();
+        searchStub.restore();
     });
 
     describe("When sending a list of known isincodes", () => {
@@ -36,30 +36,20 @@ describe("OCR tests", () => {
                 }
             };
 
-            const stubResponse = [
-                {
-                    _source: {
-                        criteria: []
-                    }
-                },
-                {
-                    _source: {
-                        criteria: []
-                    }
-                },
-                {
-                    _source: {
-                        criteria: []
+            const stubResponse = {
+                body: {
+                    hits: {
+                        hits: {}
                     }
                 }
-            ];
+            };
 
-            mapCriteriaStub = sinon.stub(criteriaService, "mapProductCriteria").returns(stubResponse);
+            searchStub = sinon.stub(client, 'search').resolves(stubResponse);
 
             ocrController = new OcrController();
             await ocrController.recognize(req, res);
 
-            expect(mapCriteriaStub.calledOnce).to.be.true;
+            expect(searchStub.calledOnce).to.be.true;
             expect(status.calledOnce).to.be.true;
             expect(status.args[0][0]).to.equal(200);
             expect(json.calledOnce).to.be.true;
@@ -78,12 +68,20 @@ describe("OCR tests", () => {
                 }
             };
 
-            mapCriteriaStub = sinon.stub(criteriaService, "mapProductCriteria").returns([{}, {}, {}]);
+            const stubResponse = {
+                body: {
+                    hits: {
+                        hits: {}
+                    }
+                }
+            };
+
+            searchStub = sinon.stub(client, 'search').returns(stubResponse);
 
             ocrController = new OcrController();
             await ocrController.recognize(req, res);
 
-            expect(mapCriteriaStub.calledOnce).to.be.true;
+            expect(searchStub.calledOnce).to.be.true;
             expect(status.calledOnce).to.be.true;
             expect(status.args[0][0]).to.equal(400);
             expect(json.calledOnce).to.be.true;

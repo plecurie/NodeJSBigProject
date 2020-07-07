@@ -10,7 +10,7 @@ export class OcrController {
             let result = req.body.codeArray.length > 0 ? ocrService.filterOcr(req.body.codeArray) : [];
             result.forEach((item, i) => result[i] = item.replace(/O/g, "0"));
 
-            return await client.search({
+            await client.search({
                 index: index,
                 body: {
                     size: 50,
@@ -20,15 +20,15 @@ export class OcrController {
                         }
                     }
                 }
-            }).then(async data => {
+            }).then(data => {
                 if (data.body.hits.hits.length != 0) {
-                    return res.status(200).json({recognized: true, data: data.body.hits.hits});
+                    res.status(200).json({recognized: true, data: data.body.hits.hits});
                 } else {
-                    return res.status(404).json({recognized: false, reason: "not found"});
+                    res.status(404).json({recognized: false, reason: "not found"});
                 }
             });
         } catch (err) {
-            return res.status(400).json({recognized: false, reason: "server error"});
+            res.status(400).json({recognized: false, reason: "server error"});
         }
     }
 }
