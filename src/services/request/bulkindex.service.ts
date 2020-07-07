@@ -2,7 +2,6 @@ import {client, index, type} from "../../utils/elasticsearch";
 import {excelToJsonService} from "../excelToJson.service";
 import {Criteria, CriteriaNames} from "../../models/Criteria";
 import {ProductsService} from "./products.service";
-import Any = jasmine.Any;
 
 const productsService = ProductsService.getInstance();
 

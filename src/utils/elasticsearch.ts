@@ -87,7 +87,7 @@ async function putMapping() {
             }
         },
         criteriaCategorieAverage: {
-            type: "long",
+            type: "float",
             cql_collection: "singleton"
         },
         email: {

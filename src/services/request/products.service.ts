@@ -4,6 +4,8 @@ import {client, index, type} from "../../utils/elasticsearch";
 import {Criteria} from '../../models/Criteria';
 import {EmployExclusion, Thematic} from '../../models/OtherModel'
 
+const rates = ['portfolioSocialScore', 'portfolioGovernanceScore', 'percentOfAUMCoveredESG', 'portfolioEnvironmentalScore'];
+
 export class ProductsService {
     private static instance: ProductsService;
     private pathFile = './src/uploads/excel/';
@@ -75,14 +77,35 @@ export class ProductsService {
             products[i]['thematics'] = this.findMatchesResult(criterias, thematics, "sustainableInvestment");
             products[i]['employsExclusion'] = this.findMatchesResult(criterias, employsExclusion, "employsExclusions");
             products[i].criteria = criteria;
-
-            const morningCriteria = products[i].criteria.find(item => item.name == 'morningstarSustainabilityRating');
-            products[i]['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+            products[i]['criteriaCategorieAverage'] = this.valuesComputed(products[i].criteria);
 
             list_products.push({index: {_index: index, _type: type}});
             list_products.push(products[i]);
         }
         return list_products;
+    }
+
+    public computedRates(values: Array<number>, esg: number) {
+        if (values.length > 0) {
+            const reducedValues = values.map(item => 1/3*(100 - item))
+                .reduce((item, current) => item + current);
+            return (reducedValues ? (reducedValues * esg) / 100 + 1 : 0);
+        }
+        return 0
+    }
+
+    public valuesComputed(criterias: Array<any>) {
+        const values = [];
+        let esg = 0;
+        criterias.forEach(item => {
+            if(rates.includes(item.name) && !item.name.match(rates[2])) {
+                values.push(item ? item.value : 0)
+            } else if (item.name.match(rates[2])) {
+                esg = item ? item.value : 0
+            }
+        });
+        const computedValue = this.computedRates(values, esg);
+        return computedValue != 0 ? parseFloat((computedValue / 10).toFixed(2)) : computedValue;
     }
 
     protected classify(value: any): number {

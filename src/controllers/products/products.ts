@@ -46,11 +46,7 @@ export class ProductsController {
                     }
                 }
             }).then(async (data) => {
-                if (data.body.hits.hits.length != 0) {
-                    return res.status(200).json({found: true, data: data.body.hits.hits});
-                } else {
-                    return res.status(404).json({found: false, reason: "not found"});
-                }
+                return res.status(200).json({data: data.body.hits.hits.length != 0 ? data.body.hits.hits : []});
             })
         } catch (err) {
             return res.status(500).json({reason: 'server error'});
