@@ -16,8 +16,8 @@ export class OcrController {
             const assWithDCat = await criteriaService.mapProductCriteria({isincodes: mapResult, products: null});
             // const matchIsinCode = assWithDCat.filter(item => result.includes(item._source.isincode));
             for (const mIC of assWithDCat) {
-                const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
-                mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+                //const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+                mIC._source['criteriaCategorieAverage'] = criteriaService.valuesComputed(mIC._source.criteria);;
             }
             res.status(200).json({recognized: true, data: assWithDCat});
 

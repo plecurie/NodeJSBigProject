@@ -57,8 +57,8 @@ export class ProductsController {
                     isincodes: null
                 })
                 for (const mIC of formatted) {
-                    const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
-                    mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+                    //const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+                    mIC._source['criteriaCategorieAverage'] = productsService.valuesComputed(mIC._source.criteria);
                 }
                 console.log(formatted.length);
                 res.json({data: formatted})
@@ -125,10 +125,10 @@ export class ProductsController {
                 isincodes: null,
             });
             for (const mIC of formatted) {
-                const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
-                mIC._source['criteriaCategorieAverage'] = morningCriteria ? morningCriteria.value : 0;
+                //const morningCriteria = mIC._source.criteria.find(item => item.name == 'morningstarSustainabilityRating');
+                mIC._source['criteriaCategorieAverage'] = productsService.valuesComputed(mIC._source.criteria);;
+                
             }
-            
             res.status(200).json({found: true, data: formatted});
             return formatted;
 

@@ -4,6 +4,8 @@ import {client, index, type} from "../../utils/elasticsearch";
 import {CriteriaView} from '../../models/Criteria';
 import {EmployExclusion, Thematic} from '../../models/OtherModel'
 
+const rates = ['portfolioSocialScore', 'portfolioGovernanceScore', 'percentOfAUMCoveredESG', 'portfolioEnvironmentalScore'];
+
 export class ProductsService {
     private static instance: ProductsService;
     private pathFile = './src/uploads/excel/';
@@ -47,7 +49,9 @@ export class ProductsService {
     public findMatchesResult(criterias: any[], array: Thematic[] | EmployExclusion[], wordToReplace: string) {
 
         return array.map(t => {
-            const findCriteria = criterias.find(c => c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == '1');
+            const findCriteria = criterias.find(c => {
+                return c.name.toLowerCase() == t.fieldName.toLowerCase() && c.value == 'Yes'
+            });
             if (findCriteria) {
                 const regex = new RegExp(wordToReplace, 'g');
                 return t.name.replace(/  +/g, ' ').replace(regex, '').trim();
@@ -137,6 +141,29 @@ export class ProductsService {
             default:
                 return parseInt(value, 10)
         }
+    }
+
+    public computedRates(values: Array<number>, esg: number) {
+        if (values.length > 0) {
+            const reducedValues = values.map(item => 1/3*(100 - item))
+            .reduce((item, current) => item + current);
+            return (reducedValues ? (reducedValues * esg) / 100 + 1 : 0);
+        }
+        return 0
+    }
+
+    public valuesComputed(criterias: Array<any>) {
+        const values = []
+        let esg = 0;
+        criterias.forEach(item => {
+            if(rates.includes(item.name) && !item.name.match(rates[2])) {
+                values.push(item ? item.value : 0)
+            } else if (item.name.match(rates[2])) {
+                esg = item ? item.value : 0
+            }
+        })
+        const computedValue = this.computedRates(values, esg);
+        return computedValue != 0 ? parseFloat((computedValue / 10).toFixed(2)) : computedValue;
     }
 
 }
