@@ -1,5 +1,6 @@
 import {OcrService} from '../../services';
 import {client, index} from "../../utils/elasticsearch";
+
 const ocrService = OcrService.getInstance();
 
 export class OcrController {

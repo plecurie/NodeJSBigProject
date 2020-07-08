@@ -5,14 +5,14 @@ import {ProductsService} from "./products.service";
 
 const productsService = ProductsService.getInstance();
 
-export class BulkDatabaseService {
-    private static instance: BulkDatabaseService;
+export class BulkProductsService {
+    private static instance: BulkProductsService;
 
-    public static getInstance(): BulkDatabaseService {
-        if (!BulkDatabaseService.instance) {
-            BulkDatabaseService.instance = new BulkDatabaseService();
+    public static getInstance(): BulkProductsService {
+        if (!BulkProductsService.instance) {
+            BulkProductsService.instance = new BulkProductsService();
         }
-        return BulkDatabaseService.instance;
+        return BulkProductsService.instance;
     }
 
     mapToObj = m => {
@@ -23,11 +23,13 @@ export class BulkDatabaseService {
     };
 
     public async importContracts(contractsxlsx = 'InputContracts.xlsx',
-                                 productsxlsx = 'InputBuyList.xlsx'): Promise<boolean> {
+                                 productsxlsx = 'InputBuyList.xlsx') {
 
         const contracts = excelToJsonService.getInstance().processXlsxToJson(contractsxlsx);
         const products = excelToJsonService.getInstance().processXlsxToJson(productsxlsx);
         const contracts_list = [];
+
+
 
         for (let i = 0; i < Object.keys(contracts).length; i++) {
             let buylist = [];
@@ -40,8 +42,8 @@ export class BulkDatabaseService {
             const dict_contracts: Map<String, String> = new Map<String, String>([
                 ["type", "contract"],
                 ["contract_name", contracts[i]['Nom']],
-                ["euro_fees", contracts[i]['Frais Fonds Euro']],
-                ["uc_fees", contracts[i]['Frais UC']],
+                ["euro_fees", (contracts[i]['Frais Fonds Euro']*100).toFixed(2)],
+                ["uc_fees", (contracts[i]['Frais UC']*100).toFixed(2)],
                 ["products", buylist],
             ]);
 
@@ -50,24 +52,20 @@ export class BulkDatabaseService {
         }
 
         try {
-            return await client.bulk({
+            await client.bulk({
                 index: index,
                 type: type,
                 body: contracts_list
             }).then((response) => {
                 if (response.body.items[0].index.status == 201) {
                     console.log('>>>> Bulk index contracts done.');
-                    return true
                 } else {
                     console.log('Error: ', response.body.items[0]);
-                    return false
                 }
             })
         } catch (err) {
             console.log('Error: ', err);
-            return false
         }
-
     }
 
     public async importProducts(products_filename = 'InputProducts.xlsx',
@@ -309,6 +307,7 @@ export class BulkDatabaseService {
                 ["criteria", criteria],
                 ["suggest", suggests]
             ]);
+
 
             if (product.get('isincode') !== previous)
                 list_products.push(this.mapToObj(product));

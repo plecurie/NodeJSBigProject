@@ -1,4 +1,4 @@
-import {sinon, expect} from "../../mocks";
+import {expect} from "../../mocks";
 
 describe("Portfolio E2E tests", () => {
 

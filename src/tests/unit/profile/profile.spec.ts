@@ -1,4 +1,4 @@
-import {sinon, expect} from "../../mocks";
+import {expect, sinon} from "../../mocks";
 
 describe("Profile Unit tests", () => {
 

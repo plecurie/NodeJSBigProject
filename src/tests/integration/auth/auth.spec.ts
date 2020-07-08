@@ -1,5 +1,4 @@
-import Application from '../../../app';
-import {sinon, expect} from "../../mocks";
+import {expect, sinon} from "../../mocks";
 
 describe("/POST auth/", () => {
 

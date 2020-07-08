@@ -17,7 +17,8 @@ export class MailerService {
         }
     });
 
-    constructor() {}
+    constructor() {
+    }
 
     public static getInstance(): MailerService {
         if (!MailerService.instance) {

@@ -1,6 +1,7 @@
 import {client, index, type} from "../../utils/elasticsearch";
-import {BulkDatabaseService} from "../../services";
-const bulkDatabaseService = BulkDatabaseService.getInstance();
+import {BulkProductsService} from "../../services";
+
+const bulkProductsService = BulkProductsService.getInstance();
 
 export class ProductsController {
 
@@ -19,7 +20,7 @@ export class ProductsController {
                     }
                 }
             }).then(async () => {
-                if (await bulkDatabaseService.importProducts(
+                if (await bulkProductsService.importProducts(
                     req.body.products_filename,
                     req.body.contracts_filename,
                     req.body.buylist_filename)) {
@@ -111,8 +112,7 @@ export class ProductsController {
                     } else {
                         res.status(404).json({found: false, reason: "not found"});
                     }
-                }
-                else {
+                } else {
                     res.status(404).json({found: false, reason: "not found"});
                 }
             })

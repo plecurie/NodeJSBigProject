@@ -4,9 +4,10 @@ import {
     sinon,
     USER_BIRTHDATE,
     USER_EMAIL,
-    USER_FIRSTNAME, USER_HASH_PASSWORD,
+    USER_FIRSTNAME,
     USER_LASTNAME,
-    USER_PASSWORD, USER_USERNAME
+    USER_PASSWORD,
+    USER_USERNAME
 } from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
 import {userController} from "../../../controllers";
@@ -55,7 +56,7 @@ describe("Users Unit tests", () => {
 
     describe("When update user", function () {
 
-        afterEach(()=> {
+        afterEach(() => {
             findByEmailStub.restore();
             findStub.restore();
         });

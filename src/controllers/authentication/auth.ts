@@ -9,7 +9,8 @@ const generatorService = GeneratorService.getInstance();
 
 export class AuthController {
 
-    constructor() {}
+    constructor() {
+    }
 
     async signup(req, res) {
 
@@ -83,7 +84,7 @@ export class AuthController {
                 await authService.updateUserPassword({
                     id: req.user_id,
                     password: newPasswordCrypted
-                }).then(async ()=>{
+                }).then(async () => {
                     await mailerService.sendEmail(user._source.email, newPassword);
                     res.status(200).json({updated: true});
                 });
@@ -100,7 +101,7 @@ export class AuthController {
         const authHeader = req.headers.authorization;
         if (authHeader) {
             let token = authHeader;
-            if(authHeader.split(' ')[1]) {
+            if (authHeader.split(' ')[1]) {
                 token = authHeader.split(' ')[1];
             }
             try {

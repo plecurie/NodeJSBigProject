@@ -107,8 +107,7 @@ export class PortfolioController {
                     }).then(() => {
                         res.status(200).json({updated: true});
                     })
-                }
-                else {
+                } else {
                     res.status(404).json({updated: false, reason: "not found"});
                 }
             });

@@ -1,18 +1,18 @@
 import {expect, PRODUCT_ISINCODE, PRODUCT_NAME, sinon} from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
 import {productsController} from "../../../controllers";
-import {BulkDatabaseService} from "../../../services";
+import {BulkProductsService} from "../../../services";
 
 describe("Products Unit tests", () => {
 
-    let status, json, res, deleteStub, bulkStub, searchStub, bulkDatabaseService;
+    let status, json, res, deleteStub, bulkStub, searchStub, bulkProductsService;
 
     beforeEach(() => {
         status = sinon.stub();
         json = sinon.spy();
         res = {json, status};
         status.returns(res);
-        bulkDatabaseService = BulkDatabaseService.getInstance();
+        bulkProductsService = BulkProductsService.getInstance();
     });
 
     afterEach(() => {
@@ -24,9 +24,9 @@ describe("Products Unit tests", () => {
 
             const req = {
                 body: {
-                    products_filename : "InputProducts.xlsx",
-                    contracts_filename : "InputContracts.xlsx",
-                    buylist_filename : "InputBuyList.xlsx"
+                    products_filename: "InputProducts.xlsx",
+                    contracts_filename: "InputContracts.xlsx",
+                    buylist_filename: "InputBuyList.xlsx"
                 }
             };
 
@@ -37,7 +37,7 @@ describe("Products Unit tests", () => {
             };
 
             deleteStub = sinon.stub(client, 'deleteByQuery').resolves(stubResponse);
-            bulkStub = sinon.stub(bulkDatabaseService, 'importProducts').resolves(stubResponse);
+            bulkStub = sinon.stub(bulkProductsService, 'importProducts').resolves(stubResponse);
 
             await productsController.update_db(req, res);
 
@@ -53,7 +53,7 @@ describe("Products Unit tests", () => {
 
     describe("When search for suggestions of products", function () {
 
-        afterEach(()=> {
+        afterEach(() => {
             searchStub.restore();
         });
 
@@ -90,11 +90,11 @@ describe("Products Unit tests", () => {
 
     describe('When search one product', function () {
 
-        afterEach(()=> {
+        afterEach(() => {
             searchStub.restore();
         });
 
-        describe('if the product exists', function() {
+        describe('if the product exists', function () {
             it('Should return one product', async done => {
                 const req = {
                     params: {
@@ -106,7 +106,8 @@ describe("Products Unit tests", () => {
                     body: {
                         hits: {
                             hits: [
-                                {_source: {
+                                {
+                                    _source: {
                                         type: 'contract',
                                         euro_fees: "",
                                         uc_fees: "",
@@ -132,7 +133,7 @@ describe("Products Unit tests", () => {
             });
         });
 
-        describe("if the product doesn't exists", function() {
+        describe("if the product doesn't exists", function () {
             it('Should return not found', async done => {
                 const req = {
                     params: {
@@ -165,7 +166,7 @@ describe("Products Unit tests", () => {
 
     describe('When search all products', function () {
 
-        afterEach(()=> {
+        afterEach(() => {
             searchStub.restore();
         });
 
@@ -232,7 +233,7 @@ describe("Products Unit tests", () => {
 
     describe('When search products with filter', function () {
 
-        afterEach(()=> {
+        afterEach(() => {
             searchStub.restore();
         });
 
@@ -242,7 +243,7 @@ describe("Products Unit tests", () => {
                     body: {
                         product_name: PRODUCT_NAME,
                         matches: {
-                            match: { category: "Energy Sector Equity" }
+                            match: {category: "Energy Sector Equity"}
                         }
                     }
                 };
@@ -274,7 +275,7 @@ describe("Products Unit tests", () => {
                     body: {
                         product_name: PRODUCT_NAME,
                         matches: {
-                            match: { category: "Energy Sector Equity" }
+                            match: {category: "Energy Sector Equity"}
                         }
                     }
                 };

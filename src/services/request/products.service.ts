@@ -1,6 +1,6 @@
 import {excelToJsonService} from "../excelToJson.service";
 import {CriteriaFamily, Family} from "../../models/Family";
-import {client, index, type} from "../../utils/elasticsearch";
+import {index, type} from "../../utils/elasticsearch";
 import {Criteria} from '../../models/Criteria';
 import {EmployExclusion, Thematic} from '../../models/OtherModel'
 
@@ -87,7 +87,7 @@ export class ProductsService {
 
     public computedRates(values: Array<number>, esg: number) {
         if (values.length > 0) {
-            const reducedValues = values.map(item => 1/3*(100 - item))
+            const reducedValues = values.map(item => 1 / 3 * (100 - item))
                 .reduce((item, current) => item + current);
             return (reducedValues ? (reducedValues * esg) / 100 + 1 : 0);
         }
@@ -98,7 +98,7 @@ export class ProductsService {
         const values = [];
         let esg = 0;
         criterias.forEach(item => {
-            if(rates.includes(item.name) && !item.name.match(rates[2])) {
+            if (rates.includes(item.name) && !item.name.match(rates[2])) {
                 values.push(item ? item.value : 0)
             } else if (item.name.match(rates[2])) {
                 esg = item ? item.value : 0

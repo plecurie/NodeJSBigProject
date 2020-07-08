@@ -1,6 +1,6 @@
 import * as express from 'express';
 import {Request, Response} from 'express';
-import {authController, productsController} from '../../controllers'
+import {productsController} from '../../controllers'
 
 export const router = express.Router({
     strict: true

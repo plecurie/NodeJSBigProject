@@ -1,4 +1,4 @@
-import {sinon, expect} from "../../mocks";
+import {expect} from "../../mocks";
 import {GeneratorService} from "../../../services";
 
 const generatorService = GeneratorService.getInstance();
