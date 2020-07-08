@@ -34,7 +34,7 @@ export class UsersController {
         const isUsed = await authService.findByEmail({email: user.email})
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === user.email));
 
-        if (req.user_id.length != 0 && !isUsed) {
+        if (!isUsed) {
             const mdpCrypted = await generatorService.hashPassword(req.body.password);
             try {
                 await client.update({
@@ -59,9 +59,7 @@ export class UsersController {
             } catch (err) {
                 res.status(500).json({reason: 'server error'});
             }
-        } else if (!req.user_id) {
-            res.sendStatus(401).json({reason: 'unidentified user'});
-        } else if (isUsed) {
+        } else {
             res.status(409).json({updated: false, reason: "email already in use"});
         }
     }
@@ -76,6 +74,7 @@ export class UsersController {
                 res.status(200).json({deleted: true});
             })
         } catch (err) {
+            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }

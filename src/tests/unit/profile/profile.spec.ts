@@ -1,18 +1,17 @@
-import {ProfileController} from "../../../controllers/profile/profile";
-
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const expect = chai.expect;
-const sinon = require("sinon");
+import {sinon, expect} from "../../mocks";
 
 describe("Profile Unit tests", () => {
 
-    beforeEach(()=> {
+    let status, json, res;
 
+    beforeEach(() => {
+        status = sinon.stub();
+        json = sinon.spy();
+        res = {json, status};
+        status.returns(res);
     });
 
-    afterEach(()=> {
+    afterEach(() => {
 
     });
 

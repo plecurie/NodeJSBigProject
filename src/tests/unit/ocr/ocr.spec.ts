@@ -1,10 +1,10 @@
-import {OcrController} from '../../../controllers/ocr/ocr'
-import {OcrService} from "../../../services";
 import {client} from "../../../utils/elasticsearch";
-import {sinon, expect} from "../../mocks";
+import {expect, sinon} from "../../mocks";
+import {ocrController} from "../../../controllers";
+import {OcrService} from "../../../services";
 
 describe("OCR tests", () => {
-    let status, json, res, ocrController, ocrService, searchStub;
+    let status, json, res, ocrService, searchStub, filterStub;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -15,11 +15,12 @@ describe("OCR tests", () => {
     });
 
     afterEach(() => {
+        filterStub.restore();
         searchStub.restore();
     });
 
     describe("When sending a list of known isincodes", () => {
-        it('Should match a list of products', async done => {
+        it('Should return a list of products', async done => {
 
             const req = {
                 body: {
@@ -31,6 +32,8 @@ describe("OCR tests", () => {
                 }
             };
 
+            const stubFilter = ['FRO007085691', 'FRO010687053', 'LU1582988058'];
+
             const stubResponse = {
                 body: {
                     hits: {
@@ -39,12 +42,13 @@ describe("OCR tests", () => {
                 }
             };
 
+            filterStub = sinon.stub(ocrService, 'filterOcr').returns(stubFilter);
             searchStub = sinon.stub(client, 'search').resolves(stubResponse);
 
-            ocrController = new OcrController();
             await ocrController.recognize(req, res);
 
             expect(searchStub.calledOnce).to.be.true;
+            expect(filterStub.calledOnce).to.be.true;
             expect(status.calledOnce).to.be.true;
             expect(status.args[0][0]).to.equal(200);
             expect(json.calledOnce).to.be.true;
@@ -54,8 +58,8 @@ describe("OCR tests", () => {
         });
     });
 
-    describe("When sending unrecognized products", () => {
-        it('Should return unrecognized', async done => {
+    describe("When sending an empty isincodes list", () => {
+        it('Should return not found', async done => {
 
             const req = {
                 body: {
@@ -66,19 +70,20 @@ describe("OCR tests", () => {
             const stubResponse = {
                 body: {
                     hits: {
-                        hits: {}
+                        hits: []
                     }
                 }
             };
 
-            searchStub = sinon.stub(client, 'search').returns(stubResponse);
+            filterStub = sinon.stub(ocrService, 'filterOcr').returns(undefined);
+            searchStub = sinon.stub(client, 'search').resolves(stubResponse);
 
-            ocrController = new OcrController();
             await ocrController.recognize(req, res);
 
+            expect(filterStub.calledOnce).to.be.false;
             expect(searchStub.calledOnce).to.be.true;
             expect(status.calledOnce).to.be.true;
-            expect(status.args[0][0]).to.equal(400);
+            expect(status.args[0][0]).to.equal(404);
             expect(json.calledOnce).to.be.true;
             expect(json.args[0][0].recognized).to.equal(false);
             done();

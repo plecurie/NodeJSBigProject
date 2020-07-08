@@ -23,10 +23,10 @@ export class AuthController {
                 .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
 
             if (userExist) {
-                return res.status(409).json({created: false, reason: "email already exists"});
+                res.status(409).json({created: false, reason: "email already exists"});
             } else {
                 const mdpCrypted = await generatorService.hashPassword(req.body.password);
-                return await client.index({
+                await client.index({
                     index: 'scala',
                     type: 'database',
                     body: {
@@ -39,11 +39,11 @@ export class AuthController {
                         password: mdpCrypted
                     }
                 }).then(() => {
-                    return res.status(201).json({created: true});
+                    res.status(201).json({created: true});
                 })
             }
         } catch (err) {
-            return res.status(500).json({created: false, reason: 'server error'});
+            res.status(500).json({created: false, reason: 'server error'});
         }
 
     }
@@ -60,18 +60,14 @@ export class AuthController {
                 if (isValidPassword) {
                     const token = await jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
                     res.status(200).json({connect: true, token: token});
-                    return true;
                 } else {
                     res.status(403).json({connect: false, reason: "invalid password"});
-                    return false;
                 }
             } else {
                 res.status(403).json({connect: false, reason: "invalid email"});
-                return false;
             }
         } catch (err) {
             res.status(500).json({connect: false, reason: 'server error'});
-            return false;
         }
     }
 
@@ -82,26 +78,21 @@ export class AuthController {
                 const user = await authService.findById({_id: req.user_id})
                     .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._id === req.user_id));
 
-                if (user) {
-                    const newPassword = generatorService.randomPassword();
-                    const newPasswordCrypted = await generatorService.hashPassword(newPassword);
-                    await authService.updateUserPassword({
-                        id: req.user_id,
-                        password: newPasswordCrypted
-                    }).then(async ()=>{
-                        await mailerService.sendEmail(user._source.email, newPassword);
-                        res.status(200).json({updated: true});
-                    });
-                }
-                else {
-                    res.status(403).json({updated: false, reason: 'access refused'});
-                }
+                const newPassword = generatorService.randomPassword();
+                const newPasswordCrypted = await generatorService.hashPassword(newPassword);
+                await authService.updateUserPassword({
+                    id: req.user_id,
+                    password: newPasswordCrypted
+                }).then(async ()=>{
+                    await mailerService.sendEmail(user._source.email, newPassword);
+                    res.status(200).json({updated: true});
+                });
+
             } else {
                 res.status(403).json({updated: false, reason: 'access refused'});
             }
         } catch (err) {
             res.status(500).json({updated: false, reason: 'server error'});
-            return;
         }
     }
 
@@ -115,17 +106,18 @@ export class AuthController {
             try {
                 jsonwebtoken.verify(token, process.env.JWT_KEY, (err, user_id) => {
                     if (err) {
-                        return res.status(401).json({reason: 'unidentified user'});
+                        res.status(401).json({reason: 'unidentified user'});
+                        return
                     }
                     req.user_id = user_id.data;
                     next();
                 });
             } catch (err) {
-                return res.status(500).json({reason: 'server error'})
+                res.status(500).json({reason: 'server error'})
             }
 
         } else {
-            return res.status(403).json({reason: 'access refused'});
+            res.status(403).json({reason: 'access refused'});
         }
     }
 

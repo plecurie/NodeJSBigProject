@@ -17,6 +17,7 @@ export class PortfolioController {
                 res.status(200).json({created: true});
             })
         } catch (err) {
+            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
@@ -86,9 +87,8 @@ export class PortfolioController {
                             must: [
                                 {match: {type: "portfolio"}},
                                 {match: {id_user: req.user_id}},
-                                {
-                                    match: {name: req.params.name}
-                                }]
+                                {match: {name: req.params.name}}
+                            ]
                         }
                     }
                 }
@@ -109,7 +109,7 @@ export class PortfolioController {
                     })
                 }
                 else {
-                    res.status(404).json({found: false, reason: "not found"});
+                    res.status(404).json({updated: false, reason: "not found"});
                 }
             });
         } catch (err) {

@@ -5,14 +5,14 @@ import {ProductsService} from "./products.service";
 
 const productsService = ProductsService.getInstance();
 
-export class bulkindexService {
-    private static instance: bulkindexService;
+export class BulkDatabaseService {
+    private static instance: BulkDatabaseService;
 
-    public static getInstance(): bulkindexService {
-        if (!bulkindexService.instance) {
-            bulkindexService.instance = new bulkindexService();
+    public static getInstance(): BulkDatabaseService {
+        if (!BulkDatabaseService.instance) {
+            BulkDatabaseService.instance = new BulkDatabaseService();
         }
-        return bulkindexService.instance;
+        return BulkDatabaseService.instance;
     }
 
     mapToObj = m => {
@@ -70,9 +70,11 @@ export class bulkindexService {
 
     }
 
-    public async importProducts(filename = 'InputProducts.xlsx'): Promise<boolean> {
+    public async importProducts(products_filename = 'InputProducts.xlsx',
+                                contracts_filename = 'InputContracts.xlsx',
+                                buylist_filename = 'InputBuyList.xlsx'): Promise<boolean> {
 
-        const data = excelToJsonService.getInstance().processXlsxToJson(filename);
+        const data = excelToJsonService.getInstance().processXlsxToJson(products_filename);
         const list_products = [];
         let products: any[];
         let previous = {};
@@ -314,12 +316,12 @@ export class bulkindexService {
         }
 
         try {
-
+            await this.importContracts(contracts_filename, buylist_filename);
             products = await productsService.mapProductList(list_products);
 
             return await client.bulk({
-                index: 'scala',
-                type: 'database',
+                index: index,
+                type: type,
                 body: products
             }).then((response) => {
                 if (response.body.items[0].index.status == 201) {

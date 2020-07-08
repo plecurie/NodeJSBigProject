@@ -6,8 +6,15 @@ export const USER_USERNAME = "random";
 export const USER_FIRSTNAME = "random";
 export const USER_LASTNAME = "random";
 export const USER_BIRTHDATE = "1970/01/01";
-export const USER_TOKEN = "randomtoken";
-export const PRODUCT_ISINCODE = "random_isin";
+export const USER_TOKEN = "random";
+export const PRODUCT_ISINCODE = "LU0252633754";
+export const PRODUCT_NAME = "Lyxor DAX (DR) ETF Acc";
+export const PORTFOLIO_NAME = "random";
+export const LIST_PRODUCTS = [
+    {"isincode": "FR0010564245"},
+    {"isincode": "LU0272828905"},
+    {"isincode": "BE0947764743"}
+];
 
 const baseApi = "http://localhost:3100";
 

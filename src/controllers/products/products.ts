@@ -1,5 +1,6 @@
-import {client, index} from "../../utils/elasticsearch";
-import {bulkindexService} from "../../services/request/bulkindex.service";
+import {client, index, type} from "../../utils/elasticsearch";
+import {BulkDatabaseService} from "../../services";
+const bulkDatabaseService = BulkDatabaseService.getInstance();
 
 export class ProductsController {
 
@@ -18,8 +19,10 @@ export class ProductsController {
                     }
                 }
             }).then(async () => {
-                if (await bulkindexService.getInstance().importContracts(req.body.contracts_filename, req.body.buylist_filename)
-                    && await bulkindexService.getInstance().importProducts(req.body.products_filename)) {
+                if (await bulkDatabaseService.importProducts(
+                    req.body.products_filename,
+                    req.body.contracts_filename,
+                    req.body.buylist_filename)) {
                     res.status(200).json({updated: true});
                 } else {
                     res.status(400).json({reason: 'malformed exception'});
@@ -57,22 +60,19 @@ export class ProductsController {
         try {
             await client.search({
                 index: index,
+                type: type,
                 body: {
                     query: {
                         bool: {
-                            must: [
-                                {match: {type: "contract"}},
+                            should: [
+                                {match: {isincode: req.params.isincode}},
                                 {
                                     nested: {
                                         path: "products",
                                         query: {
                                             bool: {
-                                                must: [
-                                                    {
-                                                        match: {
-                                                            "products.isincode": req.params.isincode
-                                                        }
-                                                    }
+                                                should: [
+                                                    {match: {"products.isincode": req.params.isincode}},
                                                 ]
                                             }
                                         }
@@ -82,39 +82,41 @@ export class ProductsController {
                         }
                     }
                 }
-            }).then(async (result) => {
-                const contracts = [];
-                if(result.body.hits.hits.length !== 0) {
-                    for (let i = 0; i < result.body.hits.hits.length; i++) {
-                        const euro_fees = result.body.hits.hits[i]._source.euro_fees;
-                        const uc_fees = result.body.hits.hits[i]._source.uc_fees;
-                        const name = result.body.hits.hits[i]._source.contract_name;
+            }).then((response) => {
 
-                        contracts.push({name: name, euro_fees: euro_fees, uc_fees: uc_fees})
-                    }
-                }
-                await client.search({
-                    index: index,
-                    body: {
-                        query: {
-                            bool: {
-                                must: [
-                                    {match: {isincode: req.params.isincode}}
-                                ]
-                            }
+                if (response.body.hits.hits.length !== 0) {
+
+                    const contracts = [];
+                    let product = [];
+
+                    for (let i = 0; i < response.body.hits.hits.length; i++) {
+                        switch (response.body.hits.hits[i]._source.type) {
+                            case "contract":
+                                contracts.push({
+                                    name: response.body.hits.hits[i]._source.name,
+                                    euro_fees: response.body.hits.hits[i]._source.euro_fees,
+                                    uc_fees: response.body.hits.hits[i]._source.uc_fees
+                                });
+                                break;
+                            case "product":
+                                product.push(response.body.hits.hits[i]);
+                                break;
+                            default:
+                                break
                         }
                     }
-                }).then((data)=> {
-                    if (data.body.hits.hits.length != 0) {
-                        data.body.hits.hits[0]._source['contracts'] = contracts;
-                        res.status(200).json({found: true, data: data.body.hits.hits});
+                    if (product.length !== 0) {
+                        product[0]._source['contracts'] = contracts.length != 0 ? contracts : [];
+                        res.status(200).json({found: true, data: product});
                     } else {
                         res.status(404).json({found: false, reason: "not found"});
                     }
-                })
-            });
+                }
+                else {
+                    res.status(404).json({found: false, reason: "not found"});
+                }
+            })
         } catch (err) {
-            console.log(err.meta.body.error);
             res.status(500).json({reason: 'server error'});
         }
     }
