@@ -50,7 +50,7 @@ export class ProductsController {
                     }
                 }
             }).then(async (data) => {
-                if (data.body.suggest.length != 0) {
+                if (data.body.suggest) {
                     return res.status(200).json({data: data.body.suggest.products[0].options});
                 } else {
                     return res.status(200).json({data: []});

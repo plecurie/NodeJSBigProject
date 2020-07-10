@@ -68,7 +68,12 @@ describe("Products Unit tests", () => {
                 const stubResponse = {
                     body: {
                         suggest: {
-                            products: [{_source: {isincode: PRODUCT_ISINCODE}}]
+                            products: [{
+                                options: [
+                                    {_source: {isincode: PRODUCT_ISINCODE}},
+                                    {_source: {isincode: PRODUCT_ISINCODE}}
+                                ]
+                            }]
                         }
                     }
                 };
@@ -81,7 +86,30 @@ describe("Products Unit tests", () => {
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(200);
                 expect(json.calledOnce).to.be.true;
-                expect(json.args[0][0].found).to.equal(undefined);
+                done();
+            });
+        });
+
+        describe("If suggestion doesn't match with input", function () {
+            it('Should suggest products', async done => {
+                const req = {
+                    params: {
+                        input: "LU"
+                    }
+                };
+
+                const stubResponse = {
+                    body: {}
+                };
+
+                searchStub = sinon.stub(client, 'search').resolves(stubResponse);
+
+                await productsController.suggest(req, res);
+
+                expect(searchStub.calledOnce).to.be.true;
+                expect(status.calledOnce).to.be.true;
+                expect(status.args[0][0]).to.equal(200);
+                expect(json.calledOnce).to.be.true;
                 done();
             });
         })
