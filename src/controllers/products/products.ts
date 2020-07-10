@@ -50,9 +50,14 @@ export class ProductsController {
                     }
                 }
             }).then(async (data) => {
-                res.status(200).json({data: data.body.suggest.products.length != 0 ? data.body.suggest.products[0].options : []});
+                if (data.body.suggest.length != 0) {
+                    return res.status(200).json({data: data.body.suggest.products[0].options});
+                } else {
+                    return res.status(200).json({data: []});
+                }
             })
         } catch (err) {
+            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
