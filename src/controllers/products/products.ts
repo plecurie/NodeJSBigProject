@@ -1,6 +1,7 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {BulkProductsService} from "../../services";
 import {Request, Response} from "express";
+import {Product} from "../../models/Product";
 
 const bulkProductsService = BulkProductsService.getInstance();
 
@@ -101,7 +102,7 @@ export class ProductsController {
                         switch (response.body.hits.hits[i]._source.type) {
                             case "contract":
                                 contracts.push({
-                                    name: response.body.hits.hits[i]._source.name,
+                                    name: response.body.hits.hits[i]._source.contract_name,
                                     euro_fees: response.body.hits.hits[i]._source.euro_fees,
                                     uc_fees: response.body.hits.hits[i]._source.uc_fees
                                 });
@@ -133,60 +134,8 @@ export class ProductsController {
         const isinCodes = req.body.isincodes;
         if(!isinCodes || !isinCodes.length) throw 'No IsinCodes for fetch products';
         try {
-            const {body : { hits : { hits} }} = await client.search({
-                index: index,
-                type: type,
-                body: {
-                    query: {
-                        bool: {
-                            should: [
-                                {match: {isincode: isinCodes[0]}},
-                                {
-                                    nested: {
-                                        path: "products",
-                                        query: {
-                                            bool: {
-                                                should: [
-                                                    {match: {"products.isincode": isinCodes[0]}},
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            });
-            if(hits.length === 0) return res.status(400).json({ found: false, reason: "No products found" });
-
-            const contracts = [];
-            let product = [];
-
-            for (let i = 0; i < hits.length; i++) {
-                console.log(hits);
-                switch (hits[i]._source.type) {
-                    case "contract":
-                        contracts.push({
-                            name: hits[i]._source.name,
-                            euro_fees: hits[i]._source.euro_fees,
-                            uc_fees: hits[i]._source.uc_fees
-                        });
-                        break;
-                    case "product":
-                        product.push(hits[i]);
-                        break;
-                    default:
-                        break
-                }
-            }
-            if (product.length !== 0) {
-                product[0]._source['contracts'] = contracts.length != 0 ? contracts : [];
-                console.log(product);
-                res.status(200).json({found: true, data: product});
-            } else {
-                res.status(404).json({found: false, reason: "not found"});
-            }
+            const products = await Product.findProducts(isinCodes);
+            return res.status(200).json(products);
         } catch (err) {
             return res.status(500).json({reason: 'server error'});
         }
