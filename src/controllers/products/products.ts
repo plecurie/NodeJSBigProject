@@ -132,7 +132,8 @@ export class ProductsController {
 
     async findMany(req: Request, res: Response) {
         const isinCodes = req.body.isincodes;
-        if(!isinCodes || !isinCodes.length) throw 'No IsinCodes for fetch products';
+        if(!isinCodes || !isinCodes.length)
+            return res.status(500).json({reason: 'server error'});
         try {
             const products = await Product.findProducts(isinCodes);
             return res.status(200).json(products);
