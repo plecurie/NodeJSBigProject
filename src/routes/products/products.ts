@@ -22,7 +22,7 @@ router.get('/:isincode', (req: Request, res: Response) => {
     productsController.findOne(req, res)
 });
 
-router.get('/find/many', productsController.findMany);
+router.post('/find/many', productsController.findMany);
 
 
 router.post('/search', (req, res) => {
