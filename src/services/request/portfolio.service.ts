@@ -48,9 +48,7 @@ export class PortfolioService {
             type: type,
             id: id_portfolio,
             body: {
-                doc: {
-                    products: products
-                }
+                doc: { products }
             }
         })
     }

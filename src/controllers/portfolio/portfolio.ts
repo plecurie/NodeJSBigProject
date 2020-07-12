@@ -109,6 +109,7 @@ export class PortfolioController {
                     const {_source: { products }, _id: id} = response.body.hits.hits[0];
                     const userProducts = await portfolioService.handleProducts(products);
                     const productsToSave = userProducts.filter(idProduct => !isinCodes.includes(idProduct));
+                    console.log(productsToSave);
                     await portfolioService.update(id, productsToSave);
                     return res.status(200).json({removed: true})
                 })
