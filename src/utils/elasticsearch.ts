@@ -37,7 +37,7 @@ export async function resetIndex() {
     try {
         client.indices.exists({index}, async (err, response) => {
             if (err)
-                console.log("ERROR", err);
+                throw err;
             if (response.body) {
                 await client.indices.delete({index});
             }
@@ -52,13 +52,7 @@ export async function resetIndex() {
 }
 
 async function putMapping() {
-
     const schema = {
-        birthdate: {
-            type: "date",
-            format: "yyyy-MM-dd",
-            cql_collection: "singleton"
-        },
         category: {
             type: "keyword",
             cql_collection: "singleton"
@@ -94,17 +88,6 @@ async function putMapping() {
             type: "keyword",
             cql_collection: "singleton"
         },
-        /*employsExclusion: {
-            type: "nested",
-            cql_collection: "list",
-            cql_udt_name: "database_exclusions",
-            properties: {
-                exclusion: {
-                    type: "keyword",
-                    cql_collection: "singleton"
-                }
-            }
-        },*/
         euro_fees: {
             type: "float",
             cql_collection: "singleton"
@@ -113,19 +96,11 @@ async function putMapping() {
             type: "keyword",
             cql_collection: "singleton"
         },
-        firstname: {
-            type: "keyword",
-            cql_collection: "singleton"
-        },
         id_user: {
             type: "keyword",
             cql_collection: "singleton"
         },
         isincode: {
-            type: "keyword",
-            cql_collection: "singleton"
-        },
-        lastname: {
             type: "keyword",
             cql_collection: "singleton"
         },
@@ -152,17 +127,6 @@ async function putMapping() {
             type: "keyword",
             cql_collection: "singleton"
         },
-        /*thematics: {
-            type: "nested",
-            cql_collection: "list",
-            cql_udt_name: "database_thematics",
-            properties: {
-                thematic: {
-                    type: "keyword",
-                    cql_collection: "singleton"
-                }
-            }
-        },*/
         type: {
             type: "keyword",
             cql_collection: "singleton"
@@ -173,19 +137,13 @@ async function putMapping() {
         uc_fees: {
             type: "float",
             cql_collection: "singleton"
-        },
-        username: {
-            type: "keyword",
-            cql_collection: "singleton"
         }
     };
-
     try {
         await client.indices.putMapping({index, type, body: {properties: schema}});
     } catch (err) {
-        console.log(err.meta.body.error)
+        throw err
     }
-
 }
 
 module.exports = {

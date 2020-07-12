@@ -1,4 +1,4 @@
-import {AuthService, GeneratorService, MailerService, UserService} from '../../services';
+import {AuthService, GeneratorService, MailerService, UserService, PortfolioService} from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 import {User} from "../../models/User";
 import {client} from "../../utils/elasticsearch";
@@ -7,6 +7,7 @@ const mailerService = MailerService.getInstance();
 let authService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
 const userService = UserService.getInstance();
+const portfolioService = PortfolioService.getInstance();
 
 export class AuthController {
     constructor() {}
@@ -29,37 +30,41 @@ export class AuthController {
                     password: mdpCrypted
                 }
             });
-            return createdUser ? res.status(200).json({created: true}) : res.status(500).json({created: false})
+            if (createdUser) {
+                await portfolioService.create(createdUser.body._id);
+                return res.status(200).json({created: true})
+            }
+            return res.status(500).json({created: false})
         } catch (err) {
-            return res.status(500).json({created: false, reason: 'server error'});
+            res.status(500).json({created: false, reason: 'server error'});
         }
 
     }
 
     async signin(req, res) {
+        const user: User = {
+            email: req.body.email,
+            password: req.body.password
+        };
         try {
-            const user = await authService.findByEmail({email: req.body.email})
-                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
-            if (user) {
+            const foundUser = await authService.findByEmail({email: user.email})
+                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === user.email));
+            if (foundUser) {
                 const isValidPassword = await authService.checkValidPassword(
-                    req.body.password,
-                    user._source.password
+                    user.password,
+                    foundUser._source.password
                 );
                 if (isValidPassword) {
-                    const token = await jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
+                    const token = await jsonwebtoken.sign({data: foundUser._id}, process.env.JWT_KEY, {expiresIn: "7d"});
                     res.status(200).json({connect: true, token: token});
-                    return true;
                 } else {
                     res.status(403).json({connect: false, reason: "invalid password"});
-                    return false;
                 }
             } else {
                 res.status(403).json({connect: false, reason: "invalid email"});
-                return false;
             }
         } catch (err) {
             res.status(500).json({connect: false, reason: 'server error'});
-            return false;
         }
     }
 
@@ -81,31 +86,31 @@ export class AuthController {
             });
         } catch (err) {
             res.status(500).json({updated: false, reason: 'server error'});
-            return;
         }
     }
 
-    async checkToken(req, res, next): Promise<void> {
+    async checkToken(req, res, next) {
         const authHeader = req.headers.authorization;
         if (authHeader) {
             let token = authHeader;
-            if(authHeader.split(' ')[1]) {
+            if (authHeader.split(' ')[1]) {
                 token = authHeader.split(' ')[1];
             }
             try {
                 jsonwebtoken.verify(token, process.env.JWT_KEY, (err, user_id) => {
                     if (err) {
-                        return res.status(403).json({reason: 'access refused'});
+                        res.status(401).json({reason: 'unidentified user'});
+                        return
                     }
                     req.user_id = user_id.data;
                     next();
                 });
             } catch (err) {
-                return res.status(500).json({reason: 'server error'})
+                res.status(500).json({reason: 'server error'})
             }
 
         } else {
-            return res.status(401).json({reason: 'unidentified user'});
+            res.status(403).json({reason: 'access refused'});
         }
     }
 

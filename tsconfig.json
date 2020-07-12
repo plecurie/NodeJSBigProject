@@ -11,6 +11,10 @@
       "es6",
       "scripthost",
       "es2017"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
     ]
   },
   "include": [

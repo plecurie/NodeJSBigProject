@@ -5,7 +5,8 @@ const bcrypt = require('bcrypt');
 export class AuthService {
     private static instance: AuthService;
 
-    constructor() {}
+    constructor() {
+    }
 
     public static getInstance(): AuthService {
         if (!AuthService.instance) {

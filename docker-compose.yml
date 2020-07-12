@@ -17,6 +17,8 @@ services:
     ports:
       - "9042:9042"
       - "9200:9200"
+    volumes:
+      - ./data:/var/lib/cassandra
   node:
     container_name: elassandra_node
     image: "docker.io/strapdata/elassandra:6.8.4.4"
@@ -56,7 +58,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - .:/app
+      - ./app:/app
       - ./error.log:/usr/src/app/error.log
     links:
       - seed

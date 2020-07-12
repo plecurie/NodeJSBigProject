@@ -27,7 +27,6 @@ export class OcrService {
                 console.error(err);
                 return
             }
-            console.log('file removed')
         });
     }
 }
