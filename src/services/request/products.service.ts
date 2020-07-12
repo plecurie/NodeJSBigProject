@@ -135,8 +135,6 @@ export class ProductsService {
             }
         });
 
-        console.log(hits);
-
         if(hits.length === 0) throw  "No products found";
         const [contracts, products] = hits.reduce(([contracts, product], hit) => {
             const { contract_name: name, euro_fees, uc_fees, type, products } = hit._source;

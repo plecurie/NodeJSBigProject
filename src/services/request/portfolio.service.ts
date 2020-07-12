@@ -42,5 +42,18 @@ export class PortfolioService {
             })
     }
 
+    public async update(id_portfolio, products) {
+        return client.update({
+            index: index,
+            type: type,
+            id: id_portfolio,
+            body: {
+                doc: {
+                    products: products
+                }
+            }
+        })
+    }
+
 
 }

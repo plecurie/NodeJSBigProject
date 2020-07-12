@@ -1,4 +1,8 @@
 import {client, index, type} from "../../utils/elasticsearch";
+import { PortfolioService, ProductsService} from "../../services";
+
+const portfolioService = PortfolioService.getInstance();
+const productsService = ProductsService.getInstance();
 
 export class PortfolioController {
 
@@ -66,38 +70,90 @@ export class PortfolioController {
         }
     }
 
-    async removeProduct(req, res) {
+    async addProducts(req, res) {
         const isinCodes = req.body.isincodes;
 
         if (isinCodes.length !== 0) {
-            await client.search({
-                index: index,
-                type: type,
-                body: {
-                    query: {
-                        bool: {
-                            should: [
-                                {match: {isincode: isinCodes[0]}},
-                                {
-                                    nested: {
-                                        path: "products",
-                                        query: {
-                                            bool: {
-                                                should: [
-                                                    {match: {"products.isincode": isinCodes[0]}},
-                                                ]
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+            try {
+                await client.search({
+                    index: index,
+                    body: {
+                        query: {
+                            bool: {
+                                must: [
+                                    {match: {id_user: req.user_id}},
+                                    {match: {type: "portfolio"}}
+                                ]
+                            }
                         }
                     }
-                }
-            }).then((response) => {
-                console.log(response)
-                // delete nested
-            })
+                }).then(async (response) => {
+
+                    let products = [];
+                    if (response.body.hits.hits.length != 0 && response.body.hits.hits[0]._source.products != undefined)
+                        products = response.body.hits.hits[0]._source.products;
+
+                    const id = response.body.hits.hits[0]._id;
+
+                    for (let isincode of isinCodes) {
+                        products.push({isincode: isincode});
+                    }
+
+                    await portfolioService.update(id, products).then(() =>
+                        res.status(200).json({added: true}));
+
+                })
+            }catch (err) {
+                console.log(err.meta.body.error);
+                res.status(500).json({reason: 'server error'});
+            }
+
+        }
+    }
+
+    async removeProducts(req, res) {
+        const isinCodes = req.body.isincodes;
+
+        if (isinCodes.length !== 0) {
+            try {
+                await client.search({
+                    index: index,
+                    body: {
+                        query: {
+                            bool: {
+                                must: [
+                                    {match: {id_user: req.user_id}},
+                                    {match: {type: "portfolio"}}
+                                ]
+                            }
+                        }
+                    }
+                }).then(async (response) => {
+
+                    const products = response.body.hits.hits[0]._source.products;
+                    const id = response.body.hits.hits[0]._id;
+
+                    if (products.length != 0) {
+                        for (let i = 0; i< products.length; i++) {
+                            for (let isincode of isinCodes) {
+                                if (products[i].isincode === isincode){
+                                    products.splice(products[i], 1)
+                                }
+                            }
+                        }
+                        await portfolioService.update(id, products).then(() =>
+                            res.status(200).json({removed: true}));
+
+                    } else {
+                        res.status(404).json({removed: false, reason: "no products to remove"});
+                    }
+                })
+            }
+            catch (err) {
+                console.log(err);
+                res.status(500).json({reason: 'server error'});
+            }
+
         }
     }
 

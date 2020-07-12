@@ -26,3 +26,11 @@ router.get('/portfolio', authController.checkToken, (req: Request, res: Response
 router.post('/portfolio/update', authController.checkToken, (req: Request, res: Response) => {
     portfolioController.update(req, res);
 });
+
+router.post('/portfolio/add', authController.checkToken, (req: Request, res: Response) => {
+    portfolioController.addProducts(req, res);
+});
+
+router.post('/portfolio/remove', authController.checkToken, (req: Request, res: Response) => {
+    portfolioController.removeProducts(req, res);
+});
