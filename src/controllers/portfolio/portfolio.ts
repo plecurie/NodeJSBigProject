@@ -68,19 +68,14 @@ export class PortfolioController {
                         }
                     }
                 }).then(async (response) => {
-
-                    let products = [];
-                    const id = response.body.hits.hits[0]._id;
-                    if (response.body.hits.hits.length != 0 && response.body.hits.hits[0]._source.products != undefined)
-                        products.push(response.body.hits.hits[0]._source.products);
-
-                    for (let isincode of isinCodes) {
-                        products.push({isincode: isincode});
-                    }
-
-                    await portfolioService.update(id, products).then(() =>
-                        res.status(200).json({added: true}));
-
+                    const hits = response.body.hits.hits[0];
+                    const newProducts = isinCodes.map(isincode => ({isincode}));
+                    const products = [
+                        ...hits._source.products || [],
+                        ...newProducts
+                    ];
+                    await portfolioService.update(hits._id, products);
+                    return res.sendStatus(200);
                 })
             } catch (err) {
                 res.status(500).json({reason: 'server error'});
