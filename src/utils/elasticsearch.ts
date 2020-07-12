@@ -147,5 +147,5 @@ async function putMapping() {
 }
 
 module.exports = {
-    client, index, type
+    client, index, type, checkConnection, resetIndex
 };
