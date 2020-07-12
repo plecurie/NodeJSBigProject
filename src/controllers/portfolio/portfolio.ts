@@ -3,8 +3,14 @@ import {PortfolioService} from "../../services";
 
 const portfolioService = PortfolioService.getInstance();
 
-export class PortfolioController {
+const getProducts = (source) => {
+    if (!source.products) return [];
+    if (source.products instanceof Object) return [source.products.isincode];
+    if(source.products.length) return source.products.map(({isincode}) => isincode);
+    return [];
+};
 
+export class PortfolioController {
     async read(req, res) {
         try {
             await client.search({
@@ -20,9 +26,8 @@ export class PortfolioController {
                     }
                 }
             }).then((data) => {
-                const hits = data.body.hits.hits[0];
-                hits._source.products = hits._source.products.map(({isincode}) => isincode);
-                return res.status(200).json({found: true, portfolios: hits._source});
+                const source = data.body.hits.hits[0]._source;
+                return res.status(200).json({products: getProducts(source)});
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
