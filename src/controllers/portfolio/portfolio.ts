@@ -21,7 +21,12 @@ export class PortfolioController {
                 }
             }).then((data) => {
                 if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, portfolios: data.body.hits.hits});
+                    if (data.body.hits.hits[0]._source.products) {
+                        const products = [];
+                        products.push(data.body.hits.hits[0]._source.products);
+                        data.body.hits.hits[0]._source.products = products;
+                    }
+                    res.status(200).json({found: true, portfolios: data.body.hits.hits[0]._source});
                     data.body.hits.hits._source;
                 } else {
                     res.status(404).json({found: false, reason: "no portfolio found"});

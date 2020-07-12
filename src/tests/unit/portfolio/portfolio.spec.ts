@@ -1,11 +1,11 @@
-import {expect, sinon} from "../../mocks";
+import {expect, RANDOM_ID, sinon} from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
 import {portfolioController} from "../../../controllers";
 
 
 describe("Portfolio Unit tests", () => {
 
-    let status, json, res, indexStub, searchStub, updateStub, deleteStub;
+    let status, json, res, searchStub, updateStub;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -22,12 +22,14 @@ describe("Portfolio Unit tests", () => {
 
         describe("If user has at least one portfolio", function () {
             it('Should return a list of portfolios', async done => {
-                const req = {};
+                const req = {
+                    user_id: RANDOM_ID
+                };
 
                 const stubResponse = {
                     body: {
                         hits: {
-                            hits: [{}, {}]
+                            hits: [{_source:{products:[{}]}}]
                         }
                     }
                 };
