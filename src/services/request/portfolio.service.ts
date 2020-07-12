@@ -48,11 +48,32 @@ export class PortfolioService {
             type: type,
             id: id_portfolio,
             body: {
-                doc: {
-                    products: products
-                }
+                doc: { products }
             }
         })
+    }
+
+    public async handleProducts(products) {
+        if (!products) return [];
+        if(Array.isArray(products)) return products.map(({isincode}) => isincode);
+        if (products.isincode) return [products.isincode];
+        return [];
+    };
+
+    public async getProducts(userId) {
+        return client.search({
+            index: index,
+            body: {
+                query: {
+                    bool: {
+                        must: [
+                            {match: {id_user: userId}},
+                            {match: {type: "portfolio"}}
+                        ]
+                    }
+                }
+            }
+        }).then(({body}) => this.handleProducts(body.hits.hits[0]._source.products));
     }
 
 }
