@@ -52,35 +52,32 @@ export class PortfolioController {
 
     async addProducts(req, res) {
         const isinCodes = req.body.isincodes;
-
-        if (isinCodes.length !== 0) {
-            try {
-                await client.search({
-                    index: index,
-                    body: {
-                        query: {
-                            bool: {
-                                must: [
-                                    {match: {id_user: req.user_id}},
-                                    {match: {type: "portfolio"}}
-                                ]
-                            }
+        try {
+            await client.search({
+                index: index,
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                {match: {id_user: req.user_id}},
+                                {match: {type: "portfolio"}}
+                            ]
                         }
                     }
-                }).then(async (response) => {
-                    const hits = response.body.hits.hits[0];
-                    const newProducts = isinCodes.map(isincode => ({isincode}));
-                    const products = [
-                        ...hits._source.products || [],
-                        ...newProducts
-                    ];
-                    await portfolioService.update(hits._id, products);
-                    return res.sendStatus(200);
-                })
-            } catch (err) {
-                res.status(500).json({reason: 'server error'});
-            }
-
+                }
+            }).then(async (response) => {
+                const hits = response.body.hits.hits[0];
+                const products = [
+                    ...await portfolioService.handleProducts(hits._source.products),
+                    ...isinCodes
+                ];
+                const mappedProducts = [...new Set(products)].map(isincode => ({ isincode }));
+                await portfolioService.update(hits._id, mappedProducts);
+                return res.sendStatus(200);
+            })
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({reason: 'server error'});
         }
     }
 
