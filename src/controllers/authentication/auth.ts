@@ -16,8 +16,8 @@ export class AuthController {
     async signup(req, res) {
 
         const user: User = {
-            firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
-            email: req.body.email, password: req.body.password, username: req.body.username
+            email: req.body.email,
+            password: req.body.password
         };
 
         try {
@@ -33,10 +33,6 @@ export class AuthController {
                     type: 'database',
                     body: {
                         type: "user",
-                        firstname: user.firstname,
-                        lastname: user.lastname,
-                        username: user.username,
-                        birthdate: user.birthdate,
                         email: user.email,
                         password: mdpCrypted
                     }
@@ -52,16 +48,20 @@ export class AuthController {
     }
 
     async signin(req, res) {
+        const user: User = {
+            email: req.body.email,
+            password: req.body.password
+        };
         try {
-            const user = await authService.findByEmail({email: req.body.email})
-                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
-            if (user) {
+            const foundUser = await authService.findByEmail({email: user.email})
+                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === user.email));
+            if (foundUser) {
                 const isValidPassword = await authService.checkValidPassword(
-                    req.body.password,
-                    user._source.password
+                    user.password,
+                    foundUser._source.password
                 );
                 if (isValidPassword) {
-                    const token = await jsonwebtoken.sign({data: user._id}, process.env.JWT_KEY, {expiresIn: "7d"});
+                    const token = await jsonwebtoken.sign({data: foundUser._id}, process.env.JWT_KEY, {expiresIn: "7d"});
                     res.status(200).json({connect: true, token: token});
                 } else {
                     res.status(403).json({connect: false, reason: "invalid password"});
@@ -78,7 +78,7 @@ export class AuthController {
         try {
             if (req.user_id) {
 
-                const user = await authService.findById({_id: req.user_id})
+                const foundUser = await authService.findById({_id: req.user_id})
                     .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._id === req.user_id));
 
                 const newPassword = generatorService.randomPassword();
@@ -87,7 +87,7 @@ export class AuthController {
                     id: req.user_id,
                     password: newPasswordCrypted
                 }).then(async () => {
-                    await mailerService.sendEmail(user._source.email, newPassword);
+                    await mailerService.sendEmail(foundUser._source.email, newPassword);
                     res.status(200).json({updated: true});
                 });
 

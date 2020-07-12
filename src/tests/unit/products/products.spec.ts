@@ -1,11 +1,11 @@
 import {expect, PRODUCT_ISINCODE, PRODUCT_NAME, sinon} from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
-import {ocrController, productsController} from "../../../controllers";
-import {BulkProductsService} from "../../../services";
+import {productsController} from "../../../controllers";
+import {BulkProductsService, ProductsService} from "../../../services";
 
 describe("Products Unit tests", () => {
 
-    let status, json, res, deleteStub, bulkStub, searchStub, bulkProductsService;
+    let status, json, res, deleteStub, bulkStub, searchStub, findProductsStub, bulkProductsService, productsService;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -13,6 +13,8 @@ describe("Products Unit tests", () => {
         res = {json, status};
         status.returns(res);
         bulkProductsService = BulkProductsService.getInstance();
+        productsService = ProductsService.getInstance();
+
     });
 
     afterEach(() => {
@@ -211,24 +213,15 @@ describe("Products Unit tests", () => {
 
 
             const stubResponse = {
-                body: {
-                    hits: {
+
                         hits: [
-                            {
-                                _source: {
-                                    type: 'contract',
-                                    euro_fees: "",
-                                    uc_fees: "",
-                                    contract_name: ""
-                                }
-                            },
+                            {_source: {type: 'product'}},
                             {_source: {type: 'product'}}
                         ]
-                    }
-                }
+
             };
 
-            searchStub = sinon.stub(client, 'search').resolves(stubResponse);
+            findProductsStub = sinon.stub(productsService, 'findProducts').returns(stubResponse);
 
             await productsController.findProductsList(req, res);
 
@@ -236,8 +229,7 @@ describe("Products Unit tests", () => {
             expect(status.calledOnce).to.be.true;
             expect(status.args[0][0]).to.equal(200);
             expect(json.calledOnce).to.be.true;
-            expect(json.args[0][0].found).to.equal(true);
-            expect(typeof json.args[0][0].data).to.equal("object");
+            expect(typeof json.args[0][0]).to.equal("object");
             done();
         })
 

@@ -1,7 +1,7 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {User} from "../../models/User";
 import {AuthService, GeneratorService} from "../../services";
-import {PortfolioService} from "../../services/request/portfolio.service";
+import {PortfolioService} from "../../services";
 
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
@@ -26,18 +26,15 @@ export class UsersController {
     async update(req, res) {
 
         const user: User = {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            birthdate: req.body.birthdate,
             email: req.body.newmail,
-            password: req.body.password,
-            username: req.body.username
+            password: req.body.password
         };
+
         const isUsed = await authService.findByEmail({email: user.email})
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === user.email));
 
         if (!isUsed) {
-            const mdpCrypted = await generatorService.hashPassword(req.body.password);
+            const mdpCrypted = await generatorService.hashPassword(user.password);
             try {
                 await client.update({
                     index: index,
@@ -46,10 +43,6 @@ export class UsersController {
                     body: {
                         query: {
                             doc: {
-                                firstname: user.firstname,
-                                lastname: user.lastname,
-                                username: user.username,
-                                birthdate: user.birthdate,
                                 email: user.email,
                                 password: mdpCrypted
                             }

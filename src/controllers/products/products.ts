@@ -1,7 +1,8 @@
 import {client, index, type} from "../../utils/elasticsearch";
-import {BulkProductsService} from "../../services";
+import {BulkProductsService, ProductsService} from "../../services";
 
 const bulkProductsService = BulkProductsService.getInstance();
+const productsService = ProductsService.getInstance();
 
 export class ProductsController {
 
@@ -128,71 +129,16 @@ export class ProductsController {
 
     async findProductsList(req, res) {
 
+        const isinCodes = req.body.isincodes;
+        if(!isinCodes || !isinCodes.length)
+            return res.status(400).json({reason: 'bad request'});
         try {
-            const isinCodes = req.body.isincodes;
-
-            if(isinCodes.length !== 0) {
-                await client.search({
-                    index: index,
-                    type: type,
-                    body: {
-                        query: {
-                            bool: {
-                                should: [
-                                    {match: {isincode: isinCodes[0]}},
-                                    {
-                                        nested: {
-                                            path: "products",
-                                            query: {
-                                                bool: {
-                                                    should: [
-                                                        {match: {"products.isincode": isinCodes[0]}},
-                                                    ]
-                                                }
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }).then((response) => {
-                    if(response.body.hits.hits.length === 0)
-                        return res.status(400).json({ found: false, reason: "No products found" });
-
-                    const contracts = [];
-                    let products = [];
-
-                    for (let i = 0; i < response.body.hits.hits.length; i++) {
-                        switch (response.body.hits.hits[i]._source.type) {
-                            case "contract":
-                                contracts.push({
-                                    name: response.body.hits.hits[i]._source.name,
-                                    euro_fees: response.body.hits.hits[i]._source.euro_fees,
-                                    uc_fees: response.body.hits.hits[i]._source.uc_fees
-                                });
-                                break;
-                            case "product":
-                                products.push(response.body.hits.hits[i]);
-                                break;
-                            default:
-                                break
-                        }
-                    }
-                    if (products.length !== 0) {
-                        products[0]._source['contracts'] = contracts.length != 0 ? contracts : [];
-                        res.status(200).json({found: true, data: products});
-                    } else {
-                        res.status(404).json({found: false, reason: "not found"});
-                    }
-                });
-
-            } else {
-                res.status(400).json({found: false, reason: "bad request"});
-            }
+            const products = await productsService.findProducts(isinCodes);
+            return res.status(200).json(products);
         } catch (err) {
             return res.status(500).json({reason: 'server error'});
         }
+
     }
 
 
