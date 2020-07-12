@@ -109,8 +109,8 @@ export class PortfolioController {
                     const {_source: { products }, _id: id} = response.body.hits.hits[0];
                     const userProducts = await portfolioService.handleProducts(products);
                     const productsToSave = userProducts.filter(idProduct => !isinCodes.includes(idProduct));
-                    console.log(productsToSave);
-                    await portfolioService.update(id, productsToSave);
+                    const mapProducts = productsToSave.map(isincode => ({isincode}));
+                    await portfolioService.update(id, mapProducts);
                     return res.status(200).json({removed: true})
                 })
             } catch (err) {
