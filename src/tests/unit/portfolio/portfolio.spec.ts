@@ -42,7 +42,6 @@ describe("Portfolio Unit tests", () => {
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(200);
                 expect(json.calledOnce).to.be.true;
-                expect(json.args[0][0].found).to.equal(true);
                 done();
             });
         });
