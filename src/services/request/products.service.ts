@@ -109,9 +109,9 @@ export class ProductsService {
     }
 
     public async findProducts(isinCodes: Array<string>) {
-        const codesToMatches = isinCodes.map(isincode => ({ match: { isincode }}));
-        const productsCodesToMatches = isinCodes.map(isincode => ({ match: { "products.isincode": isincode }}));
-        const {body : { hits : { hits} }} = await client.search({
+        const codesToMatches = isinCodes.map(isincode => ({match: {isincode}}));
+        const productsCodesToMatches = isinCodes.map(isincode => ({match: {"products.isincode": isincode}}));
+        const {body: {hits: {hits}}} = await client.search({
             index: index,
             type: type,
             body: {
@@ -135,13 +135,13 @@ export class ProductsService {
             }
         });
 
-        if(hits.length === 0) throw  "No products found";
+        if (hits.length === 0) throw  "No products found";
         const [contracts, products] = hits.reduce(([contracts, product], hit) => {
-            const { contract_name: name, euro_fees, uc_fees, type, products } = hit._source;
-            if(type == 'contract') contracts.push({ name, euro_fees, uc_fees, products });
+            const {contract_name: name, euro_fees, uc_fees, type, products} = hit._source;
+            if (type == 'contract') contracts.push({name, euro_fees, uc_fees, products});
             else if (type == 'product') product.push(hit);
             return [contracts, product];
-        }, [[],[]]);
+        }, [[], []]);
         if (products.length === 0) throw "No products returned";
         products.forEach(product => {
             const isinCode = product._source.isincode;

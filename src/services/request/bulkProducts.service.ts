@@ -30,7 +30,6 @@ export class BulkProductsService {
         const contracts_list = [];
 
 
-
         for (let i = 0; i < Object.keys(contracts).length; i++) {
             let buylist = [];
             for (let j = 0; j < Object.keys(products).length; j++) {
@@ -42,8 +41,8 @@ export class BulkProductsService {
             const dict_contracts: Map<String, String> = new Map<String, String>([
                 ["type", "contract"],
                 ["contract_name", contracts[i]['Nom']],
-                ["euro_fees", (contracts[i]['Frais Fonds Euro']*100).toFixed(2)],
-                ["uc_fees", (contracts[i]['Frais UC']*100).toFixed(2)],
+                ["euro_fees", (contracts[i]['Frais Fonds Euro'] * 100).toFixed(2)],
+                ["uc_fees", (contracts[i]['Frais UC'] * 100).toFixed(2)],
                 ["products", buylist],
             ]);
 
@@ -56,15 +55,11 @@ export class BulkProductsService {
                 index: index,
                 type: type,
                 body: contracts_list
-            }).then((response) => {
-                if (response.body.items[0].index.status == 201) {
-                    console.log('>>>> Bulk index contracts done.');
-                } else {
-                    console.log('Error: ', response.body.items[0]);
-                }
+            }).then(() => {
+                console.log('>>>> Bulk index contracts done.');
             })
         } catch (err) {
-            console.log('Error: ', err);
+            throw err;
         }
     }
 
@@ -322,17 +317,12 @@ export class BulkProductsService {
                 index: index,
                 type: type,
                 body: products
-            }).then((response) => {
-                if (response.body.items[0].index.status == 201) {
-                    console.log('>>>> Bulk index products done.');
-                    return true
-                } else {
-                    console.log(response.body.items[0]);
-                    return false
-                }
+            }).then(() => {
+                console.log('>>>> Bulk index products done.');
+                return true;
             })
         } catch (err) {
-            throw err
+            throw err;
         }
 
     }

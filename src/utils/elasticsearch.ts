@@ -37,7 +37,7 @@ export async function resetIndex() {
     try {
         client.indices.exists({index}, async (err, response) => {
             if (err)
-                console.log("ERROR", err);
+                throw err;
             if (response.body) {
                 await client.indices.delete({index});
             }
@@ -52,7 +52,6 @@ export async function resetIndex() {
 }
 
 async function putMapping() {
-
     const schema = {
         category: {
             type: "keyword",
@@ -140,15 +139,13 @@ async function putMapping() {
             cql_collection: "singleton"
         }
     };
-
     try {
         await client.indices.putMapping({index, type, body: {properties: schema}});
     } catch (err) {
-        console.log(err.meta.body.error)
+        throw err
     }
-
 }
 
 module.exports = {
-    client, index, type, checkConnection, resetIndex
+    client, index, type
 };

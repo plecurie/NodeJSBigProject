@@ -19,7 +19,8 @@ import {authController} from "../../../controllers";
 
 describe("Authentication Unit tests", () => {
 
-    let status, json, res, authService, mailerService, generatorService, portfolioService, updatePasswordStub, findByIdStub, next,
+    let status, json, res, authService, mailerService, generatorService, portfolioService, updatePasswordStub,
+        findByIdStub, next,
         hashPasswdStub, findByEmailStub, findStub, indexStub, tokenStub, sendMailStub, stubResponse, stubFoundUser,
         checkValidStub, randomPasswdStub, portfolioStub;
 

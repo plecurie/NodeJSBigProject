@@ -15,31 +15,31 @@ export class PortfolioService {
 
     public async create(id) {
         return client.index({
-                index: index,
-                type: type,
-                body: {
-                    id_user: id,
-                    type: "portfolio",
-                    products: []
-                }
-            })
+            index: index,
+            type: type,
+            body: {
+                id_user: id,
+                type: "portfolio",
+                products: []
+            }
+        })
     }
 
     public async delete(id) {
         return client.deleteByQuery({
-                index: index,
-                type: type,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                {match: {type: "portfolio"}},
-                                {match: {id_user: id}},
-                            ]
-                        }
+            index: index,
+            type: type,
+            body: {
+                query: {
+                    bool: {
+                        must: [
+                            {match: {type: "portfolio"}},
+                            {match: {id_user: id}},
+                        ]
                     }
                 }
-            })
+            }
+        })
     }
 
     public async update(id_portfolio, products) {
@@ -54,6 +54,5 @@ export class PortfolioService {
             }
         })
     }
-
 
 }

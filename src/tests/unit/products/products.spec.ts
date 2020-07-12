@@ -214,10 +214,10 @@ describe("Products Unit tests", () => {
 
             const stubResponse = {
 
-                        hits: [
-                            {_source: {type: 'product'}},
-                            {_source: {type: 'product'}}
-                        ]
+                hits: [
+                    {_source: {type: 'product'}},
+                    {_source: {type: 'product'}}
+                ]
 
             };
 
@@ -372,7 +372,6 @@ describe("Products Unit tests", () => {
             });
         });
     });
-
 
 
 });

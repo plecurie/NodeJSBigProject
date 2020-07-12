@@ -1,8 +1,7 @@
 import {client, index, type} from "../../utils/elasticsearch";
-import { PortfolioService, ProductsService} from "../../services";
+import {PortfolioService} from "../../services";
 
 const portfolioService = PortfolioService.getInstance();
-const productsService = ProductsService.getInstance();
 
 export class PortfolioController {
 
@@ -90,10 +89,9 @@ export class PortfolioController {
                 }).then(async (response) => {
 
                     let products = [];
-                    if (response.body.hits.hits.length != 0 && response.body.hits.hits[0]._source.products != undefined)
-                        products = response.body.hits.hits[0]._source.products;
-
                     const id = response.body.hits.hits[0]._id;
+                    if (response.body.hits.hits.length != 0 && response.body.hits.hits[0]._source.products != undefined)
+                        products.push(response.body.hits.hits[0]._source.products);
 
                     for (let isincode of isinCodes) {
                         products.push({isincode: isincode});
@@ -103,8 +101,7 @@ export class PortfolioController {
                         res.status(200).json({added: true}));
 
                 })
-            }catch (err) {
-                console.log(err.meta.body.error);
+            } catch (err) {
                 res.status(500).json({reason: 'server error'});
             }
 
@@ -134,9 +131,10 @@ export class PortfolioController {
                     const id = response.body.hits.hits[0]._id;
 
                     if (products.length != 0) {
-                        for (let i = 0; i< products.length; i++) {
+                        for (let i = 0; i < products.length; i++) {
                             for (let isincode of isinCodes) {
-                                if (products[i].isincode === isincode){
+
+                                if (products[i].isincode === isincode) {
                                     products.splice(products[i], 1)
                                 }
                             }
@@ -148,12 +146,9 @@ export class PortfolioController {
                         res.status(404).json({removed: false, reason: "no products to remove"});
                     }
                 })
-            }
-            catch (err) {
-                console.log(err);
+            } catch (err) {
                 res.status(500).json({reason: 'server error'});
             }
-
         }
     }
 

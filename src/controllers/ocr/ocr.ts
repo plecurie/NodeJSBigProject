@@ -29,7 +29,7 @@ export class OcrController {
                 }
             });
         } catch (err) {
-            res.status(400).json({recognized: false, reason: "server error"});
+            res.status(500).json({recognized: false, reason: "server error"});
         }
     }
 }

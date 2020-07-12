@@ -11,7 +11,7 @@ export class excelToJsonService {
     }
 
     public processXlsxToJson(filename): Object {
-        const workbook = XLSX.readFile(filename, {cellDates:true});
+        const workbook = XLSX.readFile(filename, {cellDates: true});
         return XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {raw: false});
     }
 }

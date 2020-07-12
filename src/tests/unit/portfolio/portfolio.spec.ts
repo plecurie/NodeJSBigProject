@@ -1,4 +1,4 @@
-import {expect, LIST_PRODUCTS, PORTFOLIO_NAME, RANDOM_ID, sinon} from "../../mocks";
+import {expect, sinon} from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
 import {portfolioController} from "../../../controllers";
 

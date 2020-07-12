@@ -1,7 +1,6 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {User} from "../../models/User";
-import {AuthService, GeneratorService} from "../../services";
-import {PortfolioService} from "../../services";
+import {AuthService, GeneratorService, PortfolioService} from "../../services";
 
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
@@ -70,7 +69,6 @@ export class UsersController {
                 res.status(200).json({deleted: true});
             })
         } catch (err) {
-            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
