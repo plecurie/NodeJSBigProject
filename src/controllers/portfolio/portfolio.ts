@@ -3,34 +3,13 @@ import {PortfolioService} from "../../services";
 
 const portfolioService = PortfolioService.getInstance();
 
-const getProducts = (source) => {
-    if (!source.products) return [];
-    if (source.products instanceof Object) return [source.products.isincode];
-    if(source.products.length) return source.products.map(({isincode}) => isincode);
-    return [];
-};
-
 export class PortfolioController {
     async read(req, res) {
         try {
-            await client.search({
-                index: index,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                {match: {id_user: req.user_id}},
-                                {match: {type: "portfolio"}}
-                            ]
-                        }
-                    }
-                }
-            }).then((data) => {
-                const source = data.body.hits.hits[0]._source;
-                return res.status(200).json({products: getProducts(source)});
-            })
+            const products = await portfolioService.getProducts(req.user_id);
+            return res.status(200).json(products);
         } catch (err) {
-            res.status(500).json({reason: 'server error'});
+            return res.status(500).json({reason: 'server error'});
         }
     }
 
@@ -112,7 +91,6 @@ export class PortfolioController {
 
     async removeProducts(req, res) {
         const isinCodes = req.body.isincodes;
-
         if (isinCodes.length !== 0) {
             try {
                 await client.search({
@@ -128,25 +106,11 @@ export class PortfolioController {
                         }
                     }
                 }).then(async (response) => {
-
-                    const products = response.body.hits.hits[0]._source.products;
-                    const id = response.body.hits.hits[0]._id;
-
-                    if (products.length != 0) {
-                        for (let i = 0; i < products.length; i++) {
-                            for (let isincode of isinCodes) {
-
-                                if (products[i].isincode === isincode) {
-                                    products.splice(products[i], 1)
-                                }
-                            }
-                        }
-                        await portfolioService.update(id, products).then(() =>
-                            res.status(200).json({removed: true}));
-
-                    } else {
-                        res.status(404).json({removed: false, reason: "no products to remove"});
-                    }
+                    const {_source: { products }, _id: id} = response.body.hits.hits[0];
+                    const userProducts = await portfolioService.handleProducts(products);
+                    const productsToSave = userProducts.filter(idProduct => !isinCodes.includes(idProduct));
+                    await portfolioService.update(id, productsToSave);
+                    return res.status(200).json({removed: true})
                 })
             } catch (err) {
                 res.status(500).json({reason: 'server error'});
