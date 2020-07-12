@@ -26,12 +26,8 @@ export class UsersController {
     async update(req, res): Promise<boolean> {
 
         const user: User = {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            birthdate: req.body.birthdate,
             email: req.body.newmail,
             password: req.body.password,
-            username: req.body.username
         };
         const isUsed = await authService.findByEmail({email: user.email})
             .then(response => response.body.hits.hits.find(user => user._source !== undefined && user._source.email === user.email));
@@ -46,10 +42,6 @@ export class UsersController {
                     body: {
                         query: {
                             doc: {
-                                firstname: user.firstname,
-                                lastname: user.lastname,
-                                username: user.username,
-                                birthdate: user.birthdate,
                                 email: user.email,
                                 password: mdpCrypted
                             }

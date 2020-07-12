@@ -11,7 +11,7 @@ router.post('/signup', (req: Request, res: Response) => {
     authController.signup(req, res);
 });
 
-router.post('/forgot-password', authController.checkToken, (req: Request, res: Response) => {
+router.put('/forgot-password', (req: Request, res: Response) => {
     authController.generateNewPassword(req, res);
 });
 

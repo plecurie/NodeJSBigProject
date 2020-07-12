@@ -1,4 +1,4 @@
-import {AuthService, GeneratorService, MailerService} from '../../services';
+import {AuthService, GeneratorService, MailerService, UserService} from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 import {User} from "../../models/User";
 import {client} from "../../utils/elasticsearch";
@@ -6,42 +6,30 @@ import {client} from "../../utils/elasticsearch";
 const mailerService = MailerService.getInstance();
 let authService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
+const userService = UserService.getInstance();
 
 export class AuthController {
-
     constructor() {}
 
     async signup(req, res) {
-
-        const user: User = {
-            firstname: req.body.firstname, lastname: req.body.lastname, birthdate: req.body.birthdate,
-            email: req.body.email, password: req.body.password, username: req.body.username
-        };
-
+        const user: User = userService.userValidatorSignUp(req.body);
+        if(!user) return res.status(404).json({created: false, reason: "email or password incorrect"});
         try {
-            const userExist = await authService.findByEmail({email: req.body.email})
-                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
+            const userExist = await authService.findByEmail({email: user.email})
+                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === user.email));
 
-            if (userExist) {
-                return res.status(409).json({created: false, reason: "email already exists"});
-            } else {
-                const mdpCrypted = await generatorService.hashPassword(req.body.password);
-                return await client.index({
-                    index: 'scala',
-                    type: 'database',
-                    body: {
-                        type: "user",
-                        firstname: user.firstname,
-                        lastname: user.lastname,
-                        username: user.username,
-                        birthdate: user.birthdate,
-                        email: user.email,
-                        password: mdpCrypted
-                    }
-                }).then(() => {
-                    return res.status(201).json({created: true});
-                })
-            }
+            if (userExist) return res.status(403).json({created: false, reason: "email already exists"});  
+            const mdpCrypted = await generatorService.hashPassword(user.password);
+            const createdUser =  await client.index({
+                index: 'scala',
+                type: 'database',
+                body: {
+                    type: "user",
+                    email: user.email,
+                    password: mdpCrypted
+                }
+            });
+            return createdUser ? res.status(200).json({created: true}) : res.status(500).json({created: false})
         } catch (err) {
             return res.status(500).json({created: false, reason: 'server error'});
         }
@@ -77,28 +65,20 @@ export class AuthController {
 
     async generateNewPassword(req, res) {
         try {
-            if (req.user_id) {
-
-                const user = await authService.findById({_id: req.user_id})
-                    .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._id === req.user_id));
-
-                if (user) {
-                    const newPassword = generatorService.randomPassword();
-                    const newPasswordCrypted = await generatorService.hashPassword(newPassword);
-                    await authService.updateUserPassword({
-                        id: req.user_id,
-                        password: newPasswordCrypted
-                    }).then(async ()=>{
-                        await mailerService.sendEmail(user._source.email, newPassword);
-                        res.status(200).json({updated: true});
-                    });
-                }
-                else {
-                    res.status(403).json({updated: false, reason: 'access refused'});
-                }
-            } else {
-                res.status(403).json({updated: false, reason: 'access refused'});
-            }
+            const user: User = userService.userValidatorForgotPassword(req.body);
+            if(!user) return res.status(404).json({updated: false, reason: "emai malformed"});
+            const findUser = await authService.findByEmail({email: req.body.email})
+                .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === req.body.email));
+            if(!findUser) return res.status(403).json({updated: false, reason: 'user not found'});
+            const newPassword = generatorService.randomPassword();
+            const newPasswordCrypted = await generatorService.hashPassword(newPassword);
+            await authService.updateUserPassword({
+                id: findUser._id,
+                password: newPasswordCrypted
+            }).then(async ()=>{
+                const test = await mailerService.sendEmail(findUser._source.email, newPassword);
+                res.status(200).json({updated: true});
+            });
         } catch (err) {
             res.status(500).json({updated: false, reason: 'server error'});
             return;
