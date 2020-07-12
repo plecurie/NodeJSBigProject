@@ -20,17 +20,9 @@ export class PortfolioController {
                     }
                 }
             }).then((data) => {
-                if (data.body.hits.hits.length != 0) {
-                    if (data.body.hits.hits[0]._source.products) {
-                        const products = [];
-                        products.push(data.body.hits.hits[0]._source.products);
-                        data.body.hits.hits[0]._source.products = products;
-                    }
-                    res.status(200).json({found: true, portfolios: data.body.hits.hits[0]._source});
-                    data.body.hits.hits._source;
-                } else {
-                    res.status(404).json({found: false, reason: "no portfolio found"});
-                }
+                const hits = data.body.hits.hits[0];
+                hits._source.products = hits._source.products.map(({isincode}) => isincode);
+                return res.status(200).json({found: true, portfolios: hits._source});
             })
         } catch (err) {
             res.status(500).json({reason: 'server error'});
