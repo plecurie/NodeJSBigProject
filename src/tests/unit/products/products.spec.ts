@@ -1,6 +1,6 @@
 import {expect, PRODUCT_ISINCODE, PRODUCT_NAME, sinon} from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
-import {productsController} from "../../../controllers";
+import {ocrController, productsController} from "../../../controllers";
 import {BulkProductsService} from "../../../services";
 
 describe("Products Unit tests", () => {
@@ -172,7 +172,7 @@ describe("Products Unit tests", () => {
                 const stubResponse = {
                     body: {
                         hits: {
-                            hits: []
+                            hits: {}
                         }
                     }
                 };
@@ -189,6 +189,57 @@ describe("Products Unit tests", () => {
                 done();
             });
         });
+
+    });
+
+    describe('When search a list of products', function () {
+
+        afterEach(() => {
+            searchStub.restore();
+        });
+
+        it('Should return a list of products', async done => {
+            const req = {
+                body: {
+                    isincodes: [
+                        "FRO007085691",
+                        "FRO010687053",
+                        "LU1582988058"
+                    ]
+                }
+            };
+
+
+            const stubResponse = {
+                body: {
+                    hits: {
+                        hits: [
+                            {
+                                _source: {
+                                    type: 'contract',
+                                    euro_fees: "",
+                                    uc_fees: "",
+                                    contract_name: ""
+                                }
+                            },
+                            {_source: {type: 'product'}}
+                        ]
+                    }
+                }
+            };
+
+            searchStub = sinon.stub(client, 'search').resolves(stubResponse);
+
+            await productsController.findProductsList(req, res);
+
+            expect(searchStub.calledOnce).to.be.true;
+            expect(status.calledOnce).to.be.true;
+            expect(status.args[0][0]).to.equal(200);
+            expect(json.calledOnce).to.be.true;
+            expect(json.args[0][0].found).to.equal(true);
+            expect(typeof json.args[0][0].data).to.equal("object");
+            done();
+        })
 
     });
 
@@ -330,10 +381,6 @@ describe("Products Unit tests", () => {
         });
     });
 
-    describe('When search personalized products', function () {
-        it('Should return a list of products', async () => {
-            expect('').not.to.have.length(5);
-        });
-    });
+
 
 });

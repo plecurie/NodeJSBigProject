@@ -11,7 +11,7 @@ import {
     USER_TOKEN,
     USER_USERNAME
 } from "../../mocks";
-import {AuthService, GeneratorService, MailerService} from "../../../services";
+import {AuthService, GeneratorService, MailerService, PortfolioService} from "../../../services";
 import {client} from "../../../utils/elasticsearch";
 import * as jsonwebtoken from 'jsonwebtoken';
 import {authController} from "../../../controllers";
@@ -19,9 +19,9 @@ import {authController} from "../../../controllers";
 
 describe("Authentication Unit tests", () => {
 
-    let status, json, res, authService, mailerService, generatorService, updatePasswordStub, findByIdStub, next,
+    let status, json, res, authService, mailerService, generatorService, portfolioService, updatePasswordStub, findByIdStub, next,
         hashPasswdStub, findByEmailStub, findStub, indexStub, tokenStub, sendMailStub, stubResponse, stubFoundUser,
-        checkValidStub, randomPasswdStub;
+        checkValidStub, randomPasswdStub, portfolioStub;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -31,6 +31,7 @@ describe("Authentication Unit tests", () => {
         status.returns(res);
         authService = AuthService.getInstance();
         generatorService = GeneratorService.getInstance();
+        portfolioService = PortfolioService.getInstance();
     });
 
     afterEach(() => {
@@ -43,6 +44,7 @@ describe("Authentication Unit tests", () => {
         afterEach(() => {
             indexStub.restore();
             hashPasswdStub.restore();
+            portfolioStub.restore();
         });
 
         describe("if the email is already used", () => {
@@ -88,6 +90,7 @@ describe("Authentication Unit tests", () => {
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(stubFoundUser);
                 hashPasswdStub = sinon.stub(generatorService, "hashPassword").returns(undefined);
                 indexStub = sinon.stub(client, 'index').resolves();
+                portfolioStub = sinon.stub(portfolioService, "create").returns();
 
                 await authController.signup(req, res);
 
@@ -95,6 +98,7 @@ describe("Authentication Unit tests", () => {
                 expect(findStub.calledOnce).to.be.true;
                 expect(hashPasswdStub.calledOnce).to.be.false;
                 expect(indexStub.calledOnce).to.be.false;
+                expect(portfolioStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(409);
                 expect(json.calledOnce).to.be.true;
@@ -132,10 +136,17 @@ describe("Authentication Unit tests", () => {
                     }
                 };
 
+                const stubCreated = {
+                    body: {
+                        _id: RANDOM_ID
+                    }
+                };
+
                 findByEmailStub = sinon.stub(authService, "findByEmail").resolves(stubResponse);
                 findStub = sinon.stub(stubResponse.body.hits.hits, "find").returns(undefined);
                 hashPasswdStub = sinon.stub(generatorService, "hashPassword").returns("newhashpasswd");
-                indexStub = sinon.stub(client, 'index').resolves();
+                indexStub = sinon.stub(client, 'index').resolves(stubCreated);
+                portfolioStub = sinon.stub(portfolioService, "create").returns();
 
                 await authController.signup(req, res);
 
@@ -143,6 +154,7 @@ describe("Authentication Unit tests", () => {
                 expect(findStub.calledOnce).to.be.true;
                 expect(hashPasswdStub.calledOnce).to.be.true;
                 expect(indexStub.calledOnce).to.be.true;
+                expect(portfolioStub.calledOnce).to.be.true;
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(201);
                 expect(json.calledOnce).to.be.true;
@@ -178,6 +190,7 @@ describe("Authentication Unit tests", () => {
                 findStub = sinon.stub(stubResponse.body, "find").returns(undefined);
                 hashPasswdStub = sinon.stub(generatorService, "hashPassword").returns(undefined);
                 indexStub = sinon.stub(client, 'index').resolves();
+                portfolioStub = sinon.stub(portfolioService, "create").returns();
 
                 await authController.signup(req, res);
 
@@ -185,6 +198,7 @@ describe("Authentication Unit tests", () => {
                 expect(findStub.calledOnce).to.be.false;
                 expect(hashPasswdStub.calledOnce).to.be.false;
                 expect(indexStub.calledOnce).to.be.false;
+                expect(portfolioStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
                 expect(status.args[0][0]).to.equal(500);
                 expect(json.calledOnce).to.be.true;

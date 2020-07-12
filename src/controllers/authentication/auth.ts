@@ -1,4 +1,4 @@
-import {AuthService, GeneratorService, MailerService} from '../../services';
+import {AuthService, GeneratorService, MailerService, PortfolioService} from '../../services';
 import * as jsonwebtoken from 'jsonwebtoken';
 import {User} from "../../models/User";
 import {client} from "../../utils/elasticsearch";
@@ -6,6 +6,7 @@ import {client} from "../../utils/elasticsearch";
 const mailerService = MailerService.getInstance();
 let authService = AuthService.getInstance();
 const generatorService = GeneratorService.getInstance();
+const portfolioService = PortfolioService.getInstance();
 
 export class AuthController {
 
@@ -39,7 +40,8 @@ export class AuthController {
                         email: user.email,
                         password: mdpCrypted
                     }
-                }).then(() => {
+                }).then((response) => {
+                    portfolioService.create(response.body._id);
                     res.status(201).json({created: true});
                 })
             }

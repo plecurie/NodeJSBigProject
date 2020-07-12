@@ -22,6 +22,10 @@ router.get('/:isincode', (req: Request, res: Response) => {
     productsController.findOne(req, res)
 });
 
+router.post('/list', (req: Request, res: Response) => {
+    productsController.findProductsList(req, res)
+});
+
 router.post('/search', (req, res) => {
     productsController.search(req, res);
 });

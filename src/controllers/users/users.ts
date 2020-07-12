@@ -1,9 +1,11 @@
 import {client, index, type} from "../../utils/elasticsearch";
 import {User} from "../../models/User";
 import {AuthService, GeneratorService} from "../../services";
+import {PortfolioService} from "../../services/request/portfolio.service";
 
 const generatorService = GeneratorService.getInstance();
 const authService = AuthService.getInstance();
+const portfolioService = PortfolioService.getInstance();
 
 export class UsersController {
 
@@ -71,6 +73,7 @@ export class UsersController {
                 type: type,
                 id: req.user_id
             }).then(() => {
+                portfolioService.delete(req.user_id);
                 res.status(200).json({deleted: true});
             })
         } catch (err) {

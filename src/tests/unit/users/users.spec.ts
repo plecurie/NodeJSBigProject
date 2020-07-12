@@ -11,12 +11,12 @@ import {
 } from "../../mocks";
 import {client} from "../../../utils/elasticsearch";
 import {userController} from "../../../controllers";
-import {AuthService, GeneratorService} from "../../../services";
+import {AuthService, GeneratorService, PortfolioService} from "../../../services";
 
 describe("Users Unit tests", () => {
 
-    let status, json, res, authService, generatorService, getStub,
-        findByEmailStub, findStub, hashPasswdStub, updateStub, deleteStub;
+    let status, json, res, authService, generatorService, getStub, portfolioService,
+        findByEmailStub, findStub, hashPasswdStub, updateStub, deleteStub, portfolioStub;
 
     beforeEach(() => {
         status = sinon.stub();
@@ -25,6 +25,7 @@ describe("Users Unit tests", () => {
         status.returns(res);
         authService = AuthService.getInstance();
         generatorService = GeneratorService.getInstance();
+        portfolioService = PortfolioService.getInstance();
     });
 
     describe('When search user with ID', function () {
@@ -113,6 +114,7 @@ describe("Users Unit tests", () => {
             };
 
             deleteStub = sinon.stub(client, 'delete').resolves();
+            portfolioStub = sinon.stub(portfolioService, "delete").returns();
 
             await userController.delete(req, res);
 

@@ -35,22 +35,10 @@ router.delete('/profile', authController.checkToken, (req: Request, res: Respons
     profileController.delete(req, res);
 });
 
-router.post('/portfolio', authController.checkToken, (req: Request, res: Response) => {
-    portfolioController.create(req, res)
-});
-
 router.get('/portfolio', authController.checkToken, (req: Request, res: Response) => {
-    portfolioController.findAll(req, res)
+    portfolioController.read(req, res)
 });
 
-router.get('/portfolio/:name', authController.checkToken, (req: Request, res: Response) => {
-    portfolioController.findOne(req, res)
-});
-
-router.post('/portfolio/:name/update', authController.checkToken, (req: Request, res: Response) => {
+router.post('/portfolio/update', authController.checkToken, (req: Request, res: Response) => {
     portfolioController.update(req, res);
-});
-
-router.delete('/portfolio/:name', authController.checkToken, (req: Request, res: Response) => {
-    portfolioController.delete(req, res);
 });

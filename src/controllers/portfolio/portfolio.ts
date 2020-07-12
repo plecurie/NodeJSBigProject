@@ -2,27 +2,7 @@ import {client, index, type} from "../../utils/elasticsearch";
 
 export class PortfolioController {
 
-    async create(req, res) {
-        try {
-            await client.index({
-                index: index,
-                type: type,
-                body: {
-                    id_user: req.user_id,
-                    type: "portfolio",
-                    name: req.body.name,
-                    products: req.body.products
-                }
-            }).then(() => {
-                res.status(200).json({created: true});
-            })
-        } catch (err) {
-            console.log(err);
-            res.status(500).json({reason: 'server error'});
-        }
-    }
-
-    async findAll(req, res) {
+    async read(req, res) {
         try {
             await client.search({
                 index: index,
@@ -49,34 +29,6 @@ export class PortfolioController {
         }
     }
 
-    async findOne(req, res) {
-        try {
-            await client.search({
-                index: index,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                {match: {id_user: req.user_id}},
-                                {match: {name: req.params.name}},
-                                {match: {type: "portfolio"}}
-                            ]
-                        }
-                    }
-                }
-            }).then((data) => {
-                if (data.body.hits.hits.length != 0) {
-                    res.status(200).json({found: true, portfolio: data.body.hits.hits});
-                    data.body.hits.hits;
-                } else {
-                    res.status(404).json({found: false, reason: "not found"});
-                }
-            })
-        } catch (err) {
-            res.status(500).json({reason: 'server error'});
-        }
-    }
-
     async update(req, res) {
         try {
             await client.search({
@@ -87,7 +39,6 @@ export class PortfolioController {
                             must: [
                                 {match: {type: "portfolio"}},
                                 {match: {id_user: req.user_id}},
-                                {match: {name: req.params.name}}
                             ]
                         }
                     }
@@ -100,7 +51,6 @@ export class PortfolioController {
                         id: data.body.hits.hits[0]._id,
                         body: {
                             doc: {
-                                name: req.body.newname,
                                 products: req.body.products
                             }
                         }
@@ -116,31 +66,39 @@ export class PortfolioController {
         }
     }
 
-    async delete(req, res) {
-        try {
-            await client.deleteByQuery({
+    async removeProduct(req, res) {
+        const isinCodes = req.body.isincodes;
+
+        if (isinCodes.length !== 0) {
+            await client.search({
                 index: index,
                 type: type,
                 body: {
                     query: {
                         bool: {
-                            must: [
-                                {match: {type: "portfolio"}},
-                                {match: {id_user: req.user_id}},
-                                {match: {name: req.params.name}}
+                            should: [
+                                {match: {isincode: isinCodes[0]}},
+                                {
+                                    nested: {
+                                        path: "products",
+                                        query: {
+                                            bool: {
+                                                should: [
+                                                    {match: {"products.isincode": isinCodes[0]}},
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
                             ]
                         }
                     }
                 }
             }).then((response) => {
-                if (response.body.deleted === 0) {
-                    res.status(404).json({deleted: false, reason: "not found"});
-                } else {
-                    res.status(200).json({deleted: true});
-                }
+                console.log(response)
+                // delete nested
             })
-        } catch (err) {
-            res.status(500).json({reason: 'server error'});
         }
     }
+
 }
