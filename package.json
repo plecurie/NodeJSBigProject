@@ -15,7 +15,7 @@
     "debug": "node --inspect dist/",
     "test": "jest",
     "build": "npm run clean && tsc",
-    "start": "ls -lla && ts-node dist/index.js"
+    "start": "ts-node dist/index.js"
   },
   "keywords": [],
   "author": "Scala Patrimoine",

@@ -26,7 +26,7 @@ export class UsersController {
 
         const user: User = {
             email: req.body.newmail,
-            password: req.body.password
+            password: req.body.password,
         };
 
         const isUsed = await authService.findByEmail({email: user.email})
