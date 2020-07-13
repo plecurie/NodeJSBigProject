@@ -32,8 +32,8 @@ export class MailerService {
             from: process.env.MAILER_EMAIL,
             to: to,
             subject: 'Reset Password',
-            html: `<p> Here, your new password generated ${newPassword} (write it down somewhere), 
-            if you want to change your password, login to your account.</p>`,
+            html: `<p> Voici ton nouveau mot de passe générée ${newPassword} (enregistre le quelques part!!), 
+            Si tu veux changer ton mot de passe, tu pourra le faire depuis ton compte sur l'application mobile.</p>`,
         });
     }
 }

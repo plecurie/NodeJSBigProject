@@ -156,27 +156,25 @@ export class ProductsService {
     protected classify(value: any): number {
         switch (value.toLowerCase()) {
             case 'low':
+            case'low risk':
+            case '1':
+            case 'yes':
                 return 1;
             case 'below average':
+            case 'medium risk':
                 return 2;
             case 'average':
+            case 'high risk':
                 return 3;
             case 'above average':
                 return 4;
             case 'high':
                 return 5;
-            case 'low risk':
-                return 1;
-            case 'medium risk':
-                return 2;
-            case 'high risk':
-                return 3;
-            case '1':
-                return 1;
             case '0':
+            case 'no':
                 return 0;
             default:
-                return parseInt(value, 10)
+                return +value;
         }
     }
 
