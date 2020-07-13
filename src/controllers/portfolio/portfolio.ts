@@ -67,10 +67,10 @@ export class PortfolioController {
                 }
             }).then(async (response) => {
                 const hits = response.body.hits.hits[0];
-                const products = [
-                    ...await portfolioService.handleProducts(hits._source.products),
-                    ...isinCodes
-                ];
+                const oldProductsId = await portfolioService.handleProducts(hits._source.products);
+                if (isinCodes.some(code => oldProductsId.includes(code)))
+                    return res.status(409).json({reason: 'Isin code already on portfolio'});
+                const products = [...oldProductsId, ...isinCodes];
                 const mappedProducts = [...new Set(products)].map(isincode => ({ isincode }));
                 await portfolioService.update(hits._id, mappedProducts);
                 return res.sendStatus(200);
