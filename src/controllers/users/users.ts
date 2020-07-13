@@ -18,7 +18,7 @@ export class UsersController {
                 res.status(200).json({found: true, user: data.body._source});
             })
         } catch (err) {
-            res.status(500).json({reason: 'server error'});
+            res.status(401).json({reason: 'Unauthorized'});
         }
     }
 

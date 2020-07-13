@@ -107,11 +107,11 @@ export class AuthController {
                     next();
                 });
             } catch (err) {
-                res.status(500).json({reason: 'server error'})
+                res.status(401).json({reason: 'server error'})
             }
 
         } else {
-            res.status(403).json({reason: 'access refused'});
+            res.status(401).json({reason: 'access refused'});
         }
     }
 
