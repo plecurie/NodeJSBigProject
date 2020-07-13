@@ -136,7 +136,18 @@ export class ProductsController {
         } catch (err) {
             res.status(500).json({reason: 'server error'});
         }
+    }
 
+    async findProductsByCriterias(req, res) {
+        const isinCodes = req.body.isincodes;
+        if (!isinCodes) return res.status(400).json({reason: 'bad request'});
+        if (!isinCodes.length) return res.status(200).json([]);
+        try {
+            const products = await productsService.findProductsByCriterias(isinCodes);
+            return res.status(200).json(products);
+        } catch (err) {
+            res.status(500).json({reason: 'server error'});
+        }
     }
 
 

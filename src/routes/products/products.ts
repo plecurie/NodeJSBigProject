@@ -1,31 +1,20 @@
 import * as express from 'express';
-import {Request, Response} from 'express';
 import {productsController} from '../../controllers'
 
 export const router = express.Router({
     strict: true
 });
 
-router.post('/_updatedb', (req: Request, res: Response) => {
-    productsController.update_db(req, res)
-});
+router.post('/_updatedb', productsController.update_db);
 
-router.get('/suggest/:input', function (req, res, next) {
-    productsController.suggest(req, res)
-});
+router.get('/suggest/:input', productsController.suggest);
 
-router.post('/', (req: Request, res: Response) => {
-    productsController.findAll(req, res)
-});
+router.post('/', productsController.findAll);
 
-router.get('/:isincode', (req: Request, res: Response) => {
-    productsController.findOne(req, res)
-});
+router.get('/:isincode', productsController.findOne);
 
-router.post('/list', (req: Request, res: Response) => {
-    productsController.findProductsList(req, res)
-});
+router.post('/list', productsController.findProductsList);
 
-router.post('/search', (req, res) => {
-    productsController.search(req, res);
-});
+router.post('/filteredList', productsController.findProductsByCriterias);
+
+router.post('/search', productsController.search);

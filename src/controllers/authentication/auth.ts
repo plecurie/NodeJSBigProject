@@ -19,7 +19,7 @@ export class AuthController {
             const userExist = await authService.findByEmail({email: user.email})
                 .then(su => su.body.hits.hits.find(u => u._source !== undefined && u._source.email === user.email));
 
-            if (userExist) return res.status(403).json({created: false, reason: "email already exists"});  
+            if (userExist) return res.status(403).json({created: false, reason: "email already exists"});
             const mdpCrypted = await generatorService.hashPassword(user.password);
             const createdUser =  await client.index({
                 index: 'scala',
@@ -36,6 +36,7 @@ export class AuthController {
             }
             return res.status(500).json({created: false})
         } catch (err) {
+            console.log(err);
             res.status(500).json({created: false, reason: 'server error'});
         }
 
