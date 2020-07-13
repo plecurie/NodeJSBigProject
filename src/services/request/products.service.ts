@@ -152,41 +152,37 @@ export class ProductsService {
         return products;
     }
 
-    public async findProductsByCriterias(isinCodes: Array<string>) {
-        const codesToMatches = isinCodes.map(isincode => ({match: {isincode}}));
-        const productsCodesToMatches = isinCodes.map(isincode => ({match: {"products.isincode": isincode}}));
+    public async findProductsByCriterias() {
         const {body: {hits: {hits}}} = await client.search({
+            size: 10000,
             index: index,
             type: type,
             body: {
-                query: {
-                    bool: {
-                        should: [
-                            ...codesToMatches,
-                            {
-                                nested: {
-                                    path: "products",
-                                    query: {
-                                        bool: {
-                                            should: productsCodesToMatches
-                                        }
-                                    }
-                                }
+                query : {
+                    nested : {
+                        path :  "criteria",
+                        query :  {
+                            bool : {
+                                must : [
+                                    { match : { "criteria.familyName" : "Other Category" } },
+                                    { match : { "criteria.name" : "sustainableInvestmentOverall" } },
+                                ],
+                                must_not: [
+                                    { match : { "criteria.value" : 0 } }
+                                ]
                             }
-                        ]
+                        }
                     }
                 }
             }
         });
-
-        if (hits.length === 0) throw  "No products found";
+        console.log(hits.length);
         const [contracts, products] = hits.reduce(([contracts, product], hit) => {
             const {contract_name: name, euro_fees, uc_fees, type, products} = hit._source;
             if (type == 'contract') contracts.push({name, euro_fees, uc_fees, products});
             else if (type == 'product') product.push(hit);
             return [contracts, product];
         }, [[], []]);
-        if (products.length === 0) throw "No products returned";
         products.forEach(product => {
             const isinCode = product._source.isincode;
             product._source.contracts = contracts.filter(({products}) =>
