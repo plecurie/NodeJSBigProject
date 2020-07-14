@@ -158,20 +158,42 @@ export class ProductsService {
             index: index,
             type: type,
             body: {
-                query : {
-                    nested : {
-                        path :  "criteria",
-                        query :  {
-                            bool : {
-                                must : [
-                                    { match : { "criteria.familyName" : "Other Category" } },
-                                    { match : { "criteria.name" : "sustainableInvestmentOverall" } },
-                                ],
-                                must_not: [
-                                    { match : { "criteria.value" : 0 } }
-                                ]
+                query: {
+                    bool: {
+                        must: [
+                            {
+                                nested: {
+                                    path: "criteria",
+                                    query: {
+                                        bool: {
+                                            must: [
+                                                { match : { "criteria.familyName" : "Other Category" } },
+                                                { match : { "criteria.name" : "sustainableInvestmentOverall" } },
+                                            ],
+                                            must_not: [
+                                                { match : { "criteria.value" : 0 } }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                nested: {
+                                    path: "criteria",
+                                    query: {
+                                        bool: {
+                                            must: [
+                                                { match : { "criteria.familyName" : "Environmental" } },
+                                                { match : { "criteria.name" : "sustainableInvestmentLowCarbonFossilFuelFree" } },
+                                            ],
+                                            must_not: [
+                                                { match : { "criteria.value" : 0 } }
+                                            ]
+                                        }
+                                    }
+                                }
                             }
-                        }
+                        ]
                     }
                 }
             }
