@@ -55,6 +55,9 @@ services:
       - ES_HOST=elasticsearch
       - NODE_PORT=3100
       - "ELASTICSEARCH_URL=http://elassandra:9200"
+      - JWT_KEY=U1i3f6eMx7cZViaS1IEeE95y5ApzFUs3
+      - MAILER_EMAIL=noreply.scala.app@gmail.com
+      - MAILER_PASS=smtxnlczftiptqnj
     ports:
       - "3100:3100"
     volumes:
