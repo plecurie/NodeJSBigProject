@@ -153,7 +153,7 @@ export class ProductsService {
     }
 
     public async countProductsByCriteria() {
-        const body = await client.search({
+        const {body: {aggregations: {count}}} = await client.search({
             index: index,
             type: type,
             body: {
@@ -182,8 +182,7 @@ export class ProductsService {
                 },
             }
         });
-        console.log(body.body.aggregations.count);
-        return [];
+        return count.meta.doc_count;
     }
 
 
