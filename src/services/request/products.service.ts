@@ -163,9 +163,9 @@ export class ProductsService {
                         nested: {
                             path: "criteria"
                         },
-                        "aggs": {
-                            "meta": {
-                                "filter" : {
+                        aggs: {
+                            meta: {
+                                filter : {
                                     bool : {
                                         must : [
                                             { term : { "criteria.familyName" : "Other Category" } },
