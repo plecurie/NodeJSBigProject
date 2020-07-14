@@ -63,6 +63,7 @@ deploy_staging:
     - job: compile
       artifacts: true
     - job: dockerize
+    - job: unittest
   before_script:
     - 'which ssh-agent || ( apk add openssh-client )'
     - 'which sshpass || ( apk add sshpass )'
