@@ -153,36 +153,43 @@ export class ProductsService {
     }
 
     public async countProductsByCriteria() {
-        const {body: {aggregations: {count}}} = await client.search({
+        const {body: {hits: {hits}}} = await client.search({
+            size: 10000,
             index: index,
             type: type,
             body: {
-                size: 0,
-                aggs: {
-                    count: {
-                        nested: {
-                            path: "criteria"
-                        },
-                        aggs: {
-                            meta: {
-                                filter : {
-                                    bool : {
-                                        must : [
-                                            { term : { "criteria.familyName" : "Other Category" } },
-                                            { term : { "criteria.name" : "sustainableInvestmentOverall" } },
-                                        ],
-                                        must_not: [
-                                            { term : { "criteria.value" : 0 } }
-                                        ]
-                                    }
-                                },
+                query : {
+                    nested : {
+                        path :  "criteria",
+                        query :  {
+                            bool : {
+                                must : [
+                                    { match : { "criteria.familyName" : "Other Category" } },
+                                    { match : { "criteria.name" : "sustainableInvestmentOverall" } },
+                                ],
+                                must_not: [
+                                    { match : { "criteria.value" : 0 } }
+                                ]
                             }
                         }
                     }
-                },
+                }
             }
         });
-        return count.meta.doc_count;
+        console.log(hits.length);
+        const [contracts, products] = hits.reduce(([contracts, product], hit) => {
+            const {contract_name: name, euro_fees, uc_fees, type, products} = hit._source;
+            if (type == 'contract') contracts.push({name, euro_fees, uc_fees, products});
+            else if (type == 'product') product.push(hit);
+            return [contracts, product];
+        }, [[], []]);
+        products.forEach(product => {
+            const isinCode = product._source.isincode;
+            product._source.contracts = contracts.filter(({products}) =>
+                products.some(({isincode}) => isincode == isinCode)
+            );
+        });
+        return products;
     }
 
 
