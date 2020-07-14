@@ -153,8 +153,8 @@ export class ProductsService {
     }
 
     public async countProductsByCriteria() {
-        const {body: {hits: {hits}}} = await client.search({
-            size: 10000,
+        const {body: {hits: {total}}} = await client.search({
+            size: 0,
             index: index,
             type: type,
             body: {
@@ -195,23 +195,10 @@ export class ProductsService {
                             }
                         ]
                     }
-                }
+                },
             }
         });
-        console.log(hits.length);
-        const [contracts, products] = hits.reduce(([contracts, product], hit) => {
-            const {contract_name: name, euro_fees, uc_fees, type, products} = hit._source;
-            if (type == 'contract') contracts.push({name, euro_fees, uc_fees, products});
-            else if (type == 'product') product.push(hit);
-            return [contracts, product];
-        }, [[], []]);
-        products.forEach(product => {
-            const isinCode = product._source.isincode;
-            product._source.contracts = contracts.filter(({products}) =>
-                products.some(({isincode}) => isincode == isinCode)
-            );
-        });
-        return products;
+        return total;
     }
 
 
