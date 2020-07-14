@@ -444,7 +444,7 @@ describe("Authentication Unit tests", () => {
 
                 expect(tokenStub.calledOnce).to.be.false;
                 expect(status.calledOnce).to.be.true;
-                expect(status.args[0][0]).to.equal(403);
+                expect(status.args[0][0]).to.equal(401);
                 expect(json.calledOnce).to.be.true;
                 expect(json.args[0][0].reason).to.equal('access refused');
                 expect(next.calledOnce).to.be.false;
