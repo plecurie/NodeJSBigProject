@@ -23,7 +23,7 @@ export class UsersController {
     }
 
     async update(req, res) {
-
+        
         const user: User = {
             email: req.body.newmail,
             password: req.body.password,
