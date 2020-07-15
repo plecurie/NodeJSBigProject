@@ -196,6 +196,7 @@ export class ProductsService {
         const societyPercentage = 25;
         const gouvernancePercentage = 50;
         const categories = {};
+
         products.forEach(({_source: { criteria, category, isincode, product_name }}) => {
             if(category) {
                 const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
@@ -228,6 +229,22 @@ export class ProductsService {
         });
         const ordonnedProducts = categories.sort(({note: a}, {note: b}) => b - a);
         return ordonnedProducts.map(({isincode}) => isincode);
+    }
+
+    // Handle scoring for question Q3A1 when response is C
+    //On applique la formule sur tous les fonds
+    //et on affichera uniquement ceux qui obtiennent un résultat supérieur à 0
+    public handleScoringProductsOnProgession(products) {
+        const funds = [];
+
+        products.forEach(({_source: { criteria, isincode }}) => {
+            const portfolioSustainabilityScore = criteria.find(({name}) => name === 'portfolioSustainabilityScore').value || 0;
+            const historicalSustainabilityScore = criteria.find(({name}) => name === 'historicalSustainabilityAbsoluteRankInGlobalCategory').value || 0;
+            const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
+            const note = ((100-portfolioSustainabilityScore)*percentOfAUMCoveredESG + 1)/(100-historicalSustainabilityScore)*percentOfAUMCoveredESG/100 + 1;
+            funds.push({ isincode, note });
+        });
+        return funds.filter(({note}) => note > 0).map(({isincode}) => isincode);
     }
 
 
