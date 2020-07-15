@@ -76,7 +76,6 @@ export class PortfolioController {
                 return res.sendStatus(200);
             })
         } catch (err) {
-            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }

@@ -36,7 +36,6 @@ export class AuthController {
             }
             return res.status(500).json({created: false})
         } catch (err) {
-            console.log(err);
             res.status(500).json({created: false, reason: 'server error'});
         }
 

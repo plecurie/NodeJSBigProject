@@ -147,7 +147,6 @@ export class ProductsController {
             const scoringProducts = productsService[scoringMethod](products, percentages);
             return res.status(200).json(scoringProducts);
         } catch (err) {
-            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
