@@ -152,48 +152,91 @@ export class ProductsService {
         return products;
     }
 
-    public async findProductsByCriterias(isinCodes: Array<string>) {
-        const codesToMatches = isinCodes.map(isincode => ({match: {isincode}}));
-        const productsCodesToMatches = isinCodes.map(isincode => ({match: {"products.isincode": isincode}}));
-        const {body: {hits: {hits}}} = await client.search({
+    public async getProductsByCriteria(allExclusions) {
+        const nestedCriterias = allExclusions.map(({familyName, name, value}) => ({
+            nested: {
+                path: "criteria",
+                query: {
+                    bool: {
+                        must: [
+                            { match : { "criteria.familyName" : familyName } },
+                            { match : { "criteria.name" : name } },
+                        ],
+                        must_not: [
+                            { match : { "criteria.value" : value } }
+                        ]
+                    }
+                }
+            }
+        }));
+        const {body: {hits : {hits}}} = await client.search({
+            size: 10000,
             index: index,
             type: type,
             body: {
                 query: {
                     bool: {
-                        should: [
-                            ...codesToMatches,
-                            {
-                                nested: {
-                                    path: "products",
-                                    query: {
-                                        bool: {
-                                            should: productsCodesToMatches
-                                        }
-                                    }
-                                }
-                            }
-                        ]
+                        must: nestedCriterias
                     }
-                }
+                },
             }
         });
-
-        if (hits.length === 0) throw  "No products found";
-        const [contracts, products] = hits.reduce(([contracts, product], hit) => {
-            const {contract_name: name, euro_fees, uc_fees, type, products} = hit._source;
-            if (type == 'contract') contracts.push({name, euro_fees, uc_fees, products});
-            else if (type == 'product') product.push(hit);
-            return [contracts, product];
-        }, [[], []]);
-        if (products.length === 0) throw "No products returned";
-        products.forEach(product => {
-            const isinCode = product._source.isincode;
-            product._source.contracts = contracts.filter(({products}) =>
-                products.some(({isincode}) => isincode == isinCode)
-            );
-        });
+        const products = hits.reduce((product, hit) => {
+            if (hit._source.type == 'product') product.push(hit);
+            return product;
+        }, []);
         return products;
+    }
+
+    // Handle scoring for question Q3A1 when response is A
+    // On prend celui qui a la meilleure note dans chaque catégorie.
+    // Les résultats seront classés par ordre alphabétique du nom du fonds.
+    public handleScoringProductsByCategories(products, {envPercentage, societyPercentage, gouvernancePercentage}) {
+        const categories = {};
+
+        products.forEach(({_source: { criteria, category, isincode, product_name }}) => {
+            if(category) {
+                const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
+                const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
+                const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
+                const note = ((envPercentage * (100 - portfolioEnvironmentalScore) + societyPercentage * (100 - portfolioSocialScore ) + gouvernancePercentage * (100 - portfolioEnvironmentalScore)) * percentOfAUMCoveredESG / 100 + 1);
+                if(!categories[category]) return categories[category] = { isincode, note, product_name };
+                else if(note > categories[category].note) return categories[category] = { isincode, note, product_name };
+            }
+        });
+        return Object.values(categories)
+            .sort(({product_name: a}, {product_name: b}) => a.localeCompare(b))
+            .map(({isincode}) => isincode)
+    }
+
+    // Handle scoring for question Q3A1 when response is B
+    // On applique simplement la formule sur tous les fonds, et on les classe par note à la fin
+    public handleScoringProductsOnUniverse(products, {envPercentage, societyPercentage, gouvernancePercentage}) {
+        const categories = [];
+        products.forEach(({_source: { criteria, isincode }}) => {
+            const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
+            const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
+            const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
+            const note = (envPercentage * (100-portfolioEnvironmentalScore)+societyPercentage*(100-portfolioSocialScore)+gouvernancePercentage*(100-portfolioEnvironmentalScore))*percentOfAUMCoveredESG/100 + 1;
+            categories.push({ isincode, note });
+        });
+        const ordonnedProducts = categories.sort(({note: a}, {note: b}) => b - a);
+        return ordonnedProducts.map(({isincode}) => isincode);
+    }
+
+    // Handle scoring for question Q3A1 when response is C
+    //On applique la formule sur tous les fonds
+    //et on affichera uniquement ceux qui obtiennent un résultat supérieur à 0
+    public handleScoringProductsOnProgression(products, percentages) {
+        const funds = [];
+        products.forEach(({_source: { criteria, isincode }}) => {
+            const portfolioSustainabilityScore = criteria.find(({name}) => name === 'portfolioSustainabilityScore').value || 0;
+            const historicalSustainabilityScore = criteria.find(({name}) => name === 'historicalSustainabilityAbsoluteRankInGlobalCategory').value || 0;
+            const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
+            const note = ((100-portfolioSustainabilityScore)*percentOfAUMCoveredESG + 1)/(100-historicalSustainabilityScore)*percentOfAUMCoveredESG/100 + 1;
+            funds.push({ isincode, note });
+        });
+        return funds.filter(({note}) => note > 0).map(({isincode}) => isincode);
     }
 
 
@@ -221,5 +264,4 @@ export class ProductsService {
                 return +value;
         }
     }
-
 }

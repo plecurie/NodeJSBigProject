@@ -138,14 +138,16 @@ export class ProductsController {
         }
     }
 
-    async findProductsByCriterias(req, res) {
-        const isinCodes = req.body.isincodes;
-        if (!isinCodes) return res.status(400).json({reason: 'bad request'});
-        if (!isinCodes.length) return res.status(200).json([]);
+    async getProductsByCriteria(req, res) {
         try {
-            const products = await productsService.findProductsByCriterias(isinCodes);
-            return res.status(200).json(products);
+            const { allExclusions, isScoring, percentages, scoringMethod } = req.body;
+            if(!allExclusions) return res.status(400).json({reason: 'No exclusions'});
+            const products = await productsService.getProductsByCriteria(allExclusions);
+            if(!isScoring) return res.status(200).json(products.map(({_source: { isincode }}) => isincode));
+            const scoringProducts = productsService[scoringMethod](products, percentages);
+            return res.status(200).json(scoringProducts);
         } catch (err) {
+            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
