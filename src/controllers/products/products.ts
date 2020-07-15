@@ -140,9 +140,9 @@ export class ProductsController {
 
     async getProductsByCriteria(req, res) {
         try {
-            const { allExclusions, isScoring, isincodes, percentages } = req.body;
+            const { allExclusions, isScoring, percentages } = req.body;
             if(!allExclusions) return res.status(400).json({reason: 'No exclusions'});
-            const products = await productsService.getProductsByCriteria(allExclusions, isincodes);
+            const products = await productsService.getProductsByCriteria(allExclusions);
             if(!isScoring) return res.status(200).json(products.map(({_source: { isincode }}) => isincode));
             const scoringProducts = productsService.handleScoringProductsOnProgession(products, percentages);
             return res.status(200).json(scoringProducts);

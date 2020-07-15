@@ -152,15 +152,12 @@ export class ProductsService {
         return products;
     }
 
-    public async getProductsByCriteria(allExclusions, isinCodes) {
-        console.log("isincodes", isinCodes.length);
-        const codesToMatches = isinCodes.map(isincode => ({match: {isincode}}));
+    public async getProductsByCriteria(allExclusions) {
         const nestedCriterias = allExclusions.map(({familyName, name, value}) => ({
             nested: {
                 path: "criteria",
                 query: {
                     bool: {
-                        should: codesToMatches,
                         must: [
                             { match : { "criteria.familyName" : familyName } },
                             { match : { "criteria.name" : name } },
@@ -188,7 +185,6 @@ export class ProductsService {
             if (hit._source.type == 'product') product.push(hit);
             return product;
         }, []);
-        console.log('procucts', products.length);
         return products;
     }
 
