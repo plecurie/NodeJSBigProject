@@ -191,19 +191,24 @@ export class ProductsService {
     // Handle scoring for question Q3A1 when response is A
     // On prend celui qui a la meilleure note dans chaque catégorie.
     // Les résultats seront classés par ordre alphabétique du nom du fonds.
-    public handleScoringProductsByCategories(products, envPercentage, societyPercentage, gouvernancePercentage) {
+    public handleScoringProductsByCategories(products) {
+        const envPercentage = 25;
+        const societyPercentage = 25;
+        const gouvernancePercentage = 50;
         const categories = {};
-        products.forEach(({_source: { criteria, category, isincode }}) => {
+        products.forEach(({_source: { criteria, category, isincode, product_name }}) => {
             if(category) {
                 const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
                 const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
                 const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
                 const note = ((envPercentage * (100 - portfolioEnvironmentalScore) + societyPercentage * (100 - portfolioSocialScore ) + gouvernancePercentage * (100 - portfolioEnvironmentalScore)) * percentOfAUMCoveredESG / 100 + 1);
                 if(!categories[category]) return categories[category] = { isincode, note };
-                else if(note > categories[category].note) return categories[category] = { isincode, note };
+                else if(note > categories[category].note) return categories[category] = { isincode, note, product_name };
             }
         });
         return categories;
+        //return categories.sort(({product_name: a}, {product_name: b}) => b - a);
+        return null;
     }
 
     // Handle scoring for question Q3A1 when response is B

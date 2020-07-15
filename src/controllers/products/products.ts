@@ -143,7 +143,7 @@ export class ProductsController {
             const { allExclusions } = req.body;
             if(!allExclusions) return res.status(400).json({reason: 'No exclusions'});
             const products = await productsService.getProductsByCriteria(allExclusions);
-            const scoringProducts =  productsService.handleScoringProductsOnUniverse(products);
+            const scoringProducts =  productsService.handleScoringProductsByCategories(products);
             return res.status(200).json(scoringProducts);
         } catch (err) {
             res.status(500).json({reason: 'server error'});
