@@ -152,32 +152,31 @@ export class ProductsService {
         return products;
     }
 
-    public async countProductsByCriteria() {
+    public async countProductsByCriteria(allExclusions) {
+        const nestedCriterias = allExclusions.map(({familyName, name, value}) => ({
+            nested: {
+                path: "criteria",
+                query: {
+                    bool: {
+                        must: [
+                            { match : { "criteria.familyName" : familyName } },
+                            { match : { "criteria.name" : name } },
+                        ],
+                        must_not: [
+                            { match : { "criteria.value" : value } }
+                        ]
+                    }
+                }
+            }
+        }));
         const {body: {hits: {total}}} = await client.search({
-            size: 0,
+            size: 1000,
             index: index,
             type: type,
             body: {
                 query: {
                     bool: {
-                        must: [
-                            {
-                                nested: {
-                                    path: "criteria",
-                                    query: {
-                                        bool: {
-                                            must: [
-                                                { match : { "criteria.familyName" : "Other Category" } },
-                                                { match : { "criteria.name" : "sustainableInvestmentOverall" } },
-                                            ],
-                                            must_not: [
-                                                { match : { "criteria.value" : 0 } }
-                                            ]
-                                        }
-                                    }
-                                }
-                            },
-                        ]
+                        must: nestedCriterias
                     }
                 },
             }

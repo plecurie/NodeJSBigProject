@@ -140,8 +140,9 @@ export class ProductsController {
 
     async countProductsByCriteria(req, res) {
         try {
-            console.log(req.body);
-            const products = await productsService.countProductsByCriteria();
+            const { allExclusions } = req.body;
+            if(!allExclusions) return res.status(400).json({reason: 'No exclusions'});
+            const products = await productsService.countProductsByCriteria(allExclusions);
             return res.status(200).json(products);
         } catch (err) {
             res.status(500).json({reason: 'server error'});
