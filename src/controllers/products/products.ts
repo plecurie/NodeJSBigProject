@@ -140,6 +140,7 @@ export class ProductsController {
 
     async countProductsByCriteria(req, res) {
         try {
+            console.log(req.body);
             const products = await productsService.countProductsByCriteria();
             return res.status(200).json(products);
         } catch (err) {

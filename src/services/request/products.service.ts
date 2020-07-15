@@ -177,22 +177,6 @@ export class ProductsService {
                                     }
                                 }
                             },
-                            {
-                                nested: {
-                                    path: "criteria",
-                                    query: {
-                                        bool: {
-                                            must: [
-                                                { match : { "criteria.familyName" : "Environmental" } },
-                                                { match : { "criteria.name" : "sustainableInvestmentLowCarbonFossilFuelFree" } },
-                                            ],
-                                            must_not: [
-                                                { match : { "criteria.value" : 0 } }
-                                            ]
-                                        }
-                                    }
-                                }
-                            }
                         ]
                     }
                 },
