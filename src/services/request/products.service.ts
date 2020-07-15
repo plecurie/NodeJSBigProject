@@ -152,7 +152,7 @@ export class ProductsService {
         return products;
     }
 
-    public async countProductsByCriteria(allExclusions) {
+    public async getProductsByCriteria(allExclusions) {
         const nestedCriterias = allExclusions.map(({familyName, name, value}) => ({
             nested: {
                 path: "criteria",
@@ -169,8 +169,8 @@ export class ProductsService {
                 }
             }
         }));
-        const {body: {hits: {total}}} = await client.search({
-            size: 1000,
+        const {body: {hits : {hits}}} = await client.search({
+            size: 10000,
             index: index,
             type: type,
             body: {
@@ -181,7 +181,32 @@ export class ProductsService {
                 },
             }
         });
-        return total;
+        const products = hits.reduce((product, hit) => {
+            if (hit._source.type == 'product') product.push(hit);
+            return product;
+        }, []);
+        return products;
+    }
+
+    // Handle scoring for question Q3A1
+    public handleScoringProducts(products) {
+        const envPercentage = 25;
+        const societyPercentage = 25;
+        const gouvernancePercentage = 50;
+        const categories = [];
+
+        products.forEach(({_source: { criteria, category, isincode }}) => {
+            if(category) {
+                const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
+                const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
+                const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
+                const formuleA = ((envPercentage * (100 - portfolioEnvironmentalScore) + societyPercentage * (100 - portfolioSocialScore ) + gouvernancePercentage * (100 - portfolioEnvironmentalScore)) * percentOfAUMCoveredESG / 100 + 1);
+                if(!categories[category]) return categories[category] = { isincode, note: formuleA };
+                else console.log("ts");
+            }
+        });
+        console.log(categories);
+        return null;
     }
 
 
@@ -209,5 +234,4 @@ export class ProductsService {
                 return +value;
         }
     }
-
 }
