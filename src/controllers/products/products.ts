@@ -128,12 +128,15 @@ export class ProductsController {
 
     async findProductsList(req, res) {
         const isinCodes = req.body.isincodes;
+        console.log(isinCodes);
         if (!isinCodes) return res.status(400).json({reason: 'bad request'});
         if (!isinCodes.length) return res.status(200).json([]);
         try {
             const products = await productsService.findProducts(isinCodes);
+            console.log(products);
             return res.status(200).json(products);
         } catch (err) {
+            console.log(err);
             res.status(500).json({reason: 'server error'});
         }
     }
