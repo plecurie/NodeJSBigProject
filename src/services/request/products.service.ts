@@ -152,12 +152,15 @@ export class ProductsService {
         return products;
     }
 
-    public async getProductsByCriteria(allExclusions) {
+    public async getProductsByCriteria(allExclusions, isinCodes) {
+        console.log("isincodes", isinCodes.length);
+        const codesToMatches = isinCodes.map(isincode => ({match: {isincode}}));
         const nestedCriterias = allExclusions.map(({familyName, name, value}) => ({
             nested: {
                 path: "criteria",
                 query: {
                     bool: {
+                        should: codesToMatches,
                         must: [
                             { match : { "criteria.familyName" : familyName } },
                             { match : { "criteria.name" : name } },
@@ -185,16 +188,14 @@ export class ProductsService {
             if (hit._source.type == 'product') product.push(hit);
             return product;
         }, []);
+        console.log('procucts', products.length);
         return products;
     }
 
     // Handle scoring for question Q3A1 when response is A
     // On prend celui qui a la meilleure note dans chaque catégorie.
     // Les résultats seront classés par ordre alphabétique du nom du fonds.
-    public handleScoringProductsByCategories(products) {
-        const envPercentage = 25;
-        const societyPercentage = 25;
-        const gouvernancePercentage = 50;
+    public handleScoringProductsByCategories(products, {envPercentage, societyPercentage, gouvernancePercentage}) {
         const categories = {};
 
         products.forEach(({_source: { criteria, category, isincode, product_name }}) => {
@@ -214,12 +215,8 @@ export class ProductsService {
 
     // Handle scoring for question Q3A1 when response is B
     // On applique simplement la formule sur tous les fonds, et on les classe par note à la fin
-    public handleScoringProductsOnUniverse(products) {
-        const envPercentage = 25;
-        const societyPercentage = 25;
-        const gouvernancePercentage = 50;
+    public handleScoringProductsOnUniverse(products, {envPercentage, societyPercentage, gouvernancePercentage}) {
         const categories = [];
-
         products.forEach(({_source: { criteria, isincode }}) => {
             const portfolioEnvironmentalScore = criteria.find(({name}) => name === 'portfolioEnvironmentalScore').value || 0;
             const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
@@ -234,9 +231,8 @@ export class ProductsService {
     // Handle scoring for question Q3A1 when response is C
     //On applique la formule sur tous les fonds
     //et on affichera uniquement ceux qui obtiennent un résultat supérieur à 0
-    public handleScoringProductsOnProgession(products) {
+    public handleScoringProductsOnProgession(products, percentages) {
         const funds = [];
-
         products.forEach(({_source: { criteria, isincode }}) => {
             const portfolioSustainabilityScore = criteria.find(({name}) => name === 'portfolioSustainabilityScore').value || 0;
             const historicalSustainabilityScore = criteria.find(({name}) => name === 'historicalSustainabilityAbsoluteRankInGlobalCategory').value || 0;
