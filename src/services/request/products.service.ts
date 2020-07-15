@@ -202,13 +202,13 @@ export class ProductsService {
                 const portfolioSocialScore = criteria.find(({name}) => name === 'portfolioSocialScore').value || 0;
                 const percentOfAUMCoveredESG = criteria.find(({name}) => name === 'percentOfAUMCoveredESG').value || 0;
                 const note = ((envPercentage * (100 - portfolioEnvironmentalScore) + societyPercentage * (100 - portfolioSocialScore ) + gouvernancePercentage * (100 - portfolioEnvironmentalScore)) * percentOfAUMCoveredESG / 100 + 1);
-                if(!categories[category]) return categories[category] = { isincode, note };
+                if(!categories[category]) return categories[category] = { isincode, note, product_name };
                 else if(note > categories[category].note) return categories[category] = { isincode, note, product_name };
             }
         });
-        return categories;
-        //return categories.sort(({product_name: a}, {product_name: b}) => b - a);
-        return null;
+        return Object.values(categories)
+            .sort(({product_name: a}, {product_name: b}) => a.localeCompare(b))
+            .map(({isincode}) => isincode)
     }
 
     // Handle scoring for question Q3A1 when response is B
