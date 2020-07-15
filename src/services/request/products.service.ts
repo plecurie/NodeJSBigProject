@@ -227,7 +227,7 @@ export class ProductsService {
     // Handle scoring for question Q3A1 when response is C
     //On applique la formule sur tous les fonds
     //et on affichera uniquement ceux qui obtiennent un résultat supérieur à 0
-    public handleScoringProductsOnProgession(products, percentages) {
+    public handleScoringProductsOnProgression(products, percentages) {
         const funds = [];
         products.forEach(({_source: { criteria, isincode }}) => {
             const portfolioSustainabilityScore = criteria.find(({name}) => name === 'portfolioSustainabilityScore').value || 0;
