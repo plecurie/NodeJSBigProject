@@ -28,7 +28,6 @@ export class MailerService {
     }
 
     public async sendEmail(to: string, newPassword: String) {
-        const lang = 'en';
         return await this.transporter.sendMail({
             from: process.env.MAILER_EMAIL,
             to: to,
