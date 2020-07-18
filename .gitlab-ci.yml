@@ -42,7 +42,7 @@ dockerize:
       artifacts: true
     - job: unittest
   before_script:
-    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - echo -n $CI_PROD_REGISTRY_PASSWORD | docker login -u $CI_PROD_REGISTRY_USER --password-stdin $CI_PROD_REGISTRY
   script:
     - docker build --pull -t $PRODUCTION_IMAGE .
     - docker push $PRODUCTION_IMAGE
@@ -69,18 +69,18 @@ deploy_staging:
     - chmod 600 ~/.ssh/id_rsa
     - eval "$(ssh-agent -s)"
     - ssh-add ~/.ssh/id_rsa
-    - ssh-keyscan -H $H_PRODUCTION >> ~/.ssh/known_hosts
+    - ssh-keyscan -H $H_PROD >> ~/.ssh/known_hosts
   script:
     - sshpass -V
     - export SSHPASS=$SSH_PASS
-    - sshpass -e ssh $U_PRODUCTION@$H_PRODUCTION "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
-    - sshpass -e ssh $U_PRODUCTION@$H_PRODUCTION "docker-compose down" || true
-    - sshpass -e ssh $U_PRODUCTION@$H_PRODUCTION "docker-compose pull nodejs" || true
-    - sshpass -e ssh $U_PRODUCTION@$H_PRODUCTION "docker-compose up -d" || true
+    - sshpass -e ssh $U_PROD@$H_PROD "docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
+    - sshpass -e ssh $U_PROD@$H_PROD "docker-compose down" || true
+    - sshpass -e ssh $U_PROD@$H_PROD "docker-compose pull nodejs" || true
+    - sshpass -e ssh $U_PROD@$H_PROD "docker-compose up -d" || true
     - rm -f ~/.ssh/id_rsa
     - 'echo Deploy done: $(date “+%F %H:%M:%S”)'
   environment:
     name: Production
-    url: http://$H_PRODUCTION:3100
+    url: http://$H_PROD:3100
   only:
     - master
